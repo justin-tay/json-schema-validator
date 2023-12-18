@@ -28,8 +28,9 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(PatternPropertiesValidator.class);
     private final Map<RegularExpression, JsonSchema> schemas = new IdentityHashMap<>();
 
-    public PatternPropertiesValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema,
-                                      ValidationContext validationContext) {
+    public PatternPropertiesValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
+            JsonSchema parentSchema, ValidationContext validationContext, Keyword keyword,
+            ErrorMessageType errorMessageType) {
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.PATTERN_PROPERTIES, validationContext);
         if (!schemaNode.isObject()) {
             throw new JsonSchemaException("patternProperties must be an object node");

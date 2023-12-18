@@ -27,7 +27,9 @@ public class DependenciesValidator extends BaseJsonValidator implements JsonVali
     private final Map<String, List<String>> propertyDeps = new HashMap<String, List<String>>();
     private final Map<String, JsonSchema> schemaDeps = new HashMap<String, JsonSchema>();
 
-    public DependenciesValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+    public DependenciesValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
+            JsonSchema parentSchema, ValidationContext validationContext, Keyword keyword,
+            ErrorMessageType errorMessageType) {
 
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.DEPENDENCIES, validationContext);
 

@@ -26,7 +26,9 @@ public class DependentSchemas extends BaseJsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(DependentSchemas.class);
     private final Map<String, JsonSchema> schemaDependencies = new HashMap<>();
 
-    public DependentSchemas(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+    public DependentSchemas(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
+            JsonSchema parentSchema, ValidationContext validationContext, Keyword keyword,
+            ErrorMessageType errorMessageType) {
 
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.DEPENDENT_SCHEMAS, validationContext);
 

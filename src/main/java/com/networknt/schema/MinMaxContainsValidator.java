@@ -17,8 +17,9 @@ import java.util.stream.Collectors;
 public class MinMaxContainsValidator extends BaseJsonValidator {
     private final Set<Analysis> analysis;
 
-    public MinMaxContainsValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema,
-            ValidationContext validationContext) {
+    public MinMaxContainsValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
+            JsonSchema parentSchema, ValidationContext validationContext, Keyword keyword,
+            ErrorMessageType errorMessageType) {
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.MAX_CONTAINS, validationContext);
 
         Set<Analysis> analysis = null;

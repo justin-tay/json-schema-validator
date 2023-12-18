@@ -32,7 +32,9 @@ public class UnionTypeValidator extends BaseJsonValidator implements JsonValidat
     private final String error;
 
 
-    public UnionTypeValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+    public UnionTypeValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
+            JsonSchema parentSchema, ValidationContext validationContext, Keyword keyword,
+            ErrorMessageType errorMessageType) {
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.UNION_TYPE, validationContext);
         this.validationContext = validationContext;
         StringBuilder errorBuilder = new StringBuilder();

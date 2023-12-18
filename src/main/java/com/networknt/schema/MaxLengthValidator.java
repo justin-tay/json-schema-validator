@@ -28,7 +28,9 @@ public class MaxLengthValidator extends BaseJsonValidator implements JsonValidat
 
     private int maxLength;
 
-    public MaxLengthValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+    public MaxLengthValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
+            JsonSchema parentSchema, ValidationContext validationContext, Keyword keyword,
+            ErrorMessageType errorMessageType) {
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.MAX_LENGTH, validationContext);
         maxLength = Integer.MAX_VALUE;
         if (schemaNode != null && schemaNode.canConvertToExactIntegral()) {

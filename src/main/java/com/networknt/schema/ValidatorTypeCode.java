@@ -28,7 +28,8 @@ import java.util.Map;
 @FunctionalInterface
 interface ValidatorFactory {
     JsonValidator newInstance(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
-            JsonSchema parentSchema, ValidationContext validationContext);
+            JsonSchema parentSchema, ValidationContext validationContext, Keyword keyword,
+            ErrorMessageType errorMessageType);
 }
 
 enum VersionCode {
@@ -162,7 +163,7 @@ public enum ValidatorTypeCode implements Keyword, ErrorMessageType {
             throw new UnsupportedOperationException("No suitable validator for " + getValue());
         }
         return validatorFactory.newInstance(schemaLocation.resolve(getValue()), evaluationPath.resolve(getValue()),
-                schemaNode, parentSchema, validationContext);
+                schemaNode, parentSchema, validationContext, keyword, errorMessageType);
     }
 
     @Override
