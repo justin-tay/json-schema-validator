@@ -82,6 +82,15 @@ public class ValidationContext {
     public SchemaValidatorsConfig getConfig() {
         if (this.config == null) {
             this.config = new SchemaValidatorsConfig();
+            if (this.metaSchema != null) {
+                // Set some defaults
+                if (this.metaSchema.getKeywords().get("unevaluatedItems") == null) {
+                    this.config.disableUnevaluatedItems();
+                }
+                if (this.metaSchema.getKeywords().get("unevaluatedProperties") == null) {
+                    this.config.disableUnevaluatedProperties();
+                }
+            }
         }
         return this.config;
     }
