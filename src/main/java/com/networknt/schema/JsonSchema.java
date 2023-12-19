@@ -404,6 +404,33 @@ public class JsonSchema extends BaseJsonValidator {
         return validate(createExecutionContext(), rootNode);
     }
 
+    /**
+     * Validates the given root JsonNode, starting at the root of the data path. The
+     * output will be formatted using the formatter specified.
+     * 
+     * @param <T>      the result type
+     * @param rootNode the root note
+     * @param format   the formatter
+     * @return the result
+     */
+    public <T> T validate(JsonNode rootNode, OutputFormat<T> format) {
+        return validate(rootNode, format, null);
+    }
+
+    /**
+     * Validates the given root JsonNode, starting at the root of the data path. The
+     * output will be formatted using the formatter specified.
+     * 
+     * @param <T>                 the result type
+     * @param rootNode            the root note
+     * @param format              the formatter
+     * @param executionCustomizer the execution customizer
+     * @return the result
+     */
+    public <T> T validate(JsonNode rootNode, OutputFormat<T> format, ExecutionCustomizer executionCustomizer) {
+        return validate(createExecutionContext(), rootNode, format, executionCustomizer);
+    }
+
     public ValidationResult validateAndCollect(ExecutionContext executionContext, JsonNode node) {
         return validateAndCollect(executionContext, node, node, atRoot());
     }
