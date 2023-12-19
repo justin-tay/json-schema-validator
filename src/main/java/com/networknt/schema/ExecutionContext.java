@@ -22,6 +22,7 @@ package com.networknt.schema;
 public class ExecutionContext {
     private ExecutionConfig executionConfig;
     private CollectorContext collectorContext;
+    private JsonNodeAnnotations annotations = new JsonNodeAnnotations();
 
     /**
      * Creates an execution context.
@@ -94,4 +95,9 @@ public class ExecutionContext {
     public void setExecutionConfig(ExecutionConfig executionConfig) {
         this.executionConfig = executionConfig;
     }
+
+    public JsonNodeAnnotations getAnnotations() {
+        return annotations;
+    }
+
 }

@@ -80,21 +80,61 @@ public class ItemsValidator extends BaseJsonValidator {
             // ignores non-arrays
             return Collections.emptySet();
         }
+
+        // Add items annotation
+        if (this.schema != null) {
+            // Applies to all
+            executionContext.getAnnotations()
+                    .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation)
+                            .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                            .keyword(getKeyword()).value(true).build());
+        } else if (this.tupleSchema != null) {
+            // Tuples
+            int items = node.isArray() ? node.size() : 1;
+            int schemas = this.tupleSchema.size();
+            if (items > schemas) {
+                // More items than schemas so the keyword only applied to the number of schemas
+                executionContext.getAnnotations()
+                        .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation)
+                                .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                                .keyword(getKeyword()).value(schemas).build());
+            } else {
+                // Applies to all
+                executionContext.getAnnotations()
+                        .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation)
+                                .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                                .keyword(getKeyword()).value(true).build());
+            }
+        }
+
+        boolean hasAdditionalItem = false;
         Set<ValidationMessage> errors = new LinkedHashSet<>();
         if (node.isArray()) {
             int i = 0;
             for (JsonNode n : node) {
-                doValidate(executionContext, errors, i, n, rootNode, instanceLocation);
+                if (doValidate(executionContext, errors, i, n, rootNode, instanceLocation)) {
+                    hasAdditionalItem = true;
+                }
                 i++;
             }
         } else {
-            doValidate(executionContext, errors, 0, node, rootNode, instanceLocation);
+            if (doValidate(executionContext, errors, 0, node, rootNode, instanceLocation)) {
+                hasAdditionalItem = true;
+            }
+        }
+
+        if (hasAdditionalItem) {
+            executionContext.getAnnotations()
+                    .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation)
+                            .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                            .keyword("additionalItems").value(true).build());
         }
         return errors.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(errors);
     }
 
-    private void doValidate(ExecutionContext executionContext, Set<ValidationMessage> errors, int i, JsonNode node,
+    private boolean doValidate(ExecutionContext executionContext, Set<ValidationMessage> errors, int i, JsonNode node,
             JsonNode rootNode, JsonNodePath instanceLocation) {
+        boolean isAdditionalItem = false;
         Collection<JsonNodePath> evaluatedItems = executionContext.getCollectorContext().getEvaluatedItems();
         JsonNodePath path = instanceLocation.resolve(i);
 
@@ -117,6 +157,10 @@ public class ItemsValidator extends BaseJsonValidator {
                     errors.addAll(results);
                 }
             } else {
+                if ((this.additionalItems != null && this.additionalItems) || this.additionalSchema != null) {
+                    isAdditionalItem = true;
+                }
+
                 if (this.additionalSchema != null) {
                     // validate against additional item schema
                     Set<ValidationMessage> results = this.additionalSchema.validate(executionContext, node, rootNode, path);
@@ -138,6 +182,7 @@ public class ItemsValidator extends BaseJsonValidator {
 //        } else {
 //            evaluatedItems.add(path);
         }
+        return isAdditionalItem;
     }
 
     @Override
