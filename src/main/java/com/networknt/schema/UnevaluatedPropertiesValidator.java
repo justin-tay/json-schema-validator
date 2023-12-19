@@ -17,10 +17,13 @@
 package com.networknt.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.annotation.JsonNodeAnnotation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
@@ -49,6 +52,105 @@ public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
 
         collectorContext.exitDynamicScope();
         try {
+            // Get all the valid adjacent annotations
+            Predicate<JsonNodeAnnotation> validEvaluationPathFilter = a -> {
+                for (JsonNodePath e : executionContext.getAssertions().asMap().keySet()) {
+                    if (e.getParent().startsWith(a.getEvaluationPath())
+                            || a.getEvaluationPath().startsWith(e.getParent())) {
+                        // Invalid
+                        return false;
+                    }
+                }
+                return true;
+            };
+
+            Predicate<JsonNodeAnnotation> adjacentEvaluationPathFilter = a -> a.getEvaluationPath()
+                    .startsWith(this.evaluationPath.getParent());
+
+            Map<String, Map<JsonNodePath, JsonNodeAnnotation>> instanceLocationAnnotations = executionContext
+                    .getAnnotations().asMap().getOrDefault(instanceLocation, Collections.emptyMap());
+
+            Set<String> evaluatedProperties = new LinkedHashSet<>(); // The properties that unevaluatedProperties schema
+            Set<String> existingEvaluatedProperties = new LinkedHashSet<>();
+            // Get all the "properties" for the instanceLocation
+            List<JsonNodeAnnotation> properties = instanceLocationAnnotations
+                    .getOrDefault("properties", Collections.emptyMap()).values().stream()
+                    .filter(adjacentEvaluationPathFilter).filter(validEvaluationPathFilter)
+                    .collect(Collectors.toList());
+            for (JsonNodeAnnotation annotation : properties) {
+                if (annotation.getValue() instanceof Set) {
+                    Set<String> p = annotation.getValue();
+                    existingEvaluatedProperties.addAll(p);
+                }
+            }
+
+            // Get all the "patternProperties" for the instanceLocation
+            List<JsonNodeAnnotation> patternProperties = instanceLocationAnnotations
+                    .getOrDefault("patternProperties", Collections.emptyMap()).values().stream()
+                    .filter(adjacentEvaluationPathFilter).filter(validEvaluationPathFilter)
+                    .collect(Collectors.toList());
+            for (JsonNodeAnnotation annotation : patternProperties) {
+                if (annotation.getValue() instanceof Set) {
+                    Set<String> p = annotation.getValue();
+                    existingEvaluatedProperties.addAll(p);
+                }
+            }
+
+            // Get all the "patternProperties" for the instanceLocation
+            List<JsonNodeAnnotation> additionalProperties = instanceLocationAnnotations
+                    .getOrDefault("additionalProperties", Collections.emptyMap()).values().stream()
+                    .filter(adjacentEvaluationPathFilter).filter(validEvaluationPathFilter)
+                    .collect(Collectors.toList());
+            for (JsonNodeAnnotation annotation : additionalProperties) {
+                if (annotation.getValue() instanceof Set) {
+                    Set<String> p = annotation.getValue();
+                    existingEvaluatedProperties.addAll(p);
+                }
+            }
+
+            // Get all the "unevaluatedProperties" for the instanceLocation
+            List<JsonNodeAnnotation> unevaluatedProperties = instanceLocationAnnotations
+                    .getOrDefault("unevaluatedProperties", Collections.emptyMap()).values().stream()
+                    .filter(adjacentEvaluationPathFilter).filter(validEvaluationPathFilter)
+                    .collect(Collectors.toList());
+            for (JsonNodeAnnotation annotation : unevaluatedProperties) {
+                if (annotation.getValue() instanceof Set) {
+                    Set<String> p = annotation.getValue();
+                    existingEvaluatedProperties.addAll(p);
+                }
+            }
+            
+            Set<ValidationMessage> messages = new LinkedHashSet<>();
+            for (Iterator<String> it = node.fieldNames(); it.hasNext();) {
+                String fieldName = it.next();
+                if (!existingEvaluatedProperties.contains(fieldName)) {
+                    evaluatedProperties.add(fieldName);
+                    if (this.schemaNode.isBoolean() && this.schemaNode.booleanValue() == false) {
+                        // All fails as "unevaluatedProperties: false"
+                        messages.add(message().instanceLocation(instanceLocation.resolve(fieldName))
+                                .locale(executionContext.getExecutionConfig().getLocale()).build());
+                    } else {
+                        messages.addAll(this.schema.validate(executionContext, node.get(fieldName), node,
+                                instanceLocation.resolve(fieldName)));
+                    }
+                }
+            }
+            if (!messages.isEmpty()) {
+                // Report these as unevaluated paths or not matching the unevaluatedProperties
+                // schema
+                messages = messages.stream()
+                        .map(m -> message().instanceLocation(m.getInstanceLocation())
+                                .locale(executionContext.getExecutionConfig().getLocale()).build())
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+            }
+            executionContext.getAnnotations()
+                    .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation)
+                            .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                            .keyword(getKeyword()).value(evaluatedProperties).build());
+
+            return messages == null || messages.isEmpty() ? Collections.emptySet() : messages;
+            
+            /**
             Set<JsonNodePath> allPaths = allPaths(node, instanceLocation);
 
             // Short-circuit since schema is 'true'
@@ -80,29 +182,30 @@ public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
             }
 
             return Collections.emptySet();
+            **/
         } finally {
             collectorContext.enterDynamicScope();
         }
     }
 
-    private Set<JsonNodePath> allPaths(JsonNode node, JsonNodePath instanceLocation) {
-        Set<JsonNodePath> collector = new LinkedHashSet<>();
-        node.fields().forEachRemaining(entry -> {
-            collector.add(instanceLocation.resolve(entry.getKey()));
-        });
-        return collector;
-    }
-
-    private Set<ValidationMessage> reportUnevaluatedPaths(Set<JsonNodePath> unevaluatedPaths, ExecutionContext executionContext) {
-        return unevaluatedPaths
-                .stream().map(path -> message().instanceLocation(path)
-                        .locale(executionContext.getExecutionConfig().getLocale()).build())
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
-    private static Set<JsonNodePath> unevaluatedPaths(CollectorContext collectorContext, Set<JsonNodePath> allPaths) {
-        Set<JsonNodePath> unevaluatedProperties = new LinkedHashSet<>(allPaths);
-        unevaluatedProperties.removeAll(collectorContext.getEvaluatedProperties());
-        return unevaluatedProperties;
-    }
+//    private Set<JsonNodePath> allPaths(JsonNode node, JsonNodePath instanceLocation) {
+//        Set<JsonNodePath> collector = new LinkedHashSet<>();
+//        node.fields().forEachRemaining(entry -> {
+//            collector.add(instanceLocation.resolve(entry.getKey()));
+//        });
+//        return collector;
+//    }
+//
+//    private Set<ValidationMessage> reportUnevaluatedPaths(Set<JsonNodePath> unevaluatedPaths, ExecutionContext executionContext) {
+//        return unevaluatedPaths
+//                .stream().map(path -> message().instanceLocation(path)
+//                        .locale(executionContext.getExecutionConfig().getLocale()).build())
+//                .collect(Collectors.toCollection(LinkedHashSet::new));
+//    }
+//
+//    private static Set<JsonNodePath> unevaluatedPaths(CollectorContext collectorContext, Set<JsonNodePath> allPaths) {
+//        Set<JsonNodePath> unevaluatedProperties = new LinkedHashSet<>(allPaths);
+//        unevaluatedProperties.removeAll(collectorContext.getEvaluatedProperties());
+//        return unevaluatedProperties;
+//    }
 }

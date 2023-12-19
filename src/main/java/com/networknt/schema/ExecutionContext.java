@@ -16,12 +16,17 @@
 
 package com.networknt.schema;
 
+import com.networknt.schema.annotation.JsonNodeAnnotations;
+import com.networknt.schema.assertion.JsonNodeAssertions;
+
 /**
  * Stores the execution context for the validation run.
  */
 public class ExecutionContext {
     private ExecutionConfig executionConfig;
     private CollectorContext collectorContext;
+    private JsonNodeAnnotations annotations = new JsonNodeAnnotations();
+    private JsonNodeAssertions assertions = new JsonNodeAssertions();
 
     /**
      * Creates an execution context.
@@ -94,4 +99,13 @@ public class ExecutionContext {
     public void setExecutionConfig(ExecutionConfig executionConfig) {
         this.executionConfig = executionConfig;
     }
+
+    public JsonNodeAnnotations getAnnotations() {
+        return annotations;
+    }
+
+    public JsonNodeAssertions getAssertions() {
+        return assertions;
+    }
+
 }

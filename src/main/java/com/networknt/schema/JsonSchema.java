@@ -342,20 +342,21 @@ public class JsonSchema extends BaseJsonValidator {
             Scope parentScope = collectorContext.enterDynamicScope(this);
             try {
                 results = v.validate(executionContext, jsonNode, rootNode, instanceLocation);
+                results.forEach(executionContext.getAssertions()::put);
             } finally {
                 Scope scope = collectorContext.exitDynamicScope();
                 if (results.isEmpty()) {
                     parentScope.mergeWith(scope);
                 } else {
                     errors.addAll(results);
-                    if (v instanceof PrefixItemsValidator || v instanceof ItemsValidator
-                            || v instanceof ItemsValidator202012 || v instanceof ContainsValidator) {
-                        collectorContext.getEvaluatedItems().addAll(scope.getEvaluatedItems());
-                    }
-                    if (v instanceof PropertiesValidator || v instanceof AdditionalPropertiesValidator
-                            || v instanceof PatternPropertiesValidator) {
-                        collectorContext.getEvaluatedProperties().addAll(scope.getEvaluatedProperties());
-                    }
+//                    if (v instanceof PrefixItemsValidator || v instanceof ItemsValidator
+//                            || v instanceof ItemsValidator202012 || v instanceof ContainsValidator) {
+//                        collectorContext.getEvaluatedItems().addAll(scope.getEvaluatedItems());
+//                    }
+//                    if (v instanceof PropertiesValidator || v instanceof AdditionalPropertiesValidator
+//                            || v instanceof PatternPropertiesValidator) {
+//                        collectorContext.getEvaluatedProperties().addAll(scope.getEvaluatedProperties());
+//                    }
                 }
 
             }
