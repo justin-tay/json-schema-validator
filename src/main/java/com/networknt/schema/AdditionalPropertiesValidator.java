@@ -71,11 +71,15 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
             return Collections.emptySet();
         }
 
+        Set<String> matchedInstancePropertyNames = new LinkedHashSet<>();
+
         CollectorContext collectorContext = executionContext.getCollectorContext();
         // if allowAdditionalProperties is true, add all the properties as evaluated.
         if (allowAdditionalProperties) {
-            for (Iterator<String> it = node.fieldNames(); it.hasNext(); ) {
-                collectorContext.getEvaluatedProperties().add(instanceLocation.resolve(it.next()));
+            for (Iterator<String> it = node.fieldNames(); it.hasNext();) {
+                String fieldName = it.next();
+                matchedInstancePropertyNames.add(fieldName);
+                collectorContext.getEvaluatedProperties().add(instanceLocation.resolve(fieldName));
             }
         }
 
@@ -126,6 +130,10 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
                 }
             }
         }
+        executionContext.getAnnotations()
+                .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation).evaluationPath(this.evaluationPath)
+                        .schemaLocation(this.schemaLocation).keyword(getKeyword()).value(matchedInstancePropertyNames)
+                        .build());
         return errors == null ? Collections.emptySet() : Collections.unmodifiableSet(errors);
     }
 

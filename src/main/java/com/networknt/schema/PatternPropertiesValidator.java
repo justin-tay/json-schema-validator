@@ -50,6 +50,7 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
             return Collections.emptySet();
         }
         Set<ValidationMessage> errors = null;
+        Set<String> matchedInstancePropertyNames = new LinkedHashSet<>();
         Iterator<String> names = node.fieldNames();
         while (names.hasNext()) {
             String name = names.next();
@@ -59,6 +60,7 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
                     JsonNodePath path = instanceLocation.resolve(name);
                     Set<ValidationMessage> results = entry.getValue().validate(executionContext, n, rootNode, path);
                     if (results.isEmpty()) {
+                        matchedInstancePropertyNames.add(name);
                         executionContext.getCollectorContext().getEvaluatedProperties().add(path);
                     } else {
                         if (errors == null) {
@@ -69,6 +71,10 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
                 }
             }
         }
+        executionContext.getAnnotations()
+                .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation).evaluationPath(this.evaluationPath)
+                        .schemaLocation(this.schemaLocation).keyword(getKeyword()).value(matchedInstancePropertyNames)
+                        .build());
         return errors == null ? Collections.emptySet() : Collections.unmodifiableSet(errors);
     }
 
