@@ -17,6 +17,8 @@
 package com.networknt.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.SpecVersion.VersionFlag;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,17 +26,23 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static com.networknt.schema.VersionCode.MinV202012;
+
 public class UnevaluatedItemsValidator extends BaseJsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(UnevaluatedItemsValidator.class);
 
     private final JsonSchema schema;
     private final boolean disabled;
 
+    private final boolean isMinV202012;
+    private static final VersionFlag DEFAULT_VERSION = VersionFlag.V201909;
+
     public UnevaluatedItemsValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
             JsonSchema parentSchema, ValidationContext validationContext) {
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.UNEVALUATED_ITEMS,
                 validationContext);
-
+        isMinV202012 = MinV202012.getVersions().contains(SpecVersionDetector
+                .detectOptionalVersion(validationContext.getMetaSchema().getUri()).orElse(DEFAULT_VERSION));
         this.disabled = validationContext.getConfig().isUnevaluatedItemsAnalysisDisabled();
         if (schemaNode.isObject() || schemaNode.isBoolean()) {
             this.schema = validationContext.newSchema(schemaLocation, evaluationPath, schemaNode, parentSchema);
@@ -54,6 +62,17 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
 
         collectorContext.exitDynamicScope();
         try {
+            String itemsKeyword = "items";
+            String additionalItemsKeyword = "additionalItems";
+            if (isMinV202012) {
+                /*
+                 * Keywords renamed in 2020-12
+                 * 
+                 * items -> prefixItems additionalItems -> items
+                 */
+                itemsKeyword = "prefixItems";
+                additionalItemsKeyword = "items";
+            }
 
             boolean valid = false;
             int validCount = 0;
@@ -61,6 +80,24 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
             // This indicates whether the "unevaluatedItems" subschema was used for
             // evaluated for setting the annotation
             boolean evaluated = false;
+            
+            // Get all the valid adjacent annotations
+            Predicate<JsonNodeAnnotation> validEvaluationPathFilter = a -> {
+                for (JsonNodePath e : executionContext.getAssertions().asMap().keySet()) {
+                    if (e.getParent().startsWith(a.getEvaluationPath())
+                            || a.getEvaluationPath().startsWith(e.getParent())) {
+                        // Invalid
+                        return false;
+                    }
+                }
+                return true;
+            };
+
+            Predicate<JsonNodeAnnotation> adjacentEvaluationPathFilter = a -> a.getEvaluationPath()
+                    .startsWith(this.evaluationPath.getParent());
+
+            Map<String, Map<JsonNodePath, JsonNodeAnnotation>> instanceLocationAnnotations = executionContext
+                    .getAnnotations().asMap().getOrDefault(instanceLocation, Collections.emptyMap());
 
             // If schema is "unevaluatedItems: true" this is valid
             if (getSchemaNode().isBoolean() && getSchemaNode().booleanValue()) {
@@ -71,26 +108,9 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
                     evaluated = true;
                 }
             } else {
-                // Get all the valid adjacent annotations
-                Predicate<JsonNodeAnnotation> validEvaluationPathFilter = a -> {
-                    for (JsonNodePath e : executionContext.getAssertions().asMap().keySet()) {
-                        if (e.startsWith(a.getEvaluationPath()) || a.getEvaluationPath().startsWith(e)) {
-                            // Invalid
-                            return false;
-                        }
-                    }
-                    return true;
-                };
-                
-                Predicate<JsonNodeAnnotation> adjacentEvaluationPathFilter = a -> a.getEvaluationPath()
-                        .startsWith(this.evaluationPath.getParent());
-
-                Map<String, Map<JsonNodePath, JsonNodeAnnotation>> instanceLocationAnnotations = executionContext
-                        .getAnnotations().asMap().getOrDefault(instanceLocation, Collections.emptyMap());
-
                 // Get all the "items" for the instanceLocation
                 List<JsonNodeAnnotation> items = instanceLocationAnnotations
-                        .getOrDefault("items", Collections.emptyMap()).values().stream()
+                        .getOrDefault(itemsKeyword, Collections.emptyMap()).values().stream()
                         .filter(adjacentEvaluationPathFilter)
                         .filter(validEvaluationPathFilter)
                         .collect(Collectors.toList());
@@ -114,24 +134,25 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
                             valid = true;
                         }
                     }
-                    if (!valid) {
-                        // Check the additionalItems annotation
-                        // If the "additionalItems" subschema is applied to any positions within the
-                        // instance array, it produces an annotation result of boolean true, analogous
-                        // to the single schema behavior of "items". If any "additionalItems" keyword
-                        // from any subschema applied to the same instance location produces an
-                        // annotation value of true, then the combined result from these keywords is
-                        // also true.
-                        List<JsonNodeAnnotation> additionalItems = instanceLocationAnnotations
-                                .getOrDefault("additionalItems", Collections.emptyMap()).values().stream()
-                                .filter(a -> a.getEvaluationPath().startsWith(this.evaluationPath.getParent()))
-                                .collect(Collectors.toList());
-                        for (JsonNodeAnnotation annotation : additionalItems) {
-                            if (annotation.getValue() instanceof Boolean
-                                    && Boolean.TRUE.equals(annotation.getValue())) {
-                                // The annotation "additionalItems: true"
-                                valid = true;
-                            }
+                }
+                if (!valid) {
+                    // Check the additionalItems annotation
+                    // If the "additionalItems" subschema is applied to any positions within the
+                    // instance array, it produces an annotation result of boolean true, analogous
+                    // to the single schema behavior of "items". If any "additionalItems" keyword
+                    // from any subschema applied to the same instance location produces an
+                    // annotation value of true, then the combined result from these keywords is
+                    // also true.
+                    List<JsonNodeAnnotation> additionalItems = instanceLocationAnnotations
+                            .getOrDefault(additionalItemsKeyword, Collections.emptyMap()).values().stream()
+                            .filter(adjacentEvaluationPathFilter)
+                            .filter(validEvaluationPathFilter)
+                            .collect(Collectors.toList());
+                    for (JsonNodeAnnotation annotation : additionalItems) {
+                        if (annotation.getValue() instanceof Boolean
+                                && Boolean.TRUE.equals(annotation.getValue())) {
+                            // The annotation "additionalItems: true"
+                            valid = true;
                         }
                     }
                 }
@@ -140,7 +161,8 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
                     // Check if there are any "unevaluatedItems" annotations
                     List<JsonNodeAnnotation> unevaluatedItems = instanceLocationAnnotations
                             .getOrDefault("unevaluatedItems", Collections.emptyMap()).values().stream()
-                            .filter(a -> a.getEvaluationPath().startsWith(this.evaluationPath.getParent()))
+                            .filter(adjacentEvaluationPathFilter)
+                            .filter(validEvaluationPathFilter)
                             .collect(Collectors.toList());
                     for (JsonNodeAnnotation annotation : unevaluatedItems) {
                         if (annotation.getValue() instanceof Boolean && Boolean.TRUE.equals(annotation.getValue())) {
@@ -152,15 +174,34 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
             }
             Set<ValidationMessage> messages = null;
             if (!valid) {
-                if (node.size() > 0) {
-                    evaluated = true;
+                // Get all the "contains" for the instanceLocation
+                List<JsonNodeAnnotation> contains = instanceLocationAnnotations
+                        .getOrDefault("contains", Collections.emptyMap()).values().stream()
+                        .filter(adjacentEvaluationPathFilter)
+                        .collect(Collectors.toList());
+                
+                Set<Integer> containsEvaluated = new HashSet<>();
+                boolean containsEvaluatedAll = false;
+                for (JsonNodeAnnotation a : contains) {
+                    if (a.getValue() instanceof List) {
+                        List<Integer> values = a.getValue();
+                        containsEvaluated.addAll(values);
+                    } else if (a.getValue() instanceof Boolean) {
+                        containsEvaluatedAll = true;
+                    }
                 }
+                
                 messages = new LinkedHashSet<>();
-                // Start evaluating from the valid count
-                for (int x = validCount; x < node.size(); x++) {
-                    // The schema is either "false" or an object schema
-                    messages.addAll(
-                            this.schema.validate(executionContext, node.get(x), node, instanceLocation.resolve(x)));
+                if (!containsEvaluatedAll) {
+                    // Start evaluating from the valid count
+                    for (int x = validCount; x < node.size(); x++) {
+                        // The schema is either "false" or an object schema
+                        if (!containsEvaluated.contains(x)) {
+                            messages.addAll(this.schema.validate(executionContext, node.get(x), node,
+                                    instanceLocation.resolve(x)));
+                            evaluated = true;
+                        }
+                    }
                 }
                 if (messages.isEmpty()) {
                     valid = true;

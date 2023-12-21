@@ -71,6 +71,24 @@ public class PrefixItemsValidator extends BaseJsonValidator {
                     errors.addAll(results);
                 }
             }
+
+            // Add annotation
+            // Tuples
+            int items = node.isArray() ? node.size() : 1;
+            int schemas = this.tupleSchema.size();
+            if (items > schemas) {
+                // More items than schemas so the keyword only applied to the number of schemas
+                executionContext.getAnnotations()
+                        .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation)
+                                .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                                .keyword(getKeyword()).value(schemas).build());
+            } else {
+                // Applies to all
+                executionContext.getAnnotations()
+                        .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation)
+                                .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                                .keyword(getKeyword()).value(true).build());
+            }
             return errors.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(errors);
         } else {
             return Collections.emptySet();
