@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class UnevaluatedItemsValidator extends BaseJsonValidator {
@@ -70,14 +71,28 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
                     evaluated = true;
                 }
             } else {
-                // Get all the "items" for the instanceLocation
+                // Get all the valid adjacent annotations
+                Predicate<JsonNodeAnnotation> validEvaluationPathFilter = a -> {
+                    for (JsonNodePath e : executionContext.getAssertions().asMap().keySet()) {
+                        if (e.startsWith(a.getEvaluationPath()) || a.getEvaluationPath().startsWith(e)) {
+                            // Invalid
+                            return false;
+                        }
+                    }
+                    return true;
+                };
+                
+                Predicate<JsonNodeAnnotation> adjacentEvaluationPathFilter = a -> a.getEvaluationPath()
+                        .startsWith(this.evaluationPath.getParent());
 
                 Map<String, Map<JsonNodePath, JsonNodeAnnotation>> instanceLocationAnnotations = executionContext
                         .getAnnotations().asMap().getOrDefault(instanceLocation, Collections.emptyMap());
-                
+
+                // Get all the "items" for the instanceLocation
                 List<JsonNodeAnnotation> items = instanceLocationAnnotations
                         .getOrDefault("items", Collections.emptyMap()).values().stream()
-                        .filter(a -> a.getEvaluationPath().startsWith(this.evaluationPath.getParent()))
+                        .filter(adjacentEvaluationPathFilter)
+                        .filter(validEvaluationPathFilter)
                         .collect(Collectors.toList());
                 if (items.isEmpty()) {
                     // The "items" wasn't applied meaning it is unevaluated if there is content

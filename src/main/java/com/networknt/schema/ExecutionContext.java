@@ -23,6 +23,7 @@ public class ExecutionContext {
     private ExecutionConfig executionConfig;
     private CollectorContext collectorContext;
     private JsonNodeAnnotations annotations = new JsonNodeAnnotations();
+    private JsonNodeAssertions assertions = new JsonNodeAssertions();
 
     /**
      * Creates an execution context.
@@ -98,6 +99,10 @@ public class ExecutionContext {
 
     public JsonNodeAnnotations getAnnotations() {
         return annotations;
+    }
+
+    public JsonNodeAssertions getAssertions() {
+        return assertions;
     }
 
 }

@@ -342,6 +342,7 @@ public class JsonSchema extends BaseJsonValidator {
             Scope parentScope = collectorContext.enterDynamicScope(this);
             try {
                 results = v.validate(executionContext, jsonNode, rootNode, instanceLocation);
+                results.forEach(executionContext.getAssertions()::put);
             } finally {
                 Scope scope = collectorContext.exitDynamicScope();
                 if (results.isEmpty()) {
