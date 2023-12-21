@@ -349,14 +349,14 @@ public class JsonSchema extends BaseJsonValidator {
                     parentScope.mergeWith(scope);
                 } else {
                     errors.addAll(results);
-                    if (v instanceof PrefixItemsValidator || v instanceof ItemsValidator
-                            || v instanceof ItemsValidator202012 || v instanceof ContainsValidator) {
-                        collectorContext.getEvaluatedItems().addAll(scope.getEvaluatedItems());
-                    }
-                    if (v instanceof PropertiesValidator || v instanceof AdditionalPropertiesValidator
-                            || v instanceof PatternPropertiesValidator) {
-                        collectorContext.getEvaluatedProperties().addAll(scope.getEvaluatedProperties());
-                    }
+//                    if (v instanceof PrefixItemsValidator || v instanceof ItemsValidator
+//                            || v instanceof ItemsValidator202012 || v instanceof ContainsValidator) {
+//                        collectorContext.getEvaluatedItems().addAll(scope.getEvaluatedItems());
+//                    }
+//                    if (v instanceof PropertiesValidator || v instanceof AdditionalPropertiesValidator
+//                            || v instanceof PatternPropertiesValidator) {
+//                        collectorContext.getEvaluatedProperties().addAll(scope.getEvaluatedProperties());
+//                    }
                 }
 
             }

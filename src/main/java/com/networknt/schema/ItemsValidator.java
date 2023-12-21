@@ -135,7 +135,7 @@ public class ItemsValidator extends BaseJsonValidator {
     private boolean doValidate(ExecutionContext executionContext, Set<ValidationMessage> errors, int i, JsonNode node,
             JsonNode rootNode, JsonNodePath instanceLocation) {
         boolean isAdditionalItem = false;
-        Collection<JsonNodePath> evaluatedItems = executionContext.getCollectorContext().getEvaluatedItems();
+//        Collection<JsonNodePath> evaluatedItems = executionContext.getCollectorContext().getEvaluatedItems();
         JsonNodePath path = instanceLocation.resolve(i);
 
         if (this.schema != null) {
@@ -143,7 +143,7 @@ public class ItemsValidator extends BaseJsonValidator {
             // schema)
             Set<ValidationMessage> results = this.schema.validate(executionContext, node, rootNode, path);
             if (results.isEmpty()) {
-                evaluatedItems.add(path);
+//                evaluatedItems.add(path);
             } else {
                 errors.addAll(results);
             }
@@ -152,7 +152,7 @@ public class ItemsValidator extends BaseJsonValidator {
                 // validate against tuple schema
                 Set<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
                 if (results.isEmpty()) {
-                    evaluatedItems.add(path);
+//                    evaluatedItems.add(path);
                 } else {
                     errors.addAll(results);
                 }
@@ -165,13 +165,13 @@ public class ItemsValidator extends BaseJsonValidator {
                     // validate against additional item schema
                     Set<ValidationMessage> results = this.additionalSchema.validate(executionContext, node, rootNode, path);
                     if (results.isEmpty()) {
-                        evaluatedItems.add(path);
+//                        evaluatedItems.add(path);
                     } else {
                         errors.addAll(results);
                     }
                 } else if (this.additionalItems != null) {
                     if (this.additionalItems) {
-                        evaluatedItems.add(path);
+//                        evaluatedItems.add(path);
                     } else {
                         // no additional item allowed, return error
                         errors.add(message().instanceLocation(path)

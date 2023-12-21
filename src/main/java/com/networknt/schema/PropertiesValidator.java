@@ -59,7 +59,7 @@ public class PropertiesValidator extends BaseJsonValidator {
             JsonNode propertyNode = node.get(entry.getKey());
             if (propertyNode != null) {
                 JsonNodePath path = instanceLocation.resolve(entry.getKey());
-                collectorContext.getEvaluatedProperties().add(path); // TODO: This should happen after validation
+//                collectorContext.getEvaluatedProperties().add(path); // TODO: This should happen after validation
                 matchedInstancePropertyNames.add(entry.getKey());
                 // check whether this is a complex validator. save the state
                 boolean isComplex = state.isComplexValidator();

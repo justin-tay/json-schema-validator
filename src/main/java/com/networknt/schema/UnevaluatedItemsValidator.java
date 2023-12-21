@@ -270,28 +270,28 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
         }
     }
 
-    private Set<JsonNodePath> allPaths(JsonNode node, JsonNodePath instanceLocation) {
-        Set<JsonNodePath> collector = new LinkedHashSet<>();
-        int size = node.size();
-        for (int i = 0; i < size; ++i) {
-            JsonNodePath path = instanceLocation.resolve(i);
-            collector.add(path);
-        }
-        return collector;
-    }
-
-    private Set<ValidationMessage> reportUnevaluatedPaths(Set<JsonNodePath> unevaluatedPaths,
-            ExecutionContext executionContext) {
-        return unevaluatedPaths
-                .stream().map(path -> message().instanceLocation(path)
-                        .locale(executionContext.getExecutionConfig().getLocale()).build())
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
-    private static Set<JsonNodePath> unevaluatedPaths(CollectorContext collectorContext, Set<JsonNodePath> allPaths) {
-        Set<JsonNodePath> unevaluatedProperties = new HashSet<>(allPaths);
-        unevaluatedProperties.removeAll(collectorContext.getEvaluatedItems());
-        return unevaluatedProperties;
-    }
+//    private Set<JsonNodePath> allPaths(JsonNode node, JsonNodePath instanceLocation) {
+//        Set<JsonNodePath> collector = new LinkedHashSet<>();
+//        int size = node.size();
+//        for (int i = 0; i < size; ++i) {
+//            JsonNodePath path = instanceLocation.resolve(i);
+//            collector.add(path);
+//        }
+//        return collector;
+//    }
+//
+//    private Set<ValidationMessage> reportUnevaluatedPaths(Set<JsonNodePath> unevaluatedPaths,
+//            ExecutionContext executionContext) {
+//        return unevaluatedPaths
+//                .stream().map(path -> message().instanceLocation(path)
+//                        .locale(executionContext.getExecutionConfig().getLocale()).build())
+//                .collect(Collectors.toCollection(LinkedHashSet::new));
+//    }
+//
+//    private static Set<JsonNodePath> unevaluatedPaths(CollectorContext collectorContext, Set<JsonNodePath> allPaths) {
+//        Set<JsonNodePath> unevaluatedProperties = new HashSet<>(allPaths);
+//        unevaluatedProperties.removeAll(collectorContext.getEvaluatedItems());
+//        return unevaluatedProperties;
+//    }
 
 }

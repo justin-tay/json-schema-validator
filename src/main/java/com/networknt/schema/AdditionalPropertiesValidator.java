@@ -79,7 +79,7 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
             for (Iterator<String> it = node.fieldNames(); it.hasNext();) {
                 String fieldName = it.next();
                 matchedInstancePropertyNames.add(fieldName);
-                collectorContext.getEvaluatedProperties().add(instanceLocation.resolve(fieldName));
+//                collectorContext.getEvaluatedProperties().add(instanceLocation.resolve(fieldName));
             }
         }
 

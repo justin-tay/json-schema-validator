@@ -75,13 +75,13 @@ public class ContainsValidator extends BaseJsonValidator {
         int actual = 0, i = 0;
         List<Integer> indexes = new ArrayList<>(); // for the annotation
         if (null != this.schema && node.isArray()) {
-            Collection<JsonNodePath> evaluatedItems = executionContext.getCollectorContext().getEvaluatedItems();
+//            Collection<JsonNodePath> evaluatedItems = executionContext.getCollectorContext().getEvaluatedItems();
 
             for (JsonNode n : node) {
                 JsonNodePath path = instanceLocation.resolve(i);
                 if (this.schema.validate(executionContext, n, rootNode, path).isEmpty()) {
                     ++actual;
-                    evaluatedItems.add(path);
+//                    evaluatedItems.add(path);
                     indexes.add(i);
                 }
                 ++i;
