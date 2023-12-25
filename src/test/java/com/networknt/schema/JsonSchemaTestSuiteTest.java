@@ -21,11 +21,11 @@ class JsonSchemaTestSuiteTest extends AbstractJsonSchemaTestSuite {
     public JsonSchemaTestSuiteTest() {
         this.disabled = new HashMap<>();
 
-        disableV202012Tests();
-        disableV201909Tests();
-        disableV7Tests();
-        disableV6Tests();
-        disableV4Tests();
+//        disableV202012Tests();
+//        disableV201909Tests();
+//        disableV7Tests();
+//        disableV6Tests();
+//        disableV4Tests();
     }
 
     @TestFactory
