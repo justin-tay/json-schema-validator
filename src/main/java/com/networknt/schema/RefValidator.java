@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.*;
+import java.util.function.Supplier;
 
 public class RefValidator extends BaseJsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(RefValidator.class);
@@ -55,7 +56,7 @@ public class RefValidator extends BaseJsonValidator {
         // The evaluationPath is used to derive the keywordLocation
         final String refValueOriginal = refValue;
 
-        JsonSchema parent = parentSchema;
+        Supplier<JsonSchema> parent = () -> parentSchema;
         if (!refValue.startsWith(REF_CURRENT)) {
             // This will be the uri extracted from the refValue (this may be a relative or absolute uri).
             final String refUri;
@@ -68,7 +69,7 @@ public class RefValidator extends BaseJsonValidator {
 
             // This will determine the correct absolute uri for the refUri. This decision will take into
             // account the current uri of the parent schema.
-            URI schemaUri = determineSchemaUri(validationContext.getURIFactory(), parent, refUri);
+            URI schemaUri = determineSchemaUri(validationContext.getURIFactory(), parent.get(), refUri);
             if (schemaUri == null) {
                 // the URNFactory is optional
                 if (validationContext.getURNFactory() == null) {
@@ -87,25 +88,34 @@ public class RefValidator extends BaseJsonValidator {
                 }
             }
 
+            URI schemaUriFinal = schemaUri;
             // This should retrieve schemas regardless of the protocol that is in the uri.
-            parent = validationContext.getJsonSchemaFactory().getSchema(schemaUri, validationContext.getConfig());
-
+            parent = new CachedSupplier<>(() -> {
+                JsonSchema schemaResource = validationContext.getSchemaResources().get(schemaUriFinal.toString());
+                if (schemaResource != null) {
+                    return schemaResource;
+                }
+                return validationContext.getJsonSchemaFactory().getSchema(schemaUriFinal, validationContext.getConfig())
+                        .findAncestor();
+            });
             if (index < 0) {
-                return new JsonSchemaRef(parent.findAncestor());
+                return new JsonSchemaRef(parent);
             }
             refValue = refValue.substring(index);
         }
         if (refValue.equals(REF_CURRENT)) {
-            return new JsonSchemaRef(parent.findAncestor());
+            Supplier<JsonSchema> supplier = parent;
+            return new JsonSchemaRef(() -> supplier.get().findAncestor());
         }
         return getJsonSchemaRef(parent, validationContext, refValue, refValueOriginal, evaluationPath);
     }
 
-    private static JsonSchemaRef getJsonSchemaRef(JsonSchema parent,
+    private static JsonSchemaRef getJsonSchemaRef(Supplier<JsonSchema> parentSupplier,
                                                   ValidationContext validationContext,
                                                   String refValue,
                                                   String refValueOriginal,
                                                   JsonNodePath evaluationPath) {
+        JsonSchema parent = parentSupplier.get();
         JsonNode node = parent.getRefSchemaNode(refValue);
         if (node != null) {
             JsonSchemaRef ref = validationContext.getReferenceParsingInProgress(refValueOriginal);
@@ -127,7 +137,7 @@ public class RefValidator extends BaseJsonValidator {
                     path = UriReference.get(refValue); 
                 }
                 final JsonSchema schema = validationContext.newSchema(path, evaluationPath, node, parent);
-                ref = new JsonSchemaRef(schema);
+                ref = new JsonSchemaRef(() -> schema);
                 validationContext.setReferenceParsingInProgress(refValueOriginal, ref);
             }
             return ref;
@@ -137,7 +147,9 @@ public class RefValidator extends BaseJsonValidator {
 
     private static URI determineSchemaUri(final URIFactory uriFactory, final JsonSchema parentSchema, final String refUri) {
         URI schemaUri;
-        final URI currentUri = parentSchema.getCurrentUri();
+        // $ref prevents a sibling $id from changing the base uri
+        JsonSchema parent = parentSchema.getParentSchema(); // just the parentSchema is the sibling $id with this $ref
+        final URI currentUri = parent != null ? parent.getCurrentUri() : parentSchema.getCurrentUri();
         try {
             if (currentUri == null) {
                 schemaUri = uriFactory.create(refUri);
@@ -221,6 +233,14 @@ public class RefValidator extends BaseJsonValidator {
 
     @Override
     public void preloadJsonSchema() {
-        this.schema.getSchema().initializeValidators();
+        JsonSchema jsonSchema = null;
+        try {
+            jsonSchema = this.schema.getSchema();
+        } catch (JsonSchemaException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new JsonSchemaException(e);
+        }
+        jsonSchema.initializeValidators();
     }
 }

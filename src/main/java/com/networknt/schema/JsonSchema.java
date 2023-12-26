@@ -77,6 +77,20 @@ public class JsonSchema extends BaseJsonValidator {
         if (uriRefersToSubschema(currentUri, schemaLocation)) {
             updateThisAsSubschema(currentUri);
         }
+        String idKeyword = this.validationContext.getMetaSchema().getIdKeyword();
+        if (idKeyword != null) {
+            JsonNode definitionsNode = schemaNode.get("definitions");
+            if (definitionsNode != null) {
+                readSchemaResources(idKeyword, "definitions", definitionsNode,
+                        this.schemaLocation.resolve("definitions"), this.evaluationPath.resolve("definitions"));
+            }
+            definitionsNode = schemaNode.get("$defs");
+            if (definitionsNode != null) {
+                readSchemaResources(idKeyword, "$defs", definitionsNode, this.schemaLocation.resolve("$defs"),
+                        this.evaluationPath.resolve("$defs"));
+            }
+        }
+
         if (validationContext.getConfig() != null) {
             this.keywordWalkListenerRunner = new DefaultKeywordWalkListenerRunner(this.validationContext.getConfig().getKeywordWalkListenersMap());
             if (validationContext.getConfig().isOpenAPI3StyleDiscriminators()) {
@@ -119,7 +133,7 @@ public class JsonSchema extends BaseJsonValidator {
     }
 
     private static boolean isUriFragmentWithNoContext(URI currentUri, String id) {
-        return id.startsWith("#") && currentUri == null;
+        return id.startsWith("#") && (currentUri == null || currentUri.toString().startsWith("#"));
     }
 
     private static boolean uriRefersToSubschema(URI originalUri, JsonNodePath schemaLocation) {
@@ -216,6 +230,39 @@ public class JsonSchema extends BaseJsonValidator {
         }
         return null;
     }
+
+    private void readSchemaResources(String idKeyword, String definitionsKeyword, JsonNode schemaNode,
+            JsonNodePath schemaLocation, JsonNodePath evaluationPath) {
+        JsonNode idNode = schemaNode.get(idKeyword);
+        if (idNode != null && idNode.isTextual()) {
+            // This is a schema resource
+            // $id inside an unknown keyword is not a read identifier
+            if (definitionsKeyword.equals(evaluationPath.getElement(evaluationPath.getNameCount() - 2))) {
+                String id = idNode.asText();
+                URI uri = null;
+                if (id.contains(":")) {
+                    uri = URI.create(id);
+                } else {
+                    uri = this.currentUri;
+                    if (uri == null) {
+                        uri = URI.create("");
+                    }
+                    uri = uri.resolve(id);
+                }
+                JsonSchema resource = new JsonSchema(validationContext, schemaLocation, evaluationPath, uri, schemaNode,
+                        this, true);
+                this.validationContext.getSchemaResources().put(uri.toString(), resource);
+            }
+        }
+
+        Iterator<String> pnames = schemaNode.fieldNames();
+        while (pnames.hasNext()) {
+            String pname = pnames.next();
+            JsonNode nodeToUse = schemaNode.get(pname);
+            readSchemaResources(idKeyword, definitionsKeyword, nodeToUse, schemaLocation.resolve(pname), evaluationPath.resolve(pname));
+        }
+    }
+
 
     /**
      * Please note that the key in {@link #validators} map is the evaluation path.
