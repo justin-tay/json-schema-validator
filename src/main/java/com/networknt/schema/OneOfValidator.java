@@ -36,6 +36,11 @@ public class OneOfValidator extends BaseJsonValidator {
             JsonNode childNode = schemaNode.get(i);
             this.schemas.add(validationContext.newSchema( schemaLocation.resolve(i), evaluationPath.resolve(i), childNode, parentSchema));
         }
+        for (JsonSchema schema : this.schemas) {
+            // Load the validators to parse the schema so that schema resources with $id can
+            // be identified
+            schema.getValidators();
+        }
     }
 
     @Override
