@@ -667,7 +667,7 @@
                 "foo": {"$ref": "urn:uuid:deadbeef-1234-ffff-ffff-4321feebdaed"}
             }
         },
-        "disabled": true,
+        "disabled": false,
         "reason": "Schema resources are currently unsupported. See #503",
         "tests": [
             {
@@ -793,7 +793,7 @@
                 "bar": {"type": "string"}
             }
         },
-        "disabled": true,
+        "disabled": false,
         "reason": "Schema resources are currently unsupported. See #503",
         "tests": [
             {

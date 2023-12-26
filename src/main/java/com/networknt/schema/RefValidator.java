@@ -82,7 +82,7 @@ public class RefValidator extends BaseJsonValidator {
                 }
             } else if (URN_SCHEME.equals(schemaUri.getScheme())) {
                 // Try to resolve URN schema as a JsonSchemaRef to some sub-schema of the parent
-                JsonSchemaRef ref = getJsonSchemaRef(parent, validationContext, schemaUri.toString(), refValueOriginal, evaluationPath);
+                JsonSchemaRef ref = getJsonSchemaRef(parent, validationContext, refValue, refValueOriginal, evaluationPath);
                 if (ref != null) {
                     return ref;
                 }

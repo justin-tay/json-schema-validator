@@ -183,8 +183,12 @@ public class JsonSchema extends BaseJsonValidator {
         JsonNode node = schema.getSchemaNode();
 
         String jsonPointer = ref;
+        if (schema.getId() != null && ref.startsWith(schema.getId())) {
+            String refValue = ref.substring(schema.getId().length());
+            jsonPointer = refValue;
+        }
         if (jsonPointer.startsWith("#/")) {
-            jsonPointer = ref.substring(1);
+            jsonPointer = jsonPointer.substring(1);
         }
 
         if (jsonPointer.startsWith("/")) {
