@@ -122,7 +122,7 @@ public class RefValidator extends BaseJsonValidator {
             if (ref == null) {
                 JsonNodePath path = null;
                 if (refValue.startsWith(REF_CURRENT)) {
-                    // relative
+                    // relative to document
                     path = parent.schemaLocation;
                     // get base
                     while (!path.getName(-1).contains(REF_CURRENT)) {
@@ -132,9 +132,17 @@ public class RefValidator extends BaseJsonValidator {
                     for (int x = 1; x < parts.length; x++) {
                         path = path.resolve(parts[x]);
                     }
-                } else {
+                } else if(refValue.contains(":")) {
                     // absolute
                     path = UriReference.get(refValue); 
+                } else {
+                    // relative to lexical root
+                    String id = parent.findLexicalRoot().getId();
+                    path = UriReference.get(id);
+                    String[] parts = refValue.split("/");
+                    for (int x = 1; x < parts.length; x++) {
+                        path = path.resolve(parts[x]);
+                    }
                 }
                 final JsonSchema schema = validationContext.newSchema(path, evaluationPath, node, parent);
                 ref = new JsonSchemaRef(() -> schema);
