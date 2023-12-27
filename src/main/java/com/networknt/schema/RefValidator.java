@@ -118,14 +118,13 @@ public class RefValidator extends BaseJsonValidator {
         JsonSchema parent = parentSupplier.get();
         JsonNode node = parent.getRefSchemaNode(refValue);
         if (node != null) {
-            JsonSchemaRef ref = validationContext.getReferenceParsingInProgress(refValueOriginal);
-            if (ref == null) {
+            return validationContext.getSchemaReferences().computeIfAbsent(refValueOriginal, key -> {
                 JsonNodePath path = null;
                 if (refValue.startsWith(REF_CURRENT)) {
                     // relative to document
                     path = parent.schemaLocation;
                     // get base
-                    while (!path.getName(-1).contains(REF_CURRENT)) {
+                    while (path.getNameCount() > 0 && !path.getName(-1).contains(REF_CURRENT)) {
                         path = path.getParent();
                     }
                     String[] parts = refValue.split("/");
@@ -145,10 +144,8 @@ public class RefValidator extends BaseJsonValidator {
                     }
                 }
                 final JsonSchema schema = validationContext.newSchema(path, evaluationPath, node, parent);
-                ref = new JsonSchemaRef(() -> schema);
-                validationContext.setReferenceParsingInProgress(refValueOriginal, ref);
-            }
-            return ref;
+                return new JsonSchemaRef(() -> schema);
+            });
         }
         return null;
     }
