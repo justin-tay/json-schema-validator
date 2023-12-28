@@ -101,6 +101,34 @@ public class JsonSchema extends BaseJsonValidator {
         }
     }
 
+    private JsonSchema(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
+            JsonSchema parentSchema, ErrorMessageType errorMessageType, Keyword keyword,
+            ValidationContext validationContext, boolean suppressSubSchemaRetrieval) {
+        super(schemaLocation, evaluationPath, schemaNode, parentSchema, null, null, validationContext,
+                suppressSubSchemaRetrieval);
+        this.validationContext = validationContext;
+        this.metaSchema = validationContext.getMetaSchema();
+        this.id = validationContext.resolveSchemaId(this.schemaNode);
+    }
+
+    /**
+     * Creates a schema using the current one as a template with the parent as the
+     * ref.
+     * <p>
+     * This is typically used if this schema is a schema resource that can be
+     * pointed to by various references.
+     *
+     * @param refParent         the parent ref
+     * @param refEvaluationPath the ref evaluation path
+     * @return the schema
+     */
+    public JsonSchema fromRef(JsonSchema refParent, JsonNodePath refEvaluationPath) {
+        JsonSchema copy = new JsonSchema(this.schemaLocation, refEvaluationPath, this.schemaNode, refParent, null, null, this.validationContext, this.suppressSubSchemaRetrieval);
+        copy.currentUri = this.currentUri;
+        copy.keywordWalkListenerRunner = this.keywordWalkListenerRunner;
+        return copy;
+    }
+
     public JsonSchema createChildSchema(JsonNodePath schemaLocation, JsonNode schemaNode) {
         return getValidationContext().newSchema(schemaLocation, evaluationPath, schemaNode, this);
     }
