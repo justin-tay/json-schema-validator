@@ -117,15 +117,42 @@ public class RefValidator extends BaseJsonValidator {
                                                   JsonNodePath evaluationPath) {
         JsonSchema parent = parentSupplier.get();
         JsonNode node = parent.getRefSchemaNode(refValue);
+
         if (node != null) {
             return validationContext.getSchemaReferences().computeIfAbsent(refValueOriginal, key -> {
                 JsonNodePath path = null;
+                JsonSchema currentParent = parent;
                 if (refValue.startsWith(REF_CURRENT)) {
                     // relative to document
                     path = parent.schemaLocation;
                     // get base
                     while (path.getNameCount() > 0 && !path.getName(-1).contains(REF_CURRENT)) {
                         path = path.getParent();
+                    }
+                    // Attempt to get subschema node
+                    String[] refParts = refValue.split("/");
+                    if (refParts.length > 2) {
+                        String[] subschemaParts = Arrays.copyOf(refParts, refParts.length - 2);
+                        JsonNode subschemaNode = parent.getRefSchemaNode(String.join("/", subschemaParts));
+                        String id = validationContext.resolveSchemaId(subschemaNode);
+                        if (id != null) {
+                            if (id.contains(":")) {
+                                // absolute
+                                JsonSchema subschema = validationContext.getSchemaResources().get(id);
+                                if (subschema != null) {
+                                    currentParent = subschema;
+                                }
+                                path = UriReference.get(id + "#");
+                            } else {
+                                // relative
+                                JsonSchema subschema = validationContext.getSchemaResources()
+                                        .get(path.getParent().resolve(id).toString());
+                                if (subschema != null) {
+                                    currentParent = subschema;
+                                }
+                                path = path.getParent().resolve(id + "#");
+                            }
+                        }
                     }
                     String[] parts = refValue.split("/");
                     for (int x = 1; x < parts.length; x++) {
@@ -143,7 +170,7 @@ public class RefValidator extends BaseJsonValidator {
                         path = path.resolve(parts[x]);
                     }
                 }
-                final JsonSchema schema = validationContext.newSchema(path, evaluationPath, node, parent);
+                final JsonSchema schema = validationContext.newSchema(path, evaluationPath, node, currentParent);
                 return new JsonSchemaRef(() -> schema);
             });
         }
