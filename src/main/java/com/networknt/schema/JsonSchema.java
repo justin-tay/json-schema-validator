@@ -101,14 +101,22 @@ public class JsonSchema extends BaseJsonValidator {
         }
     }
 
-    private JsonSchema(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
-            JsonSchema parentSchema, ErrorMessageType errorMessageType, Keyword keyword,
-            ValidationContext validationContext, boolean suppressSubSchemaRetrieval) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, null, null, validationContext,
-                suppressSubSchemaRetrieval);
-        this.validationContext = validationContext;
-        this.metaSchema = validationContext.getMetaSchema();
-        this.id = validationContext.resolveSchemaId(this.schemaNode);
+    /**
+     * Copy constructor.
+     * 
+     * @param copy to copy from
+     */
+    protected JsonSchema(JsonSchema copy) {
+        super(copy);
+        this.validators = copy.validators;
+        this.metaSchema = copy.metaSchema;
+        this.validatorsLoaded = copy.validatorsLoaded;
+        this.dynamicAnchor = copy.dynamicAnchor;
+        this.currentUri = copy.currentUri;
+        this.requiredValidator = copy.requiredValidator;
+        this.typeValidator = copy.typeValidator;
+        this.keywordWalkListenerRunner = copy.keywordWalkListenerRunner;
+        this.id = copy.id;
     }
 
     /**
@@ -123,9 +131,14 @@ public class JsonSchema extends BaseJsonValidator {
      * @return the schema
      */
     public JsonSchema fromRef(JsonSchema refParent, JsonNodePath refEvaluationPath) {
-        JsonSchema copy = new JsonSchema(this.schemaLocation, refEvaluationPath, this.schemaNode, refParent, null, null, this.validationContext, this.suppressSubSchemaRetrieval);
-        copy.currentUri = this.currentUri;
-        copy.keywordWalkListenerRunner = this.keywordWalkListenerRunner;
+        JsonSchema copy = new JsonSchema(this);
+        copy.evaluationPath = refEvaluationPath;
+        copy.parentSchema = refParent;
+        // Validator state is reset due to the changes in evaluation path
+        copy.validatorsLoaded = false;
+        copy.requiredValidator = null;
+        copy.typeValidator = null;
+        copy.validators = null;
         return copy;
     }
 
