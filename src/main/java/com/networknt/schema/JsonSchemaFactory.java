@@ -483,7 +483,7 @@ public class JsonSchemaFactory {
                 JsonNodePath schemaLocation = UriReference.get(schemaLocationValue);
                 final ValidationContext validationContext = createValidationContext(schemaNode);
                 validationContext.setConfig(config);
-                jsonSchema = doCreate(validationContext, UriReference.DOCUMENT, evaluationPath, mappedUri, schemaNode, null, false);
+                jsonSchema = doCreate(validationContext, schemaLocation, evaluationPath, mappedUri, schemaNode, null, false);
             }
             return jsonSchema;
         } catch (IOException e) {
