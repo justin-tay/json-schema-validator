@@ -219,7 +219,8 @@ public abstract class BaseJsonValidator extends ValidationMessageHandler impleme
         while (explicitMappings.hasNext()) {
             final Map.Entry<String, JsonNode> candidateExplicitMapping = explicitMappings.next();
             if (candidateExplicitMapping.getKey().equals(discriminatorPropertyValue)
-                    && schema.schemaLocation.toString().equals(candidateExplicitMapping.getValue().asText())) {
+                    && DiscriminatorContext.getFragment(schema.schemaLocation.toString())
+                            .equals(candidateExplicitMapping.getValue().asText())) {
                 currentDiscriminatorContext.markMatch();
                 break;
             }
@@ -231,7 +232,8 @@ public abstract class BaseJsonValidator extends ValidationMessageHandler impleme
         final Iterator<Map.Entry<String, JsonNode>> explicitMappings = discriminatorMapping.fields();
         while (explicitMappings.hasNext()) {
             final Map.Entry<String, JsonNode> candidateExplicitMapping = explicitMappings.next();
-            if (candidateExplicitMapping.getValue().asText().equals(parentSchema.schemaLocation.toString())) {
+            if (candidateExplicitMapping.getValue().asText()
+                    .equals(DiscriminatorContext.getFragment(parentSchema.schemaLocation.toString()))) {
                 return false;
             }
         }

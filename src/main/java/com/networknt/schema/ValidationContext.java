@@ -146,11 +146,15 @@ public class ValidationContext {
         private boolean discriminatorMatchFound = false;
 
         public void registerDiscriminator(final String schemaLocation, final ObjectNode discriminator) {
-            this.discriminators.put(schemaLocation, discriminator);
+            this.discriminators.put(DiscriminatorContext.getFragment(schemaLocation), discriminator);
         }
 
         public ObjectNode getDiscriminatorForPath(final String schemaLocation) {
-            return this.discriminators.get(schemaLocation);
+            return this.discriminators.get(DiscriminatorContext.getFragment(schemaLocation));
+        }
+
+        public static String getFragment(String schemaLocation) {
+            return schemaLocation.substring(schemaLocation.indexOf('#'), schemaLocation.length());
         }
 
         public void markMatch() {
