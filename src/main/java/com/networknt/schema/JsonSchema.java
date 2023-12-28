@@ -179,7 +179,7 @@ public class JsonSchema extends BaseJsonValidator {
     private static boolean uriRefersToSubschema(URI originalUri, JsonNodePath schemaLocation) {
         return originalUri != null
             && StringUtils.isNotBlank(originalUri.getRawFragment())  // Original currentUri parameter has a fragment, so it refers to a subschema
-            && (UriReference.DOCUMENT.equals(schemaLocation) || schemaLocation.getNameCount() == 0); // We aren't already in a subschema
+            && (UriReference.DOCUMENT.equals(schemaLocation) || schemaLocation.getNameCount() == 0 || schemaLocation.getName(-1).endsWith("#")); // We aren't already in a subschema
     }
 
     /**
