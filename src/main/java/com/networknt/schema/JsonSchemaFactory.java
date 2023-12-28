@@ -330,11 +330,15 @@ public class JsonSchemaFactory {
         return doCreate(validationContext, getSchemaLocation(schemaNode, validationContext),
                 new JsonNodePath(validationContext.getConfig().getPathType()), schemaUri, schemaNode, null, false);
     }
-    
-    public JsonSchema create(ValidationContext validationContext, JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema) {
+
+    public JsonSchema create(ValidationContext validationContext, JsonNodePath schemaLocation, JsonNodePath evaluationPath, URI currentUri, JsonNode schemaNode, JsonSchema parentSchema) {
         return doCreate(validationContext,
                 null == schemaLocation ? getSchemaLocation(schemaNode, validationContext) : schemaLocation,
-                evaluationPath, parentSchema.getCurrentUri(), schemaNode, parentSchema, false);
+                evaluationPath, currentUri, schemaNode, parentSchema, false);
+    }
+
+    public JsonSchema create(ValidationContext validationContext, JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema) {
+        return create(validationContext, schemaLocation, evaluationPath, parentSchema.getCurrentUri(), schemaNode, parentSchema);
     }
 
     private JsonSchema doCreate(ValidationContext validationContext, JsonNodePath schemaLocation, JsonNodePath evaluationPath, URI currentUri, JsonNode schemaNode, JsonSchema parentSchema, boolean suppressSubSchemaRetrieval) {
