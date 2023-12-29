@@ -57,4 +57,33 @@ class UriReferenceTest {
         assertEquals("schema#", uriReference.getName(1));
         assertEquals(2, uriReference.getNameCount());
     }
+
+    @Test
+    void basePath() {
+        JsonNodePath path = UriReference.get("http://json-schema.org/schema");
+        JsonNodePath base = UriReference.getBase(path);
+        assertEquals(base, path);
+    }
+    
+    @Test
+    void basePathFragment() {
+        JsonNodePath path = UriReference.get("http://json-schema.org/schema#");
+        JsonNodePath base = UriReference.getBase(path);
+        assertEquals(base, path);
+    }
+    
+    @Test
+    void basePathIndexFragment() {
+        JsonNodePath path = UriReference.get("http://json-schema.org/schema/#");
+        JsonNodePath base = UriReference.getBase(path);
+        assertEquals(base, path);
+    }
+    
+    @Test
+    void basePathIndex() {
+        JsonNodePath path = UriReference.get("http://json-schema.org/schema/");
+        JsonNodePath base = UriReference.getBase(path);
+        assertEquals(base, path);
+    }
+
 }

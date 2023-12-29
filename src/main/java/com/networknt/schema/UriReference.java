@@ -15,6 +15,8 @@
  */
 package com.networknt.schema;
 
+import java.net.URI;
+
 public class UriReference {
     public static final JsonNodePath ROOT = new JsonNodePath(PathType.URI_REFERENCE);
 
@@ -57,6 +59,44 @@ public class UriReference {
                 path = path.resolve(values[x]);
             }
         }
+        if (uriReference.endsWith("/")) {
+            path = path.resolve("");
+        }
         return path;
+    }
+    
+    public static String resolve(URI currentUri, String refValue) {
+        String uri = currentUri.resolve(refValue).toString();
+        if (refValue.equals(uri) && !refValue.contains(":")) {
+            // This means resolve didn't work as the path is in the scheme specific part
+            String baseUri = currentUri.toString();
+            if (refValue.startsWith("#")) {
+                uri = baseUri + refValue;
+            } else {
+                int slash = baseUri.lastIndexOf("/");
+                if (slash != -1) {
+                    baseUri = baseUri.substring(0, baseUri.lastIndexOf("/"));
+                    uri = baseUri + refValue;
+                } else {
+                    if (!refValue.startsWith("/")) {
+                        uri = baseUri + "/" + refValue;
+                    } else {
+                        uri = baseUri + refValue;
+                    }
+                }
+            }
+        }
+        return uri;
+    }
+
+    public static JsonNodePath getBase(JsonNodePath schemaLocation) {
+        JsonNodePath base = schemaLocation;
+        while (base.getNameCount() > 0 && !base.getName(-1).contains("#")) {
+            base = base.getParent();
+        }
+        if (base.getNameCount() == 0 || !base.getName(-1).contains("#")) {
+            return schemaLocation;
+        }
+        return base;
     }
 }

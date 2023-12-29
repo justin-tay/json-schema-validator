@@ -59,26 +59,7 @@ public class RefValidator extends BaseJsonValidator {
             base = parentSchema.parentSchema;
         }
         if (base.getCurrentUri() != null) {
-            String uri = base.getCurrentUri().resolve(refValue).toString();
-            if (refValue.equals(uri) && !refValue.contains(":")) {
-                // This means resolve didn't work as the path is in the scheme specific part
-                String baseUri = base.getCurrentUri().toString();
-                if (refValue.startsWith("#")) {
-                    uri = baseUri + refValue;
-                } else {
-                    int slash = baseUri.lastIndexOf("/");
-                    if (slash != -1) {
-                        baseUri = baseUri.substring(0, baseUri.lastIndexOf("/"));
-                        uri = baseUri + refValue;
-                    } else {
-                        if (!refValue.startsWith("/")) {
-                            uri = baseUri + "/" + refValue;
-                        } else {
-                            uri = baseUri + refValue;
-                        }
-                    }
-                }
-            }
+            String uri = UriReference.resolve(base.getCurrentUri(), refValue);
             JsonSchema schemaResource = validationContext.getSchemaResources().get(uri.toString());
             if (schemaResource != null) {
                 // Schema resource needs to update the parent and evaluation path
@@ -158,11 +139,7 @@ public class RefValidator extends BaseJsonValidator {
                 URI currentUri = parent.getCurrentUri();
                 if (refValue.startsWith(REF_CURRENT)) {
                     // relative to document
-                    path = parent.schemaLocation;
-                    // get base
-                    while (path.getNameCount() > 0 && !path.getName(-1).contains(REF_CURRENT)) {
-                        path = path.getParent();
-                    }
+                    path = UriReference.getBase(parent.schemaLocation);
                     // Attempt to get subschema node
                     String[] refParts = refValue.split("/");
                     if (refParts.length > 3) {
