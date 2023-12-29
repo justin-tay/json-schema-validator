@@ -53,6 +53,19 @@ public class RefValidator extends BaseJsonValidator {
 
     static JsonSchemaRef getRefSchema(JsonSchema parentSchema, ValidationContext validationContext, String refValue,
             JsonNodePath evaluationPath) {
+        // $ref prevents a sibling $id from changing the base uri
+        JsonSchema base = parentSchema;
+        if (parentSchema.getId() != null && parentSchema.parentSchema != null) {
+            base = parentSchema.parentSchema;
+        }
+        if (base.getCurrentUri() != null) {
+            String uri = base.getCurrentUri().resolve(refValue).toString();
+            JsonSchema schemaResource = validationContext.getSchemaResources().get(uri.toString());
+            if (schemaResource != null) {
+                // Schema resource needs to update the parent and evaluation path
+                return new JsonSchemaRef(() -> schemaResource.fromRef(parentSchema, evaluationPath));
+            }
+        }
         // The evaluationPath is used to derive the keywordLocation
         final String refValueOriginal = refValue;
 
