@@ -70,12 +70,13 @@ public class UriReference {
         if (refValue.equals(uri) && !refValue.contains(":")) {
             // This means resolve didn't work as the path is in the scheme specific part
             String baseUri = currentUri.toString();
+            // Fragment
             if (refValue.startsWith("#")) {
                 uri = baseUri + refValue;
             } else {
                 int slash = baseUri.lastIndexOf("/");
                 if (slash != -1) {
-                    baseUri = baseUri.substring(0, baseUri.lastIndexOf("/"));
+                    baseUri = baseUri.substring(0, baseUri.lastIndexOf("/") + 1);
                     uri = baseUri + refValue;
                 } else {
                     if (!refValue.startsWith("/")) {

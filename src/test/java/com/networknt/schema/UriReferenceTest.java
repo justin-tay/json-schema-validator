@@ -17,6 +17,8 @@ package com.networknt.schema;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.net.URI;
+
 import org.junit.jupiter.api.Test;
 
 class UriReferenceTest {
@@ -86,4 +88,66 @@ class UriReferenceTest {
         assertEquals(base, path);
     }
 
+    @Test
+    void resolve() {
+        URI uri = URI.create("https://example.com/test");
+        String ref = UriReference.resolve(uri, "schema/foo");
+        assertEquals("https://example.com/schema/foo", ref);
+    }
+    
+    @Test
+    void resolveRoot() {
+        URI uri = URI.create("https://example.com/a/b");
+        String ref = UriReference.resolve(uri, "/schema/foo");
+        assertEquals("https://example.com/schema/foo", ref);
+    }
+
+    @Test
+    void resolveAbsolute() {
+        URI uri = URI.create("https://example.com/a/b");
+        String ref = UriReference.resolve(uri, "https://www.test.com");
+        assertEquals("https://www.test.com", ref);
+    }
+
+    @Test
+    void resolveFragment() {
+        URI uri = URI.create("https://example.com/schema.json");
+        String ref = UriReference.resolve(uri, "#foo");
+        assertEquals("https://example.com/schema.json#foo", ref);
+    }
+
+    @Test
+    void resolveIndexFragment() {
+        URI uri = URI.create("https://example.com/schema/");
+        String ref = UriReference.resolve(uri, "#foo");
+        assertEquals("https://example.com/schema/#foo", ref);
+    }
+
+    @Test
+    void resolveResource() {
+        URI uri = URI.create("resource:schema/issue619.json");
+        String ref = UriReference.resolve(uri, "schema/foo");
+        assertEquals("resource:schema/schema/foo", ref);
+    }
+
+    @Test
+    void resolveResourceFragment() {
+        URI uri = URI.create("resource:schema/issue619.json");
+        String ref = UriReference.resolve(uri, "#foo");
+        assertEquals("resource:schema/issue619.json#foo", ref);
+    }
+
+    @Test
+    void resolveResourceIndexFragment() {
+        URI uri = URI.create("resource:schema/issue/");
+        String ref = UriReference.resolve(uri, "#foo");
+        assertEquals("resource:schema/issue/#foo", ref);
+    }
+
+    @Test
+    void resolveResourceAbsolute() {
+        URI uri = URI.create("resource:schema/issue/");
+        String ref = UriReference.resolve(uri, "http://www.test.com");
+        assertEquals("http://www.test.com", ref);
+    }
 }
