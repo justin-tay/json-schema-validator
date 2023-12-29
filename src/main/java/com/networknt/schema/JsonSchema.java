@@ -63,6 +63,7 @@ public class JsonSchema extends BaseJsonValidator {
     WalkListenerRunner keywordWalkListenerRunner = null;
 
     private final String id;
+    private final String anchor;
 
     static JsonSchema from(ValidationContext validationContext, JsonNodePath schemaLocation, JsonNodePath evaluationPath, URI currentUri, JsonNode schemaNode, JsonSchema parent, boolean suppressSubSchemaRetrieval) {
         return new JsonSchema(validationContext, schemaLocation, evaluationPath, currentUri, schemaNode, parent, suppressSubSchemaRetrieval);
@@ -89,14 +90,14 @@ public class JsonSchema extends BaseJsonValidator {
             }
         }
         this.id = validationContext.resolveSchemaId(this.schemaNode);
+        this.anchor = validationContext.getMetaSchema().readAnchor(this.schemaNode);
         readDefinitions("definitions");
         readDefinitions("$defs");
         if (this.id != null) {
             this.validationContext.getSchemaResources()
                     .putIfAbsent(this.currentUri != null ? this.currentUri.toString() : this.id, this);
         }
-        String anchor = validationContext.getMetaSchema().readAnchor(this.schemaNode);
-        if (anchor != null) {
+        if (this.anchor != null) {
             this.validationContext.getSchemaResources().putIfAbsent(this.currentUri.toString() + "#" + anchor, this);
         }
     }
@@ -117,6 +118,7 @@ public class JsonSchema extends BaseJsonValidator {
         this.typeValidator = copy.typeValidator;
         this.keywordWalkListenerRunner = copy.keywordWalkListenerRunner;
         this.id = copy.id;
+        this.anchor = copy.anchor;
     }
 
     /**
@@ -199,7 +201,7 @@ public class JsonSchema extends BaseJsonValidator {
         } catch (URISyntaxException ex) {
             throw new JsonSchemaException("Unable to create URI without fragment from " + this.currentUri + ": " + ex.getMessage());
         }
-        this.parentSchema = new JsonSchema(this.validationContext, UriReference.get(currentUriWithoutFragment.toString()), this.evaluationPath, currentUriWithoutFragment, this.schemaNode, this.parentSchema, super.suppressSubSchemaRetrieval); // TODO: Should this be delegated to the factory?
+        this.parentSchema = new JsonSchema(this.validationContext, UriReference.get(currentUriWithoutFragment.toString() + "#"), this.evaluationPath, currentUriWithoutFragment, this.schemaNode, this.parentSchema, super.suppressSubSchemaRetrieval); // TODO: Should this be delegated to the factory?
         this.schemaLocation = UriReference.get(originalUri.toString());
         this.schemaNode = fragmentSchemaNode;
         this.currentUri = combineCurrentUriWithIds(this.currentUri, fragmentSchemaNode);
@@ -296,18 +298,25 @@ public class JsonSchema extends BaseJsonValidator {
     private void readDefinitions(String definitionsKeyword) {
         JsonNode definitionsNode = schemaNode.get(definitionsKeyword);
         if (definitionsNode != null) {
-            readSchemaResources(definitionsNode);
+            readSchemaResources(definitionsNode, this.schemaLocation.resolve(definitionsKeyword),
+                    this.evaluationPath.resolve(definitionsKeyword));
         }
     }
 
-    private void readSchemaResources(JsonNode definitionsNode) {
+    private void readSchemaResources(JsonNode definitionsNode, JsonNodePath schemaLocation, JsonNodePath evaluationPath) {
         Iterator<String> pnames = definitionsNode.fieldNames();
         while (pnames.hasNext()) {
             String pname = pnames.next();
             JsonNode nodeToUse = definitionsNode.get(pname);
+            // The schema resources with id or anchor will be stored during the constructor
+            // call of JsonSchema
             JsonSchema schema = this.validationContext.newSchema(schemaLocation.resolve(pname), evaluationPath.resolve(pname), nodeToUse,
                     this);
             schema.getValidators();
+            if (schema.id == null && schema.anchor == null) {
+                // Store the $def as a resource
+                this.validationContext.getSchemaResources().putIfAbsent(schema.getSchemaLocation().toString(), schema);
+            }
         }
     }
 
