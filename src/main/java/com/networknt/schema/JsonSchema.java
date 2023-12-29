@@ -91,6 +91,7 @@ public class JsonSchema extends BaseJsonValidator {
         }
         this.id = validationContext.resolveSchemaId(this.schemaNode);
         this.anchor = validationContext.getMetaSchema().readAnchor(this.schemaNode);
+        String dynamicAnchor = validationContext.getMetaSchema().readDynamicAnchor(this.schemaNode);
         readDefinitions("definitions");
         readDefinitions("$defs");
         if (this.id != null) {
@@ -98,7 +99,12 @@ public class JsonSchema extends BaseJsonValidator {
                     .putIfAbsent(this.currentUri != null ? this.currentUri.toString() : this.id, this);
         }
         if (this.anchor != null) {
-            this.validationContext.getSchemaResources().putIfAbsent(this.currentUri.toString() + "#" + anchor, this);
+            this.validationContext.getSchemaResources().put(this.currentUri.toString() + "#" + anchor, this);
+        }
+        if (dynamicAnchor != null) {
+            this.validationContext.getSchemaResources().putIfAbsent(this.currentUri.toString() + "#" + dynamicAnchor,
+                    this);
+            this.validationContext.getDynamicAnchors().put(this.currentUri.toString() + "#" + dynamicAnchor, this);
         }
     }
 
@@ -313,13 +319,8 @@ public class JsonSchema extends BaseJsonValidator {
             JsonSchema schema = this.validationContext.newSchema(schemaLocation.resolve(pname), evaluationPath.resolve(pname), nodeToUse,
                     this);
             schema.getValidators();
-            if (schema.id == null && schema.anchor == null) {
-                // Store the $def as a resource
-                this.validationContext.getSchemaResources().putIfAbsent(schema.getSchemaLocation().toString(), schema);
-            }
         }
     }
-
 
     /**
      * Please note that the key in {@link #validators} map is the evaluation path.

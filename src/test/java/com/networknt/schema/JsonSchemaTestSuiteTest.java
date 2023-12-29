@@ -71,7 +71,7 @@ class JsonSchemaTestSuiteTest extends AbstractJsonSchemaTestSuite {
     private void disableV202012Tests() {
         this.disabled.put(Paths.get("src/test/suite/tests/draft2020-12/anchor.json"), "Unsupported behavior");
         this.disabled.put(Paths.get("src/test/suite/tests/draft2020-12/defs.json"), "Unsupported behavior");
-        this.disabled.put(Paths.get("src/test/suite/tests/draft2020-12/dynamicRef.json"), "Unsupported behavior");
+        //this.disabled.put(Paths.get("src/test/suite/tests/draft2020-12/dynamicRef.json"), "Unsupported behavior");
         this.disabled.put(Paths.get("src/test/suite/tests/draft2020-12/id.json"), "Unsupported behavior");
         this.disabled.put(Paths.get("src/test/suite/tests/draft2020-12/optional/format-assertion.json"), "Unsupported behavior");
         this.disabled.put(Paths.get("src/test/suite/tests/draft2020-12/vocabulary.json"), "Unsupported behavior");

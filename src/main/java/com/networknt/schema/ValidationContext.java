@@ -39,6 +39,7 @@ public class ValidationContext {
     private final Stack<DiscriminatorContext> discriminatorContexts = new Stack<>();
     private final ConcurrentMap<String, JsonSchemaRef> schemaReferences = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, JsonSchema> schemaResources = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, JsonSchema> dynamicAnchors = new ConcurrentHashMap<>();
 
     public ValidationContext(URIFactory uriFactory, URNFactory urnFactory, JsonMetaSchema metaSchema,
                              JsonSchemaFactory jsonSchemaFactory, SchemaValidatorsConfig config) {
@@ -115,6 +116,16 @@ public class ValidationContext {
     public ConcurrentMap<String, JsonSchema> getSchemaResources() {
         return this.schemaResources;
     }
+
+    /**
+     * Gets the dynamic anchors identified by uri.
+     *
+     * @return the dynamic anchors
+     */
+    public ConcurrentMap<String, JsonSchema> getDynamicAnchors() {
+        return this.dynamicAnchors;
+    }
+
 
     public DiscriminatorContext getCurrentDiscriminatorContext() {
         if (!this.discriminatorContexts.empty()) {
