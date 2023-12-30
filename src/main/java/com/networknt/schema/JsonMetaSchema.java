@@ -263,8 +263,7 @@ public class JsonMetaSchema {
         return this.keywords;
     }
 
-    public JsonValidator newValidator(ValidationContext validationContext, JsonNodePath schemaLocation, JsonNodePath evaluationPath, String keyword /* keyword */, JsonNode schemaNode,
-                                      JsonSchema parentSchema) {
+    public JsonValidator newValidator(ValidationContext validationContext, JsonNodePath schemaLocation, String keyword /* keyword */, JsonNode schemaNode, JsonSchema parentSchema) {
 
         try {
             Keyword kw = this.keywords.get(keyword);
@@ -274,7 +273,7 @@ public class JsonMetaSchema {
                 }
                 return null;
             }
-            return kw.newValidator(schemaLocation, evaluationPath, schemaNode, parentSchema, validationContext);
+            return kw.newValidator(schemaLocation, schemaNode, parentSchema, validationContext);
         } catch (InvocationTargetException e) {
             if (e.getTargetException() instanceof JsonSchemaException) {
                 logger.error("Error:", e);

@@ -49,9 +49,9 @@ public class CustomMetaSchemaTest {
             private final List<String> enumNames;
             private final String keyword;
 
-            private Validator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, String keyword,
+            private Validator(JsonNodePath schemaLocation, String keyword,
                     List<String> enumValues, List<String> enumNames) {
-                super(schemaLocation, evaluationPath,null);
+                super(schemaLocation, null);
                 if (enumNames.size() != enumValues.size()) {
                     throw new IllegalArgumentException("enum and enumNames need to be of same length");
                 }
@@ -61,7 +61,7 @@ public class CustomMetaSchemaTest {
             }
 
             @Override
-            public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+            public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
                 String value = node.asText();
                 int idx = enumValues.indexOf(value);
                 if (idx < 0) {
@@ -83,8 +83,8 @@ public class CustomMetaSchemaTest {
         }
 
         @Override
-        public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
-                                          JsonSchema parentSchema, ValidationContext validationContext) throws JsonSchemaException, Exception {
+        public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema,
+                                          ValidationContext validationContext) throws JsonSchemaException, Exception {
             /*
              * You can access the schema node here to read data from your keyword
              */
@@ -97,7 +97,7 @@ public class CustomMetaSchemaTest {
             }
             JsonNode enumSchemaNode = parentSchemaNode.get("enum");
 
-            return new Validator(schemaLocation, evaluationPath, getValue(), readStringList(enumSchemaNode), readStringList(schemaNode));
+            return new Validator(schemaLocation, getValue(), readStringList(enumSchemaNode), readStringList(schemaNode));
         }
 
         private List<String> readStringList(JsonNode node) {

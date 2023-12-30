@@ -27,18 +27,23 @@ import com.networknt.schema.walk.JsonSchemaWalker;
  */
 public interface JsonValidator extends JsonSchemaWalker {
     /**
-     * Validate the given JsonNode, the given node is the child node of the root node at given
-     * data path.
-     * @param executionContext  ExecutionContext
-     * @param node     JsonNode
-     * @param rootNode JsonNode
-     * @param instanceLocation JsonNodePath
-     *
-     * @return A list of ValidationMessage if there is any validation error, or an empty
-     * list if there is no error.
+     * Validate the given JsonNode, the given node is the child node of the root
+     * node at given data path.
+     * 
+     * @param executionContext ExecutionContext
+     * @param node             JsonNode
+     * @param rootNode         JsonNode
+     * @param instanceLocation The instance location is the set of keys to reach the
+     *                         value being evaluated.
+     * @param evaluationPath   The evaluation path is the set of keys, starting from
+     *                         the schema root, through which evaluation passes to
+     *                         reach the schema object that produced a specific
+     *                         result.
+     * @return A list of ValidationMessage if there is any validation error, or an
+     *         empty list if there is no error.
      */
     Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
-            JsonNodePath instanceLocation);
+            JsonNodePath instanceLocation, JsonNodePath evaluationPath);
 
     /**
      * In case the {@link com.networknt.schema.JsonValidator} has a related {@link com.networknt.schema.JsonSchema} or several
@@ -58,8 +63,8 @@ public interface JsonValidator extends JsonSchemaWalker {
      */
     @Override
     default Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
-            JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-        return shouldValidateSchema ? validate(executionContext, node, rootNode, instanceLocation)
+            JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
+        return shouldValidateSchema ? validate(executionContext, node, rootNode, instanceLocation, evaluationPath)
                 : Collections.emptySet();
     }
 
@@ -72,15 +77,6 @@ public interface JsonValidator extends JsonSchemaWalker {
      * @return the schema location
      */
     public JsonNodePath getSchemaLocation();
-
-    /**
-     * The evaluation path is the set of keys, starting from the schema root,
-     * through which evaluation passes to reach the schema object that produced a
-     * specific result.
-     * 
-     * @return the evaluation path
-     */
-    public JsonNodePath getEvaluationPath();
 
     /**
      * The keyword of the validator.

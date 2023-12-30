@@ -29,17 +29,17 @@ public class OneOfValidator extends BaseJsonValidator {
 
     private final List<JsonSchema> schemas = new ArrayList<>();
 
-    public OneOfValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.ONE_OF, validationContext);
+    public OneOfValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.ONE_OF, validationContext);
         int size = schemaNode.size();
         for (int i = 0; i < size; i++) {
             JsonNode childNode = schemaNode.get(i);
-            this.schemas.add(validationContext.newSchema( schemaLocation.resolve(i), evaluationPath.resolve(i), childNode, parentSchema));
+            this.schemas.add(validationContext.newSchema( schemaLocation.resolve(i), childNode, parentSchema));
         }
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         Set<ValidationMessage> errors = new LinkedHashSet<>();
         CollectorContext collectorContext = executionContext.getCollectorContext();
 
@@ -64,9 +64,9 @@ public class OneOfValidator extends BaseJsonValidator {
                     state.setMatchedNode(true);
 
                     if (!state.isWalkEnabled()) {
-                        schemaErrors = schema.validate(executionContext, node, rootNode, instanceLocation);
+                        schemaErrors = schema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
                     } else {
-                        schemaErrors = schema.walk(executionContext, node, rootNode, instanceLocation, state.isValidationEnabled());
+                        schemaErrors = schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, state.isValidationEnabled());
                     }
 
                     // check if any validation errors have occurred
@@ -129,13 +129,13 @@ public class OneOfValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
         HashSet<ValidationMessage> validationMessages = new LinkedHashSet<>();
         if (shouldValidateSchema) {
-            validationMessages.addAll(validate(executionContext, node, rootNode, instanceLocation));
+            validationMessages.addAll(validate(executionContext, node, rootNode, instanceLocation, evaluationPath));
         } else {
             for (JsonSchema schema : this.schemas) {
-                schema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, shouldValidateSchema);
             }
         }
         return validationMessages;

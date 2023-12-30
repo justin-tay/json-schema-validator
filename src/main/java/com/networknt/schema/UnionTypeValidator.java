@@ -32,8 +32,8 @@ public class UnionTypeValidator extends BaseJsonValidator implements JsonValidat
     private final String error;
 
 
-    public UnionTypeValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.UNION_TYPE, validationContext);
+    public UnionTypeValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.UNION_TYPE, validationContext);
         this.validationContext = validationContext;
         StringBuilder errorBuilder = new StringBuilder();
 
@@ -51,9 +51,9 @@ public class UnionTypeValidator extends BaseJsonValidator implements JsonValidat
 
             if (n.isObject())
                 schemas.add(validationContext.newSchema(schemaLocation.resolve(ValidatorTypeCode.TYPE.getValue()),
-                        evaluationPath.resolve(ValidatorTypeCode.TRUE.getValue()), n, parentSchema));
+                        n, parentSchema));
             else
-                schemas.add(new TypeValidator(schemaLocation.resolve(i), evaluationPath.resolve(i), n, parentSchema, validationContext));
+                schemas.add(new TypeValidator(schemaLocation.resolve(i), n, parentSchema, validationContext));
 
             i++;
         }
@@ -63,7 +63,7 @@ public class UnionTypeValidator extends BaseJsonValidator implements JsonValidat
         error = errorBuilder.toString();
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
 
         JsonType nodeType = TypeFactory.getValueNodeType(node, validationContext.getConfig());
@@ -71,7 +71,7 @@ public class UnionTypeValidator extends BaseJsonValidator implements JsonValidat
         boolean valid = false;
 
         for (JsonValidator schema : schemas) {
-            Set<ValidationMessage> errors = schema.validate(executionContext, node, rootNode, instanceLocation);
+            Set<ValidationMessage> errors = schema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
             if (errors == null || errors.isEmpty()) {
                 valid = true;
                 break;

@@ -36,14 +36,14 @@ public class PrefixItemsValidator extends BaseJsonValidator {
     private final List<JsonSchema> tupleSchema;
     private WalkListenerRunner arrayItemWalkListenerRunner;
 
-    public PrefixItemsValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.PREFIX_ITEMS, validationContext);
+    public PrefixItemsValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.PREFIX_ITEMS, validationContext);
 
         this.tupleSchema = new ArrayList<>();
 
         if (schemaNode instanceof ArrayNode && 0 < schemaNode.size()) {
             for (JsonNode s : schemaNode) {
-                this.tupleSchema.add(validationContext.newSchema(schemaLocation, evaluationPath, s, parentSchema));
+                this.tupleSchema.add(validationContext.newSchema(schemaLocation, s, parentSchema));
             }
         } else {
             throw new IllegalArgumentException("The value of 'prefixItems' MUST be a non-empty array of valid JSON Schemas.");
@@ -55,7 +55,7 @@ public class PrefixItemsValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
         // ignores non-arrays
         if (node.isArray()) {
@@ -64,7 +64,7 @@ public class PrefixItemsValidator extends BaseJsonValidator {
             int count = Math.min(node.size(), this.tupleSchema.size());
             for (int i = 0; i < count; ++i) {
                 JsonNodePath path = instanceLocation.resolve(i);
-                Set<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node.get(i), rootNode, path);
+                Set<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node.get(i), rootNode, path, evaluationPath);
                 if (results.isEmpty()) {
                     if (executionContext.getExecutionConfig().getAnnotationAllowedPredicate().test(getKeyword())) {
                         evaluatedItems.add(path);
@@ -80,7 +80,7 @@ public class PrefixItemsValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
         Set<ValidationMessage> validationMessages = new LinkedHashSet<>();
 
         if (this.applyDefaultsStrategy.shouldApplyArrayDefaults() && node.isArray()) {
@@ -93,7 +93,8 @@ public class PrefixItemsValidator extends BaseJsonValidator {
                     array.set(i, defaultNode);
                     n = defaultNode;
                 }
-                doWalk(executionContext, validationMessages, i, n, rootNode, instanceLocation, shouldValidateSchema);
+                doWalk(executionContext, validationMessages, i, n, rootNode, instanceLocation, evaluationPath,
+                        shouldValidateSchema);
             }
         }
 
@@ -101,27 +102,30 @@ public class PrefixItemsValidator extends BaseJsonValidator {
     }
 
     private void doWalk(ExecutionContext executionContext, Set<ValidationMessage> validationMessages, int i,
-            JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+            JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath,
+            boolean shouldValidateSchema) {
         walkSchema(executionContext, this.tupleSchema.get(i), node, rootNode, instanceLocation.resolve(i),
-                shouldValidateSchema, validationMessages);
+                evaluationPath, shouldValidateSchema, validationMessages);
     }
 
     private void walkSchema(ExecutionContext executionContext, JsonSchema walkSchema, JsonNode node, JsonNode rootNode,
-            JsonNodePath instanceLocation, boolean shouldValidateSchema, Set<ValidationMessage> validationMessages) {
+            JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema, Set<ValidationMessage> validationMessages) {
         //@formatter:off
+        JsonNodePath schemaEvaluationPath = evaluationPath.resolve(walkSchema.getSchemaLocation().getName(-1));
+
         boolean executeWalk = this.arrayItemWalkListenerRunner.runPreWalkListeners(
             executionContext,
             ValidatorTypeCode.PREFIX_ITEMS.getValue(),
             node,
             rootNode,
             instanceLocation,
-            walkSchema.getEvaluationPath(),
+            schemaEvaluationPath,
             walkSchema.getSchemaLocation(),
             walkSchema.getSchemaNode(),
             walkSchema.getParentSchema(), this.validationContext, this.validationContext.getJsonSchemaFactory()
         );
         if (executeWalk) {
-            validationMessages.addAll(walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema));
+            validationMessages.addAll(walkSchema.walk(executionContext, node, rootNode, instanceLocation, schemaEvaluationPath, shouldValidateSchema));
         }
         this.arrayItemWalkListenerRunner.runPostWalkListeners(
             executionContext,
@@ -129,7 +133,7 @@ public class PrefixItemsValidator extends BaseJsonValidator {
             node,
             rootNode,
             instanceLocation,
-            this.evaluationPath,
+            schemaEvaluationPath,
             walkSchema.getSchemaLocation(),
             walkSchema.getSchemaNode(),
             walkSchema.getParentSchema(),

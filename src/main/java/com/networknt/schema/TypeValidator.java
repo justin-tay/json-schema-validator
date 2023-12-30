@@ -30,13 +30,13 @@ public class TypeValidator extends BaseJsonValidator {
     private JsonSchema parentSchema;
     private UnionTypeValidator unionTypeValidator;
 
-    public TypeValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.TYPE, validationContext);
+    public TypeValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.TYPE, validationContext);
         this.schemaType = TypeFactory.getSchemaNodeType(schemaNode);
         this.parentSchema = parentSchema;
         this.validationContext = validationContext;
         if (this.schemaType == JsonType.UNION) {
-            this.unionTypeValidator = new UnionTypeValidator(schemaLocation, evaluationPath, schemaNode, parentSchema, validationContext);
+            this.unionTypeValidator = new UnionTypeValidator(schemaLocation, schemaNode, parentSchema, validationContext);
         }
     }
 
@@ -49,11 +49,11 @@ public class TypeValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
 
         if (this.schemaType == JsonType.UNION) {
-            return this.unionTypeValidator.validate(executionContext, node, rootNode, instanceLocation);
+            return this.unionTypeValidator.validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
         }
 
         if (!equalsToSchemaType(node)) {

@@ -28,18 +28,18 @@ public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
 
     private final JsonSchema schema;
 
-    public UnevaluatedPropertiesValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.UNEVALUATED_PROPERTIES, validationContext);
+    public UnevaluatedPropertiesValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.UNEVALUATED_PROPERTIES, validationContext);
 
         if (schemaNode.isObject() || schemaNode.isBoolean()) {
-            this.schema = validationContext.newSchema(schemaLocation, evaluationPath, schemaNode, parentSchema);
+            this.schema = validationContext.newSchema(schemaLocation, schemaNode, parentSchema);
         } else {
             throw new IllegalArgumentException("The value of 'unevaluatedProperties' MUST be a valid JSON Schema.");
         }
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         if (!executionContext.getExecutionConfig().getAnnotationAllowedPredicate().test(getKeyword()) || !node.isObject()) return Collections.emptySet();
 
         debug(logger, node, rootNode, instanceLocation);
@@ -66,7 +66,7 @@ public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
             unevaluatedPaths.forEach(path -> {
                 String pointer = path.getPathType().convertToJsonPointer(path.toString());
                 JsonNode property = rootNode.at(pointer);
-                if (!this.schema.validate(executionContext, property, rootNode, path).isEmpty()) {
+                if (!this.schema.validate(executionContext, property, rootNode, path, evaluationPath).isEmpty()) {
                     failingPaths.add(path);
                 }
             });

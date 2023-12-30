@@ -29,20 +29,20 @@ public class NotValidator extends BaseJsonValidator {
 
     private final JsonSchema schema;
 
-    public NotValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.NOT, validationContext);
-        this.schema = validationContext.newSchema(schemaLocation, evaluationPath, schemaNode, parentSchema);
+    public NotValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.NOT, validationContext);
+        this.schema = validationContext.newSchema(schemaLocation, schemaNode, parentSchema);
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         CollectorContext collectorContext = executionContext.getCollectorContext();
         Set<ValidationMessage> errors = new HashSet<>();
 
         Scope parentScope = collectorContext.enterDynamicScope();
         try {
             debug(logger, node, rootNode, instanceLocation);
-            errors = this.schema.validate(executionContext, node, rootNode, instanceLocation);
+            errors = this.schema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
             if (errors.isEmpty()) {
                 return Collections.singleton(message().instanceLocation(instanceLocation)
                         .locale(executionContext.getExecutionConfig().getLocale()).arguments(this.schema.toString())
@@ -58,12 +58,12 @@ public class NotValidator extends BaseJsonValidator {
     }
     
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
         if (shouldValidateSchema) {
-            return validate(executionContext, node, rootNode, instanceLocation);
+            return validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
         }
 
-        Set<ValidationMessage> errors = this.schema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+        Set<ValidationMessage> errors = this.schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, shouldValidateSchema);
         if (errors.isEmpty()) {
             return Collections.singleton(message().instanceLocation(instanceLocation)
                     .locale(executionContext.getExecutionConfig().getLocale()).arguments(this.schema.toString())

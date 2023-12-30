@@ -41,13 +41,13 @@ public class FormatKeyword implements Keyword {
     }
 
     @Override
-    public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+    public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
         Format format = null;
         if (schemaNode != null && schemaNode.isTextual()) {
             String formatName = schemaNode.textValue();
             format = this.formats.get(formatName);
             if (format != null) {
-                return new FormatValidator(schemaLocation, evaluationPath, schemaNode, parentSchema, validationContext, format, type);
+                return new FormatValidator(schemaLocation, schemaNode, parentSchema, validationContext, format, type);
             }
 
             switch (formatName) {
@@ -57,12 +57,12 @@ public class FormatKeyword implements Keyword {
 
                 case DATE_TIME: {
                     ValidatorTypeCode typeCode = ValidatorTypeCode.DATETIME;
-                    return new DateTimeValidator(schemaLocation, evaluationPath, schemaNode, parentSchema, validationContext, typeCode);
+                    return new DateTimeValidator(schemaLocation, schemaNode, parentSchema, validationContext, typeCode);
                 }
             }
         }
 
-        return new FormatValidator(schemaLocation, evaluationPath, schemaNode, parentSchema, validationContext, format, this.type);
+        return new FormatValidator(schemaLocation, schemaNode, parentSchema, validationContext, format, this.type);
     }
 
     @Override

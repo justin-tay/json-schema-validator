@@ -54,13 +54,13 @@ public class ValidationContext {
         this.config = config;
     }
 
-    public JsonSchema newSchema(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema) {
-        return getJsonSchemaFactory().create(this, schemaLocation, evaluationPath, schemaNode, parentSchema);
+    public JsonSchema newSchema(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema) {
+        return getJsonSchemaFactory().create(this, schemaLocation, schemaNode, parentSchema);
     }
 
-    public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath,
-            String keyword /* keyword */, JsonNode schemaNode, JsonSchema parentSchema) {
-        return this.metaSchema.newValidator(this, schemaLocation, evaluationPath, keyword, schemaNode, parentSchema);
+    public JsonValidator newValidator(JsonNodePath schemaLocation, String keyword /* keyword */,
+            JsonNode schemaNode, JsonSchema parentSchema) {
+        return this.metaSchema.newValidator(this, schemaLocation, keyword, schemaNode, parentSchema);
     }
 
     public String resolveSchemaId(JsonNode schemaNode) {

@@ -41,8 +41,8 @@ public class ContainsValidator extends BaseJsonValidator {
     private int min = 1;
     private int max = Integer.MAX_VALUE;
 
-    public ContainsValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.CONTAINS, validationContext);
+    public ContainsValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.CONTAINS, validationContext);
 
         // Draft 6 added the contains keyword but maxContains and minContains first
         // appeared in Draft 2019-09 so the semantics of the validation changes
@@ -50,7 +50,7 @@ public class ContainsValidator extends BaseJsonValidator {
         isMinV201909 = MinV201909.getVersions().contains(SpecVersionDetector.detectOptionalVersion(validationContext.getMetaSchema().getUri()).orElse(DEFAULT_VERSION));
 
         if (schemaNode.isObject() || schemaNode.isBoolean()) {
-            this.schema = validationContext.newSchema(schemaLocation, evaluationPath, schemaNode, parentSchema);
+            this.schema = validationContext.newSchema(schemaLocation, schemaNode, parentSchema);
             JsonNode parentSchemaNode = parentSchema.getSchemaNode();
             Optional.ofNullable(parentSchemaNode.get(ValidatorTypeCode.MAX_CONTAINS.getValue()))
                     .filter(JsonNode::canConvertToExactIntegral)
@@ -65,7 +65,7 @@ public class ContainsValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
 
         // ignores non-arrays
@@ -76,7 +76,7 @@ public class ContainsValidator extends BaseJsonValidator {
             for (JsonNode n : node) {
                 JsonNodePath path = instanceLocation.resolve(i);
 
-                if (this.schema.validate(executionContext, n, rootNode, path).isEmpty()) {
+                if (this.schema.validate(executionContext, n, rootNode, path, evaluationPath).isEmpty()) {
                     ++actual;
                     if (executionContext.getExecutionConfig().getAnnotationAllowedPredicate().test(getKeyword())) {
                         evaluatedItems.add(path);

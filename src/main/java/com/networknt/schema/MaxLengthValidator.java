@@ -28,8 +28,8 @@ public class MaxLengthValidator extends BaseJsonValidator implements JsonValidat
 
     private int maxLength;
 
-    public MaxLengthValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.MAX_LENGTH, validationContext);
+    public MaxLengthValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.MAX_LENGTH, validationContext);
         maxLength = Integer.MAX_VALUE;
         if (schemaNode != null && schemaNode.canConvertToExactIntegral()) {
             maxLength = schemaNode.intValue();
@@ -37,7 +37,7 @@ public class MaxLengthValidator extends BaseJsonValidator implements JsonValidat
         this.validationContext = validationContext;
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
 
         JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getConfig());

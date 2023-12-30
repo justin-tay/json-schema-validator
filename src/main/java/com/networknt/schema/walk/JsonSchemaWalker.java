@@ -16,7 +16,7 @@ public interface JsonSchemaWalker {
 	 * cutting concerns like logging or instrumentation. This method also performs
 	 * the validation if {@code shouldValidateSchema} is set to true. <br>
 	 * <br>
-	 * {@link BaseJsonValidator#walk(ExecutionContext, JsonNode, JsonNode, JsonNodePath, boolean)} provides
+	 * {@link BaseJsonValidator#walk(ExecutionContext, JsonNode, JsonNode, JsonNodePath, JsonNodePath, boolean)} provides
 	 * a default implementation of this method. However validators that parse
 	 * sub-schemas should override this method to call walk method on those
 	 * sub-schemas.
@@ -25,9 +25,10 @@ public interface JsonSchemaWalker {
 	 * @param node                 JsonNode
 	 * @param rootNode             JsonNode
 	 * @param instanceLocation     JsonNodePath
+	 * @param evaluationPath TODO
 	 * @param shouldValidateSchema boolean
 	 * @return a set of validation messages if shouldValidateSchema is true.
 	 */
     Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
-            JsonNodePath instanceLocation, boolean shouldValidateSchema);
+            JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema);
 }

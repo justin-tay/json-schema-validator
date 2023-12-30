@@ -26,22 +26,22 @@ public class DependentSchemas extends BaseJsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(DependentSchemas.class);
     private final Map<String, JsonSchema> schemaDependencies = new HashMap<>();
 
-    public DependentSchemas(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+    public DependentSchemas(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
 
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.DEPENDENT_SCHEMAS, validationContext);
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.DEPENDENT_SCHEMAS, validationContext);
 
         for (Iterator<String> it = schemaNode.fieldNames(); it.hasNext(); ) {
             String pname = it.next();
             JsonNode pvalue = schemaNode.get(pname);
             if (pvalue.isObject() || pvalue.isBoolean()) {
                 this.schemaDependencies.put(pname, validationContext.newSchema(schemaLocation.resolve(pname),
-                        evaluationPath.resolve(pname), pvalue, parentSchema));
+                        pvalue, parentSchema));
             }
         }
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
 
         Set<ValidationMessage> errors = new LinkedHashSet<>();
@@ -50,7 +50,7 @@ public class DependentSchemas extends BaseJsonValidator {
             String pname = it.next();
             JsonSchema schema = this.schemaDependencies.get(pname);
             if (schema != null) {
-                errors.addAll(schema.validate(executionContext, node, rootNode, instanceLocation));
+                errors.addAll(schema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath));
             }
         }
 
@@ -63,12 +63,12 @@ public class DependentSchemas extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
         if (shouldValidateSchema) {
-            return validate(executionContext, node, rootNode, instanceLocation);
+            return validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
         }
         for (JsonSchema schema : this.schemaDependencies.values()) {
-            schema.walk(executionContext, node, rootNode, instanceLocation, false);
+            schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, false);
         }
         return Collections.emptySet();
     }

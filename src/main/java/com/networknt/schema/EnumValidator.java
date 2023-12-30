@@ -32,8 +32,8 @@ public class EnumValidator extends BaseJsonValidator implements JsonValidator {
     private final Set<JsonNode> nodes;
     private final String error;
 
-    public EnumValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.ENUM, validationContext);
+    public EnumValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.ENUM, validationContext);
         this.validationContext = validationContext;
         if (schemaNode != null && schemaNode.isArray()) {
             nodes = new HashSet<JsonNode>();
@@ -75,7 +75,7 @@ public class EnumValidator extends BaseJsonValidator implements JsonValidator {
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
 
         if (node.isNumber()) node = DecimalNode.valueOf(node.decimalValue());

@@ -15,7 +15,6 @@ public abstract class ValidationMessageHandler {
     protected ErrorMessageType errorMessageType;
 
     protected JsonNodePath schemaLocation;
-    protected JsonNodePath evaluationPath;
 
     protected JsonSchema parentSchema;
 
@@ -26,12 +25,11 @@ public abstract class ValidationMessageHandler {
 
     protected ValidationMessageHandler(boolean failFast, ErrorMessageType errorMessageType,
             boolean customErrorMessagesEnabled, MessageSource messageSource, Keyword keyword, JsonSchema parentSchema,
-            JsonNodePath schemaLocation, JsonNodePath evaluationPath) {
+            JsonNodePath schemaLocation) {
         this.failFast = failFast;
         this.errorMessageType = errorMessageType;
         this.messageSource = messageSource;
         this.schemaLocation = Objects.requireNonNull(schemaLocation);
-        this.evaluationPath = Objects.requireNonNull(evaluationPath);
         this.parentSchema = parentSchema;
         this.customErrorMessagesEnabled = customErrorMessagesEnabled;
         updateKeyword(keyword);
@@ -43,7 +41,7 @@ public abstract class ValidationMessageHandler {
                 throw new JsonSchemaException(message);
             }
         }).code(getErrorMessageType().getErrorCode()).schemaLocation(this.schemaLocation)
-                .evaluationPath(this.evaluationPath).type(this.keyword != null ? this.keyword.getValue() : null)
+                .type(this.keyword != null ? this.keyword.getValue() : null)
                 .messageKey(getErrorMessageType().getErrorCodeValue());
     }
 

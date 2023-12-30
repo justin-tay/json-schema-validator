@@ -27,9 +27,9 @@ public class DependenciesValidator extends BaseJsonValidator implements JsonVali
     private final Map<String, List<String>> propertyDeps = new HashMap<String, List<String>>();
     private final Map<String, JsonSchema> schemaDeps = new HashMap<String, JsonSchema>();
 
-    public DependenciesValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+    public DependenciesValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
 
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.DEPENDENCIES, validationContext);
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.DEPENDENCIES, validationContext);
 
         for (Iterator<String> it = schemaNode.fieldNames(); it.hasNext(); ) {
             String pname = it.next();
@@ -45,12 +45,12 @@ public class DependenciesValidator extends BaseJsonValidator implements JsonVali
                 }
             } else if (pvalue.isObject() || pvalue.isBoolean()) {
                 schemaDeps.put(pname, validationContext.newSchema(schemaLocation.resolve(pname),
-                        evaluationPath.resolve(pname), pvalue, parentSchema));
+                        pvalue, parentSchema));
             }
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
 
         Set<ValidationMessage> errors = new LinkedHashSet<ValidationMessage>();
@@ -69,7 +69,7 @@ public class DependenciesValidator extends BaseJsonValidator implements JsonVali
             }
             JsonSchema schema = schemaDeps.get(pname);
             if (schema != null) {
-                errors.addAll(schema.validate(executionContext, node, rootNode, instanceLocation));
+                errors.addAll(schema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath));
             }
         }
 

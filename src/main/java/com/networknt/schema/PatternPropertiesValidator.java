@@ -28,9 +28,9 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(PatternPropertiesValidator.class);
     private final Map<RegularExpression, JsonSchema> schemas = new IdentityHashMap<>();
 
-    public PatternPropertiesValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema,
+    public PatternPropertiesValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema,
                                       ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.PATTERN_PROPERTIES, validationContext);
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.PATTERN_PROPERTIES, validationContext);
         if (!schemaNode.isObject()) {
             throw new JsonSchemaException("patternProperties must be an object node");
         }
@@ -38,12 +38,12 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
         while (names.hasNext()) {
             String name = names.next();
             RegularExpression pattern = RegularExpression.compile(name, validationContext);
-            schemas.put(pattern, validationContext.newSchema(schemaLocation.resolve(name), evaluationPath.resolve(name),
-                    schemaNode.get(name), parentSchema));
+            schemas.put(pattern, validationContext.newSchema(schemaLocation.resolve(name), schemaNode.get(name),
+                    parentSchema));
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
 
         if (!node.isObject()) {
@@ -57,7 +57,7 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
             for (Map.Entry<RegularExpression, JsonSchema> entry : schemas.entrySet()) {
                 if (entry.getKey().matches(name)) {
                     JsonNodePath path = instanceLocation.resolve(name);
-                    Set<ValidationMessage> results = entry.getValue().validate(executionContext, n, rootNode, path);
+                    Set<ValidationMessage> results = entry.getValue().validate(executionContext, n, rootNode, path, evaluationPath);
                     if (results.isEmpty()) {
                         if (executionContext.getExecutionConfig().getAnnotationAllowedPredicate().test(getKeyword())) {
                             executionContext.getCollectorContext().getEvaluatedProperties().add(path);

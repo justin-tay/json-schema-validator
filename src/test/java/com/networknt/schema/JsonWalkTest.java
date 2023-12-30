@@ -124,10 +124,10 @@ public class JsonWalkTest {
         }
 
         @Override
-        public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
-                                          JsonSchema parentSchema, ValidationContext validationContext) throws JsonSchemaException {
+        public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema,
+                                          ValidationContext validationContext) throws JsonSchemaException {
             if (schemaNode != null && schemaNode.isArray()) {
-                return new CustomValidator(schemaLocation, evaluationPath);
+                return new CustomValidator(schemaLocation);
             }
             return null;
         }
@@ -140,18 +140,18 @@ public class JsonWalkTest {
          */
         private static class CustomValidator extends AbstractJsonValidator {
 
-            public CustomValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath) {
-                super(schemaLocation, evaluationPath,null);
+            public CustomValidator(JsonNodePath schemaLocation) {
+                super(schemaLocation, null);
             }
 
             @Override
-            public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+            public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
                 return new TreeSet<ValidationMessage>();
             }
 
             @Override
             public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
-                    JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+                    JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
                 return new LinkedHashSet<ValidationMessage>();
             }
         }

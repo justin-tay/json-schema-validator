@@ -27,8 +27,8 @@ import java.util.Map;
 
 @FunctionalInterface
 interface ValidatorFactory {
-    JsonValidator newInstance(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
-            JsonSchema parentSchema, ValidationContext validationContext);
+    JsonValidator newInstance(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema,
+            ValidationContext validationContext);
 }
 
 enum VersionCode {
@@ -71,7 +71,7 @@ public enum ValidatorTypeCode implements Keyword, ErrorMessageType {
     EXCLUSIVE_MINIMUM("exclusiveMinimum", "1039", ExclusiveMinimumValidator::new, VersionCode.MinV6),
     FALSE("false", "1041", FalseValidator::new, VersionCode.MinV6),
     FORMAT("format", "1009", null, VersionCode.AllVersions) {
-        @Override public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        @Override public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
             throw new UnsupportedOperationException("Use FormatKeyword instead");
         }
     },
@@ -151,13 +151,12 @@ public enum ValidatorTypeCode implements Keyword, ErrorMessageType {
     }
 
     @Override
-    public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
-            JsonSchema parentSchema, ValidationContext validationContext) {
+    public JsonValidator newValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema,
+            ValidationContext validationContext) {
         if (this.validatorFactory == null) {
             throw new UnsupportedOperationException("No suitable validator for " + getValue());
         }
-        return validatorFactory.newInstance(schemaLocation, evaluationPath, schemaNode, parentSchema,
-                validationContext);
+        return validatorFactory.newInstance(schemaLocation, schemaNode, parentSchema, validationContext);
     }
 
     @Override

@@ -32,15 +32,15 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
     private final Set<String> allowedProperties;
     private final List<RegularExpression> patternProperties = new ArrayList<>();
 
-    public AdditionalPropertiesValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema,
-                                         ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.ADDITIONAL_PROPERTIES, validationContext);
+    public AdditionalPropertiesValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema,
+            ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.ADDITIONAL_PROPERTIES, validationContext);
         if (schemaNode.isBoolean()) {
             allowAdditionalProperties = schemaNode.booleanValue();
             additionalPropertiesSchema = null;
         } else if (schemaNode.isObject()) {
             allowAdditionalProperties = true;
-            additionalPropertiesSchema = validationContext.newSchema(schemaLocation, evaluationPath, schemaNode, parentSchema);
+            additionalPropertiesSchema = validationContext.newSchema(schemaLocation, schemaNode, parentSchema);
         } else {
             allowAdditionalProperties = false;
             additionalPropertiesSchema = null;
@@ -64,7 +64,7 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
         if (!node.isObject()) {
             // ignore no object
@@ -108,7 +108,7 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
                     if (additionalPropertiesSchema != null) {
                         ValidatorState state = (ValidatorState) collectorContext.get(ValidatorState.VALIDATOR_STATE_KEY);
                         if (state != null && state.isWalkEnabled()) {
-                            Set<ValidationMessage> results = additionalPropertiesSchema.walk(executionContext, node.get(pname), rootNode, instanceLocation.resolve(pname), state.isValidationEnabled());
+                            Set<ValidationMessage> results = additionalPropertiesSchema.walk(executionContext, node.get(pname), rootNode, instanceLocation.resolve(pname), evaluationPath, state.isValidationEnabled());
                             if (!results.isEmpty()) {
                                 if (errors == null) {
                                     errors = new LinkedHashSet<>();
@@ -116,7 +116,7 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
                                 errors.addAll(results);
                             }
                         } else {
-                            Set<ValidationMessage> results = additionalPropertiesSchema.validate(executionContext, node.get(pname), rootNode, instanceLocation.resolve(pname));
+                            Set<ValidationMessage> results = additionalPropertiesSchema.validate(executionContext, node.get(pname), rootNode, instanceLocation.resolve(pname), evaluationPath);
                             if (!results.isEmpty()) {
                                 if (errors == null) {
                                     errors = new LinkedHashSet<>();
@@ -132,9 +132,9 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
         if (shouldValidateSchema) {
-            return validate(executionContext, node, rootNode, instanceLocation);
+            return validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
         }
 
         if (node == null || !node.isObject()) {
@@ -162,7 +162,7 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
                     if (additionalPropertiesSchema != null) {
                         ValidatorState state = (ValidatorState) executionContext.getCollectorContext().get(ValidatorState.VALIDATOR_STATE_KEY);
                         if (state != null && state.isWalkEnabled()) {
-                           additionalPropertiesSchema.walk(executionContext, node.get(pname), rootNode, instanceLocation.resolve(pname), state.isValidationEnabled());
+                           additionalPropertiesSchema.walk(executionContext, node.get(pname), rootNode, instanceLocation.resolve(pname), evaluationPath, state.isValidationEnabled());
                         }
                     }
                 }

@@ -37,11 +37,11 @@ public class RefValidator extends BaseJsonValidator {
     private static final String REF_CURRENT = "#";
     private static final String URN_SCHEME = URNURIFactory.SCHEME;
 
-    public RefValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.REF, validationContext);
+    public RefValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.REF, validationContext);
         String refValue = schemaNode.asText();
         this.parentSchema = parentSchema;
-        this.schema = getRefSchema(parentSchema, validationContext, refValue, evaluationPath);
+        this.schema = getRefSchema(parentSchema, validationContext, refValue);
         if (this.schema == null) {
             ValidationMessage validationMessage = ValidationMessage.builder().type(ValidatorTypeCode.REF.getValue())
                     .code("internal.unresolvedRef").message("{0}: Reference {1} cannot be resolved")
@@ -50,8 +50,7 @@ public class RefValidator extends BaseJsonValidator {
         }
     }
 
-    static JsonSchemaRef getRefSchema(JsonSchema parentSchema, ValidationContext validationContext, String refValue,
-            JsonNodePath evaluationPath) {
+    static JsonSchemaRef getRefSchema(JsonSchema parentSchema, ValidationContext validationContext, String refValue) {
         // The evaluationPath is used to derive the keywordLocation
         final String refValueOriginal = refValue;
 
@@ -81,7 +80,7 @@ public class RefValidator extends BaseJsonValidator {
                 }
             } else if (URN_SCHEME.equals(schemaUri.getScheme())) {
                 // Try to resolve URN schema as a JsonSchemaRef to some sub-schema of the parent
-                JsonSchemaRef ref = getJsonSchemaRef(parent, validationContext, schemaUri.toString(), refValueOriginal, evaluationPath);
+                JsonSchemaRef ref = getJsonSchemaRef(parent, validationContext, schemaUri.toString(), refValueOriginal);
                 if (ref != null) {
                     return ref;
                 }
@@ -98,14 +97,13 @@ public class RefValidator extends BaseJsonValidator {
         if (refValue.equals(REF_CURRENT)) {
             return new JsonSchemaRef(parent.findAncestor());
         }
-        return getJsonSchemaRef(parent, validationContext, refValue, refValueOriginal, evaluationPath);
+        return getJsonSchemaRef(parent, validationContext, refValue, refValueOriginal);
     }
 
     private static JsonSchemaRef getJsonSchemaRef(JsonSchema parent,
                                                   ValidationContext validationContext,
                                                   String refValue,
-                                                  String refValueOriginal,
-                                                  JsonNodePath evaluationPath) {
+                                                  String refValueOriginal) {
         JsonNode node = parent.getRefSchemaNode(refValue);
         if (node != null) {
             JsonSchemaRef ref = validationContext.getReferenceParsingInProgress(refValueOriginal);
@@ -126,7 +124,7 @@ public class RefValidator extends BaseJsonValidator {
                     // absolute
                     path = UriReference.get(refValue); 
                 }
-                final JsonSchema schema = validationContext.newSchema(path, evaluationPath, node, parent);
+                final JsonSchema schema = validationContext.newSchema(path, node, parent);
                 ref = new JsonSchemaRef(schema);
                 validationContext.setReferenceParsingInProgress(refValueOriginal, ref);
             }
@@ -161,7 +159,7 @@ public class RefValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         CollectorContext collectorContext = executionContext.getCollectorContext();
 
         Set<ValidationMessage> errors = new HashSet<>();
@@ -174,7 +172,7 @@ public class RefValidator extends BaseJsonValidator {
             // with the latest config. Reset the config.
             this.schema.getSchema().getValidationContext().setConfig(this.parentSchema.getValidationContext().getConfig());
             if (this.schema != null) {
-                errors =  this.schema.validate(executionContext, node, rootNode, instanceLocation);
+                errors =  this.schema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
             } else {
                 errors = Collections.emptySet();
             }
@@ -188,7 +186,7 @@ public class RefValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
         CollectorContext collectorContext = executionContext.getCollectorContext();
 
         Set<ValidationMessage> errors = new HashSet<>();
@@ -201,7 +199,7 @@ public class RefValidator extends BaseJsonValidator {
             // with the latest config. Reset the config.
             this.schema.getSchema().getValidationContext().setConfig(this.parentSchema.getValidationContext().getConfig());
             if (this.schema != null) {
-                errors = this.schema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                errors = this.schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, shouldValidateSchema);
             }
             return errors;
         } finally {

@@ -33,8 +33,8 @@ public class IfValidator extends BaseJsonValidator {
     private final JsonSchema thenSchema;
     private final JsonSchema elseSchema;
 
-    public IfValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.IF_THEN_ELSE, validationContext);
+    public IfValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.IF_THEN_ELSE, validationContext);
 
         JsonSchema foundIfSchema = null;
         JsonSchema foundThenSchema = null;
@@ -43,16 +43,13 @@ public class IfValidator extends BaseJsonValidator {
         for (final String keyword : KEYWORDS) {
             final JsonNode node = parentSchema.getSchemaNode().get(keyword);
             final JsonNodePath schemaLocationOfSchema = parentSchema.schemaLocation.resolve(keyword);
-            final JsonNodePath evaluationPathOfSchema = parentSchema.evaluationPath.resolve(keyword);
+//            final JsonNodePath evaluationPathOfSchema = parentSchema.evaluationPath.resolve(keyword);
             if (keyword.equals("if")) {
-                foundIfSchema = validationContext.newSchema(schemaLocationOfSchema, evaluationPathOfSchema, node,
-                        parentSchema);
+                foundIfSchema = validationContext.newSchema(schemaLocationOfSchema, node, parentSchema);
             } else if (keyword.equals("then") && node != null) {
-                foundThenSchema = validationContext.newSchema(schemaLocationOfSchema, evaluationPathOfSchema, node,
-                        parentSchema);
+                foundThenSchema = validationContext.newSchema(schemaLocationOfSchema, node, parentSchema);
             } else if (keyword.equals("else") && node != null) {
-                foundElseSchema = validationContext.newSchema(schemaLocationOfSchema, evaluationPathOfSchema, node,
-                        parentSchema);
+                foundElseSchema = validationContext.newSchema(schemaLocationOfSchema, node, parentSchema);
             }
         }
 
@@ -62,7 +59,7 @@ public class IfValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
         CollectorContext collectorContext = executionContext.getCollectorContext();
 
@@ -72,7 +69,7 @@ public class IfValidator extends BaseJsonValidator {
         boolean ifConditionPassed = false;
         try {
             try {
-                ifConditionPassed = this.ifSchema.validate(executionContext, node, rootNode, instanceLocation).isEmpty();
+                ifConditionPassed = this.ifSchema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath).isEmpty();
             } catch (JsonSchemaException ex) {
                 // When failFast is enabled, validations are thrown as exceptions.
                 // An exception means the condition failed
@@ -80,13 +77,13 @@ public class IfValidator extends BaseJsonValidator {
             }
 
             if (ifConditionPassed && this.thenSchema != null) {
-                errors.addAll(this.thenSchema.validate(executionContext, node, rootNode, instanceLocation));
+                errors.addAll(this.thenSchema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath));
             } else if (!ifConditionPassed && this.elseSchema != null) {
                 // discard ifCondition results
                 collectorContext.exitDynamicScope();
                 collectorContext.enterDynamicScope();
 
-                errors.addAll(this.elseSchema.validate(executionContext, node, rootNode, instanceLocation));
+                errors.addAll(this.elseSchema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath));
             }
 
         } finally {
@@ -113,19 +110,19 @@ public class IfValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
         if (shouldValidateSchema) {
-            return validate(executionContext, node, rootNode, instanceLocation);
+            return validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
         }
 
         if (null != this.ifSchema) {
-            this.ifSchema.walk(executionContext, node, rootNode, instanceLocation, false);
+            this.ifSchema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, false);
         }
         if (null != this.thenSchema) {
-            this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, false);
+            this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, false);
         }
         if (null != this.elseSchema) {
-            this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, false);
+            this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, false);
         }
 
         return Collections.emptySet();

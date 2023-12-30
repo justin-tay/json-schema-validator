@@ -32,13 +32,14 @@ public class AnyOfValidator extends BaseJsonValidator {
     private final List<JsonSchema> schemas = new ArrayList<>();
     private final ValidationContext.DiscriminatorContext discriminatorContext;
 
-    public AnyOfValidator(JsonNodePath schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
-        super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.ANY_OF, validationContext);
+    public AnyOfValidator(JsonNodePath schemaLocation, JsonNode schemaNode, JsonSchema parentSchema,
+            ValidationContext validationContext) {
+        super(schemaLocation, schemaNode, parentSchema, ValidatorTypeCode.ANY_OF, validationContext);
         this.validationContext = validationContext;
         int size = schemaNode.size();
         for (int i = 0; i < size; i++) {
-            this.schemas.add(validationContext.newSchema(schemaLocation.resolve(i), evaluationPath.resolve(i),
-                    schemaNode.get(i), parentSchema));
+            this.schemas.add(validationContext.newSchema(schemaLocation.resolve(i), schemaNode.get(i),
+                    parentSchema));
         }
 
         if (this.validationContext.getConfig().isOpenAPI3StyleDiscriminators()) {
@@ -49,7 +50,7 @@ public class AnyOfValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
         CollectorContext collectorContext = executionContext.getCollectorContext();
 
@@ -79,14 +80,14 @@ public class AnyOfValidator extends BaseJsonValidator {
                         //For union type, it is a must to call TypeValidator
                         if (typeValidator.getSchemaType() != JsonType.UNION && !typeValidator.equalsToSchemaType(node)) {
                             allErrors
-                                    .addAll(typeValidator.validate(executionContext, node, rootNode, instanceLocation));
+                                    .addAll(typeValidator.validate(executionContext, node, rootNode, instanceLocation, evaluationPath));
                             continue;
                         }
                     }
                     if (!state.isWalkEnabled()) {
-                        errors = schema.validate(executionContext, node, rootNode, instanceLocation);
+                        errors = schema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
                     } else {
-                        errors = schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                        errors = schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, true);
                     }
 
                     // check if any validation errors have occurred
@@ -161,12 +162,12 @@ public class AnyOfValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
         if (shouldValidateSchema) {
-            return validate(executionContext, node, rootNode, instanceLocation);
+            return validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
         }
         for (JsonSchema schema : this.schemas) {
-            schema.walk(executionContext, node, rootNode, instanceLocation, false);
+            schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, false);
         }
         return new LinkedHashSet<>();
     }

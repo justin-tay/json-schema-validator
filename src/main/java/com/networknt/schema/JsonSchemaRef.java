@@ -35,8 +35,8 @@ public class JsonSchemaRef {
     }
 
     public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
-            JsonNodePath instanceLocation) {
-        return schema.validate(executionContext, node, rootNode, instanceLocation);
+            JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
+        return schema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
     }
 
     public JsonSchema getSchema() {
@@ -44,7 +44,7 @@ public class JsonSchemaRef {
     }
 
     public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
-            JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-        return schema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+            JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
+        return schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, shouldValidateSchema);
     }
 }
