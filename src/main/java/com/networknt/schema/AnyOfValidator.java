@@ -68,7 +68,10 @@ public class AnyOfValidator extends BaseJsonValidator {
         Scope grandParentScope = collectorContext.enterDynamicScope();
         try {
             int numberOfValidSubSchemas = 0;
+            int i = 0;
             for (JsonSchema schema: this.schemas) {
+                JsonNodePath currentEvaluationPath = evaluationPath.resolve(i);
+                i++;
                 Set<ValidationMessage> errors = Collections.emptySet();
                 Scope parentScope = collectorContext.enterDynamicScope();
                 try {
@@ -80,14 +83,14 @@ public class AnyOfValidator extends BaseJsonValidator {
                         //For union type, it is a must to call TypeValidator
                         if (typeValidator.getSchemaType() != JsonType.UNION && !typeValidator.equalsToSchemaType(node)) {
                             allErrors
-                                    .addAll(typeValidator.validate(executionContext, node, rootNode, instanceLocation, evaluationPath));
+                                    .addAll(typeValidator.validate(executionContext, node, rootNode, instanceLocation, currentEvaluationPath));
                             continue;
                         }
                     }
                     if (!state.isWalkEnabled()) {
-                        errors = schema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
+                        errors = schema.validate(executionContext, node, rootNode, instanceLocation, currentEvaluationPath);
                     } else {
-                        errors = schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, true);
+                        errors = schema.walk(executionContext, node, rootNode, instanceLocation, currentEvaluationPath, true);
                     }
 
                     // check if any validation errors have occurred
@@ -166,8 +169,11 @@ public class AnyOfValidator extends BaseJsonValidator {
         if (shouldValidateSchema) {
             return validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
         }
+        int i = 0;
         for (JsonSchema schema : this.schemas) {
-            schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, false);
+            JsonNodePath currentEvaluationPath = evaluationPath.resolve(i);
+            i++;
+            schema.walk(executionContext, node, rootNode, instanceLocation, currentEvaluationPath, false);
         }
         return new LinkedHashSet<>();
     }

@@ -82,7 +82,6 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
         }
 
         Set<ValidationMessage> errors = null;
-
         for (Iterator<String> it = node.fieldNames(); it.hasNext(); ) {
             String pname = it.next();
             // skip the context items
@@ -103,6 +102,7 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
                         errors = new LinkedHashSet<>();
                     }
                     errors.add(message().property(pname).instanceLocation(instanceLocation.resolve(pname))
+                            .evaluationPath(evaluationPath)
                             .locale(executionContext.getExecutionConfig().getLocale()).arguments(pname).build());
                 } else {
                     if (additionalPropertiesSchema != null) {

@@ -42,8 +42,10 @@ public class PropertiesValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
+    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+            JsonNodePath instanceLocation, JsonNodePath evaluationPath) {
         debug(logger, node, rootNode, instanceLocation);
+        JsonNodePath currentEvaluationPath = EvaluationPath.of(evaluationPath, this);
         CollectorContext collectorContext = executionContext.getCollectorContext();
 
         WalkListenerRunner propertyWalkListenerRunner = new DefaultPropertyWalkListenerRunner(this.validationContext.getConfig().getPropertyWalkListeners());
@@ -74,7 +76,8 @@ public class PropertiesValidator extends BaseJsonValidator {
                 
                 if (!state.isWalkEnabled()) {
                     //validate the child element(s)
-                    Set<ValidationMessage> result = propertySchema.validate(executionContext, propertyNode, rootNode, path, evaluationPath);
+                    Set<ValidationMessage> result = propertySchema.validate(executionContext, propertyNode, rootNode,
+                            path, currentEvaluationPath);
                     if (!result.isEmpty()) {
                         if (errors == null) {
                             errors = new LinkedHashSet<>();
@@ -86,7 +89,7 @@ public class PropertiesValidator extends BaseJsonValidator {
                     if (errors == null) {
                         errors = new LinkedHashSet<>();
                     }
-                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, evaluationPath,
+                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, currentEvaluationPath,
                             state.isValidationEnabled(), errors, propertyWalkListenerRunner);
                 }
 
@@ -103,7 +106,8 @@ public class PropertiesValidator extends BaseJsonValidator {
                     // The required validator runs for all properties in the node and not just the
                     // current propertyNode
                     if (requiredErrors == null) {
-                        requiredErrors = getParentSchema().getRequiredValidator().validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
+                        requiredErrors = getParentSchema().getRequiredValidator().validate(executionContext, node,
+                                rootNode, instanceLocation, currentEvaluationPath);
 
                         if (!requiredErrors.isEmpty()) {
                              // the node was mandatory, decide which behavior to employ when validator has not matched
@@ -127,16 +131,17 @@ public class PropertiesValidator extends BaseJsonValidator {
     @Override
     public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, JsonNodePath evaluationPath, boolean shouldValidateSchema) {
+        JsonNodePath currentEvaluationPath = EvaluationPath.of(evaluationPath, this);
         HashSet<ValidationMessage> validationMessages = new LinkedHashSet<>();
         if (this.applyDefaultsStrategy.shouldApplyPropertyDefaults() && null != node && node.getNodeType() == JsonNodeType.OBJECT) {
             applyPropertyDefaults((ObjectNode) node);
         }
         if (shouldValidateSchema) {
-            validationMessages.addAll(validate(executionContext, node, rootNode, instanceLocation, evaluationPath));
+            validationMessages.addAll(validate(executionContext, node, rootNode, instanceLocation, currentEvaluationPath));
         } else {
             WalkListenerRunner propertyWalkListenerRunner = new DefaultPropertyWalkListenerRunner(this.validationContext.getConfig().getPropertyWalkListeners());
             for (Map.Entry<String, JsonSchema> entry : this.schemas.entrySet()) {
-                walkSchema(executionContext, entry, node, rootNode, instanceLocation, evaluationPath,
+                walkSchema(executionContext, entry, node, rootNode, instanceLocation, currentEvaluationPath,
                         shouldValidateSchema, validationMessages, propertyWalkListenerRunner);
             }
         }
@@ -170,17 +175,16 @@ public class PropertiesValidator extends BaseJsonValidator {
         JsonSchema propertySchema = entry.getValue();
         JsonNode propertyNode = (node == null ? null : node.get(entry.getKey()));
         JsonNodePath path = instanceLocation.resolve(entry.getKey());
-        JsonNodePath schemaEvaluationPath = evaluationPath.resolve(propertySchema.getSchemaLocation().getName(-1));
         boolean executeWalk = propertyWalkListenerRunner.runPreWalkListeners(executionContext,
                 ValidatorTypeCode.PROPERTIES.getValue(), propertyNode, rootNode, path,
-                schemaEvaluationPath, propertySchema.getSchemaLocation(), propertySchema.getSchemaNode(),
+                evaluationPath, propertySchema.getSchemaLocation(), propertySchema.getSchemaNode(),
                 propertySchema.getParentSchema(), this.validationContext, this.validationContext.getJsonSchemaFactory());
         if (executeWalk) {
             validationMessages.addAll(
-                    propertySchema.walk(executionContext, propertyNode, rootNode, path, schemaEvaluationPath, shouldValidateSchema));
+                    propertySchema.walk(executionContext, propertyNode, rootNode, path, evaluationPath, shouldValidateSchema));
         }
         propertyWalkListenerRunner.runPostWalkListeners(executionContext, ValidatorTypeCode.PROPERTIES.getValue(), propertyNode,
-                rootNode, path, schemaEvaluationPath,
+                rootNode, path, evaluationPath,
                 propertySchema.getSchemaLocation(), propertySchema.getSchemaNode(), propertySchema.getParentSchema(), this.validationContext, this.validationContext.getJsonSchemaFactory(), validationMessages);
 
     }

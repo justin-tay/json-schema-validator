@@ -513,16 +513,16 @@ public class JsonSchema extends BaseJsonValidator {
         Set<ValidationMessage> validationMessages = new LinkedHashSet<>();
         // Walk through all the JSONWalker's.
         getValidators().forEach(jsonWalker -> {
-            JsonNodePath evaluationPathWithKeyword = evaluationPath.resolve(jsonWalker.getSchemaLocation().getName(-1));
+            String keyword = jsonWalker.getSchemaLocation().getName(-1);
             try {
                 // Call all the pre-walk listeners. If at least one of the pre walk listeners
                 // returns SKIP, then skip the walk.
                 if (this.keywordWalkListenerRunner.runPreWalkListeners(executionContext,
-                        evaluationPathWithKeyword.getName(-1),
+                        keyword,
                         node,
                         rootNode,
                         instanceLocation,
-                        evaluationPathWithKeyword,
+                        evaluationPath,
                         jsonWalker.getSchemaLocation(),
                         this.schemaNode,
                         this.parentSchema, this.validationContext, this.validationContext.getJsonSchemaFactory())) {
@@ -531,11 +531,11 @@ public class JsonSchema extends BaseJsonValidator {
             } finally {
                 // Call all the post-walk listeners.
                 this.keywordWalkListenerRunner.runPostWalkListeners(executionContext,
-                        evaluationPathWithKeyword.getName(-1),
+                        keyword,
                         node,
                         rootNode,
                         instanceLocation,
-                        evaluationPathWithKeyword,
+                        evaluationPath,
                         jsonWalker.getSchemaLocation(),
                         this.schemaNode,
                         this.parentSchema,

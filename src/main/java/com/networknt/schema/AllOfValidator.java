@@ -51,15 +51,18 @@ public class AllOfValidator extends BaseJsonValidator {
 
         Set<ValidationMessage> childSchemaErrors = new LinkedHashSet<>();
 
+        int i = 0;
         for (JsonSchema schema : this.schemas) {
+            JsonNodePath currentEvaluationPath = evaluationPath.resolve(i);
+            i++;
             Set<ValidationMessage> localErrors = new HashSet<>();
 
             Scope parentScope = collectorContext.enterDynamicScope();
             try {
                 if (!state.isWalkEnabled()) {
-                    localErrors = schema.validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
+                    localErrors = schema.validate(executionContext, node, rootNode, instanceLocation, currentEvaluationPath);
                 } else {
-                    localErrors = schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, true);
+                    localErrors = schema.walk(executionContext, node, rootNode, instanceLocation, currentEvaluationPath, true);
                 }
 
                 childSchemaErrors.addAll(localErrors);
@@ -111,9 +114,13 @@ public class AllOfValidator extends BaseJsonValidator {
         if (shouldValidateSchema) {
             return validate(executionContext, node, rootNode, instanceLocation, evaluationPath);
         }
+        int i = 0;
         for (JsonSchema schema : this.schemas) {
+            JsonNodePath currentEvaluationPath = evaluationPath.resolve(i);
+            i++;
+
             // Walk through the schema
-            schema.walk(executionContext, node, rootNode, instanceLocation, evaluationPath, false);
+            schema.walk(executionContext, node, rootNode, instanceLocation, currentEvaluationPath, false);
         }
         return Collections.emptySet();
     }
