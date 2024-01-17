@@ -43,6 +43,7 @@ public class JsonSchema extends BaseJsonValidator {
     private final JsonMetaSchema metaSchema;
     private boolean validatorsLoaded = false;
     private boolean dynamicAnchor = false;
+    private String dynamicAnchorValue = null;
 
     /**
      * This is the current uri of this schema. This uri could refer to the uri of this schema's file
@@ -83,6 +84,11 @@ public class JsonSchema extends BaseJsonValidator {
         if (this.anchor != null) {
             this.validationContext.getSchemaResources().putIfAbsent(this.currentUri.toString() + "#" + anchor, this);
         }
+        String dynamicAnchor = validationContext.getMetaSchema().readDynamicAnchor(this.schemaNode);
+        if (dynamicAnchor != null) {
+            this.dynamicAnchorValue = "#" + dynamicAnchor;
+        }
+
         getValidators();
     }
     
@@ -432,6 +438,9 @@ public class JsonSchema extends BaseJsonValidator {
         CollectorContext collectorContext = executionContext.getCollectorContext();
         // Set the walkEnabled and isValidationEnabled flag in internal validator state.
         setValidatorState(executionContext, false, true);
+        if (this.dynamicAnchorValue != null) {
+            collectorContext.getDynamicScope().getDynamicAnchors().put(this.dynamicAnchorValue, this);
+        }
 
         for (JsonValidator v : getValidators()) {
             Set<ValidationMessage> results = null;

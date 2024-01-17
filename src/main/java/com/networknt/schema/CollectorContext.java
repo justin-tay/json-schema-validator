@@ -91,6 +91,10 @@ public class CollectorContext {
     public Scope getDynamicScope() {
         return this.dynamicScopes.peek();
     }
+    
+    public Deque<Scope> getDynamicScopes() {
+        return this.dynamicScopes;
+    }
 
     public JsonSchema getOutermostSchema() {
 
@@ -234,6 +238,7 @@ public class CollectorContext {
     }
 
     public static class Scope {
+        private final Map<String, JsonSchema> dynamicAnchors = new HashMap<>();
 
         private final JsonSchema containingSchema;
 
@@ -311,6 +316,10 @@ public class CollectorContext {
         public Collection<JsonNodePath> getEvaluatedProperties() {
             return this.evaluatedProperties;
         }
+        
+        public Map<String, JsonSchema> getDynamicAnchors() {
+            return this.dynamicAnchors;
+        }
 
         /**
          * Merges the provided scope into this scope.
@@ -323,6 +332,9 @@ public class CollectorContext {
             }
             if (!scope.getEvaluatedProperties().isEmpty()) {
                 getEvaluatedProperties().addAll(scope.getEvaluatedProperties());
+            }
+            if (!scope.getDynamicAnchors().isEmpty()) {
+                getDynamicAnchors().putAll(scope.getDynamicAnchors());
             }
             return this;
         }
