@@ -59,11 +59,10 @@ public class JsonSchema extends BaseJsonValidator {
             JsonNode schemaNode, JsonSchema parent, boolean suppressSubSchemaRetrieval) {
         super(schemaLocation.resolve(validationContext.resolveSchemaId(schemaNode)), evaluationPath, schemaNode, parent,
                 null, null, validationContext, suppressSubSchemaRetrieval);
-        this.validationContext = validationContext;
-        this.metaSchema = validationContext.getMetaSchema();
+        this.metaSchema = this.validationContext.getMetaSchema();
         initializeConfig();
-        this.id = validationContext.resolveSchemaId(this.schemaNode);
-        this.anchor = validationContext.getMetaSchema().readAnchor(this.schemaNode);
+        this.id = this.validationContext.resolveSchemaId(this.schemaNode);
+        this.anchor = this.validationContext.getMetaSchema().readAnchor(this.schemaNode);
         if (this.id != null) {
             this.validationContext.getSchemaResources()
                     .putIfAbsent(this.schemaLocation != null ? this.schemaLocation.toString() : this.id, this);
@@ -71,6 +70,11 @@ public class JsonSchema extends BaseJsonValidator {
         if (this.anchor != null) {
             this.validationContext.getSchemaResources()
                     .putIfAbsent(this.schemaLocation.getAbsoluteIri().toString() + "#" + anchor, this);
+        }
+        String dynamicAnchor = this.validationContext.getMetaSchema().readDynamicAnchor(schemaNode);
+        if (dynamicAnchor != null) {
+            this.validationContext.getDynamicAnchors()
+                    .putIfAbsent(this.schemaLocation.getAbsoluteIri().toString() + "#" + dynamicAnchor, this);
         }
         getValidators();
     }
@@ -116,7 +120,9 @@ public class JsonSchema extends BaseJsonValidator {
         copy.validationContext = new ValidationContext(copy.getValidationContext().getMetaSchema(),
                 copy.getValidationContext().getJsonSchemaFactory(),
                 refEvaluationParentSchema.validationContext.getConfig(),
-                copy.getValidationContext().getSchemaReferences(), copy.getValidationContext().getSchemaResources());
+                refEvaluationParentSchema.getValidationContext().getSchemaReferences(),
+                refEvaluationParentSchema.getValidationContext().getSchemaResources(),
+                refEvaluationParentSchema.getValidationContext().getDynamicAnchors());
         copy.evaluationPath = refEvaluationPath;
         copy.evaluationParentSchema = refEvaluationParentSchema;
         // Validator state is reset due to the changes in evaluation path
@@ -134,7 +140,8 @@ public class JsonSchema extends BaseJsonValidator {
             copy.validationContext = new ValidationContext(copy.getValidationContext().getMetaSchema(),
                     copy.getValidationContext().getJsonSchemaFactory(), config,
                     copy.getValidationContext().getSchemaReferences(),
-                    copy.getValidationContext().getSchemaResources());
+                    copy.getValidationContext().getSchemaResources(),
+                    copy.getValidationContext().getDynamicAnchors());
             copy.validatorsLoaded = false;
             copy.requiredValidator = null;
             copy.typeValidator = null;

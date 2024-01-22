@@ -215,7 +215,7 @@ public class JsonSchemaFactory {
         if (metaSchema != null && !metaSchema.getUri().equals(validationContext.getMetaSchema().getUri())) {
             return new ValidationContext(metaSchema, validationContext.getJsonSchemaFactory(),
                     validationContext.getConfig(), validationContext.getSchemaReferences(),
-                    validationContext.getSchemaResources());
+                    validationContext.getSchemaResources(), validationContext.getDynamicAnchors());
         }
         return validationContext;
     }
