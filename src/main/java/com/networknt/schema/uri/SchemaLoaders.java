@@ -18,6 +18,9 @@ package com.networknt.schema.uri;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Schema Loaders.
@@ -36,16 +39,47 @@ public class SchemaLoaders extends ArrayList<SchemaLoader> {
     public SchemaLoaders(int initialCapacity) {
         super(initialCapacity);
     }
-    
+
     public static Builder builder() {
         return new Builder();
     }
 
     public static class Builder {
         private List<SchemaLoader> values = new ArrayList<>();
+
+        public Builder() {
+        }
+
+        public Builder(Builder copy) {
+            this.values.addAll(copy.values);
+        }
+
+        public Builder values(Consumer<List<SchemaLoader>> values) {
+            values.accept(this.values);
+            return this;
+        }
         
+        public Builder add(SchemaLoader schemaLoader) {
+            this.values.add(schemaLoader);
+            return this;
+        }
+
+        public Builder values(Map<String, String> mappings) {
+            this.values.add(new MapSchemaLoader(mappings));
+            return this;
+        }
+        
+        public Builder values(Function<String, String> mappings) {
+            this.values.add(new MapSchemaLoader(mappings));
+            return this;
+        }
+
         public SchemaLoaders build() {
-            return new SchemaLoaders(values);
+            List<SchemaLoader> result = new ArrayList<>();
+            result.add(new ClasspathSchemaLoader());
+            result.addAll(this.values);
+            result.add(new UriSchemaLoader());
+            return new SchemaLoaders(result);
         }
     }
 }
