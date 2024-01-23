@@ -483,10 +483,16 @@ public class JsonSchema extends BaseJsonValidator {
 
     /**
      * Validate the given root JsonNode, starting at the root of the data path.
+     * <p>
+     * Note that since Draft 2019-09 by default format generates only annotations
+     * and not assertions.
+     * <p>
+     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * the default.
+     * 
      * @param rootNode the root node
-     *
-     * @return A list of ValidationMessage if there is any validation error, or an empty
-     * list if there is no error.
+     * @return A list of ValidationMessage if there is any validation error, or an
+     *         empty list if there is no error.
      */
     public Set<ValidationMessage> validate(JsonNode rootNode) {
         return validate(rootNode, OutputFormat.DEFAULT);
@@ -494,9 +500,16 @@ public class JsonSchema extends BaseJsonValidator {
 
     /**
      * Validate the given root JsonNode, starting at the root of the data path.
-     * @param rootNode the root node
+     * <p>
+     * Note that since Draft 2019-09 by default format generates only annotations
+     * and not assertions.
+     * <p>
+     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * the default.
+     *
+     * @param rootNode            the root node
      * @param executionCustomizer the execution customizer
-     * @return
+     * @return the assertions
      */
     public Set<ValidationMessage> validate(JsonNode rootNode, ExecutionCustomizer executionCustomizer) {
         return validate(rootNode, OutputFormat.DEFAULT, executionCustomizer);
@@ -504,9 +517,16 @@ public class JsonSchema extends BaseJsonValidator {
 
     /**
      * Validate the given root JsonNode, starting at the root of the data path.
-     * @param rootNode the root node
+     * <p>
+     * Note that since Draft 2019-09 by default format generates only annotations
+     * and not assertions.
+     * <p>
+     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * the default.
+     * 
+     * @param rootNode            the root node
      * @param executionCustomizer the execution customizer
-     * @return
+     * @return the assertions
      */
     public Set<ValidationMessage> validate(JsonNode rootNode, Consumer<ExecutionContext> executionCustomizer) {
         return validate(rootNode, OutputFormat.DEFAULT, executionCustomizer);
@@ -515,6 +535,12 @@ public class JsonSchema extends BaseJsonValidator {
     /**
      * Validates the given root JsonNode, starting at the root of the data path. The
      * output will be formatted using the formatter specified.
+     * <p>
+     * Note that since Draft 2019-09 by default format generates only annotations
+     * and not assertions.
+     * <p>
+     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * the default.
      * 
      * @param <T>      the result type
      * @param rootNode the root note
@@ -528,6 +554,12 @@ public class JsonSchema extends BaseJsonValidator {
     /**
      * Validates the given root JsonNode, starting at the root of the data path. The
      * output will be formatted using the formatter specified.
+     * <p>
+     * Note that since Draft 2019-09 by default format generates only annotations
+     * and not assertions.
+     * <p>
+     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * the default.
      * 
      * @param <T>                 the result type
      * @param rootNode            the root node
@@ -542,6 +574,12 @@ public class JsonSchema extends BaseJsonValidator {
     /**
      * Validates the given root JsonNode, starting at the root of the data path. The
      * output will be formatted using the formatter specified.
+     * <p>
+     * Note that since Draft 2019-09 by default format generates only annotations
+     * and not assertions.
+     * <p>
+     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * the default.
      * 
      * @param <T>                 the result type
      * @param rootNode            the root node
