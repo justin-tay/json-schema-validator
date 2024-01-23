@@ -23,7 +23,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Schema Mappers.
+ * Schema Mappers used to map an ID indicated by an absolute IRI to a retrieval
+ * IRI.
  */
 public class SchemaMappers extends ArrayList<SchemaMapper> {
     private static final long serialVersionUID = 1L;
@@ -54,31 +55,67 @@ public class SchemaMappers extends ArrayList<SchemaMapper> {
             this.values.addAll(copy.values);
         }
 
-        public Builder values(Consumer<List<SchemaMapper>> values) {
-            values.accept(this.values);
+        /**
+         * Customize the schema mappers.
+         * 
+         * @param customizer the customizer
+         * @return the builder
+         */
+        public Builder values(Consumer<List<SchemaMapper>> customizer) {
+            customizer.accept(this.values);
             return this;
         }
 
+        /**
+         * Adds a schema mapper.
+         * 
+         * @param schemaMapper the schema mapper
+         * @return the builder
+         */
         public Builder add(SchemaMapper schemaMapper) {
             this.values.add(schemaMapper);
             return this;
         }
 
+        /**
+         * Maps a schema given a source prefix with a replacement.
+         * 
+         * @param source      the source prefix
+         * @param replacement the replacement prefix
+         * @return the builder
+         */
         public Builder mapPrefix(String source, String replacement) {
             this.values.add(new PrefixSchemaMapper(source, replacement));
             return this;
         }
 
-        public Builder values(Map<String, String> mappings) {
-            this.values.add(new MapSchemaMapper(mappings));
-            return this;
-        }
-        
-        public Builder values(Function<String, String> mappings) {
+        /**
+         * Sets the mappings.
+         * 
+         * @param mappings the mappings
+         * @return the builder
+         */
+        public Builder mappings(Map<String, String> mappings) {
             this.values.add(new MapSchemaMapper(mappings));
             return this;
         }
 
+        /**
+         * Sets the function that maps the IRI to another IRI.
+         * 
+         * @param mappings the mappings
+         * @return the builder
+         */
+        public Builder mappings(Function<String, String> mappings) {
+            this.values.add(new MapSchemaMapper(mappings));
+            return this;
+        }
+
+        /**
+         * Builds a {@link SchemaMappers}
+         * 
+         * @return the schema mappers
+         */
         public SchemaMappers build() {
             return new SchemaMappers(values);
         }
