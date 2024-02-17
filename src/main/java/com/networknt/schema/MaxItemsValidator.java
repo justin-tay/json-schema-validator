@@ -30,12 +30,14 @@ public class MaxItemsValidator extends BaseJsonValidator implements JsonValidato
 
     private static final Logger logger = LoggerFactory.getLogger(MaxItemsValidator.class);
 
-    private int max = 0;
+    private final int max;
 
     public MaxItemsValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.MAX_ITEMS, validationContext);
         if (schemaNode.canConvertToExactIntegral()) {
-            max = schemaNode.intValue();
+            this.max = schemaNode.intValue();
+        } else {
+            this.max = 0;
         }
     }
 

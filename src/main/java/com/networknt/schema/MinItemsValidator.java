@@ -29,12 +29,14 @@ import java.util.Set;
 public class MinItemsValidator extends BaseJsonValidator implements JsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(MinItemsValidator.class);
 
-    private int min = 0;
+    private final int min;
 
     public MinItemsValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.MIN_ITEMS, validationContext);
         if (schemaNode.canConvertToExactIntegral()) {
-            min = schemaNode.intValue();
+            this.min = schemaNode.intValue();
+        } else {
+            this.min = 0;
         }
     }
 

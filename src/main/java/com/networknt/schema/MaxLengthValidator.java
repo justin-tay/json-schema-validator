@@ -29,13 +29,14 @@ import java.util.Set;
 public class MaxLengthValidator extends BaseJsonValidator implements JsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(MaxLengthValidator.class);
 
-    private int maxLength;
+    private final int maxLength;
 
     public MaxLengthValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.MAX_LENGTH, validationContext);
-        maxLength = Integer.MAX_VALUE;
-        if (schemaNode != null && schemaNode.canConvertToExactIntegral()) {
-            maxLength = schemaNode.intValue();
+        if (schemaNode.canConvertToExactIntegral()) {
+            this.maxLength = schemaNode.intValue();
+        } else {
+            this.maxLength = Integer.MAX_VALUE;
         }
     }
 

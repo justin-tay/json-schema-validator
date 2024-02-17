@@ -34,7 +34,7 @@ public class MinimumValidator extends BaseJsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(MinimumValidator.class);
     private static final String PROPERTY_EXCLUSIVE_MINIMUM = "exclusiveMinimum";
 
-    private boolean excludeEqual = false;
+    private final boolean excludeEqual;
 
     /**
      * In order to limit number of `if` statements in `validate` method, all the
@@ -52,6 +52,8 @@ public class MinimumValidator extends BaseJsonValidator {
         JsonNode exclusiveMinimumNode = getParentSchema().getSchemaNode().get(PROPERTY_EXCLUSIVE_MINIMUM);
         if (exclusiveMinimumNode != null && exclusiveMinimumNode.isBoolean()) {
             excludeEqual = exclusiveMinimumNode.booleanValue();
+        } else {
+            excludeEqual = false;
         }
 
         final String minimumText = schemaNode.asText();
