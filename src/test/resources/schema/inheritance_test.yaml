@@ -1,0 +1,138 @@
+---
+openapi: 3.0.2
+info:
+  title: inheritance_test
+  version: 1.0.0
+components:
+  schemas:
+    SampleDataA:
+      description: ""
+      required:
+      - fld1
+      - fld2
+      type: object
+      properties:
+        fld1:
+          description: ""
+          maxLength: 10
+          minLength: 3
+          type: string
+        fld2:
+          description: ""
+          maximum: 100
+          minimum: 10
+          type: number
+    SampleDataB:
+      description: ""
+      required:
+      - fld3
+      - fld4
+      type: object
+      properties:
+        fld3:
+          description: ""
+          maxLength: 10
+          minLength: 3
+          type: string
+        fld4:
+          description: ""
+          maximum: 100
+          minimum: 10
+          type: number
+    SampleDataC:
+      description: ""
+      required:
+      - fld5
+      - fld6
+      type: object
+      properties:
+        fld5:
+          description: ""
+          maxLength: 10
+          minLength: 3
+          type: string
+        fld6:
+          description: ""
+          maximum: 100
+          minimum: 10
+          type: number
+    SampleDataD:
+      description: ""
+      required:
+      - fld7
+      - fld8
+      type: object
+      properties:
+        fld7:
+          description: ""
+          maxLength: 10
+          minLength: 3
+          type: string
+        fld8:
+          description: ""
+          maximum: 100
+          minimum: 10
+          type: number
+    Example1:
+      anyOf:
+      - type: object
+      - $ref: '#/components/schemas/SampleData1'
+      - $ref: '#/components/schemas/SampleData2'
+      description: ""
+      type: object
+    Example2:
+      description: ""
+      type: object
+      allOf:
+      - type: object
+      - $ref: '#/components/schemas/SampleData3'
+      - $ref: '#/components/schemas/SampleData4'
+    Example3:
+      oneOf:
+      - type: object
+      - $ref: '#/components/schemas/SampleData5'
+      - $ref: '#/components/schemas/SampleData6'
+      description: ""
+      type: object
+    SampleData1:
+      oneOf:
+      - type: object
+      - $ref: '#/components/schemas/SampleDataA'
+      - $ref: '#/components/schemas/SampleDataB'
+      description: ""
+      type: object
+    SampleData2:
+      oneOf:
+      - type: object
+      - $ref: '#/components/schemas/SampleDataC'
+      - $ref: '#/components/schemas/SampleDataD'
+      description: ""
+      type: object
+    SampleData3:
+      oneOf:
+      - type: object
+      - $ref: '#/components/schemas/SampleDataA'
+      - $ref: '#/components/schemas/SampleDataB'
+      description: ""
+      type: object
+    SampleData4:
+      anyOf:
+      - type: object
+      - $ref: '#/components/schemas/SampleDataC'
+      - $ref: '#/components/schemas/SampleDataD'
+      description: ""
+      type: object
+    SampleData5:
+      description: ""
+      type: object
+      allOf:
+      - type: object
+      - $ref: '#/components/schemas/SampleDataA'
+      - $ref: '#/components/schemas/SampleDataB'
+    SampleData6:
+      anyOf:
+      - type: object
+      - $ref: '#/components/schemas/SampleDataC'
+      - $ref: '#/components/schemas/SampleDataD'
+      description: ""
+      type: object

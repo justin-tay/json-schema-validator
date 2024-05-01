@@ -163,4 +163,25 @@ public class NestedApplicatorTest {
         Set<ValidationMessage> messages = schema.validate("{}", InputFormat.JSON);
         Assertions.assertTrue(messages.isEmpty());
     }
+
+    @Test
+    void example1() {
+        JsonSchema schema = JsonSchemaFactory.getInstance(VersionFlag.V202012)
+                .getSchema(SchemaLocation.of("classpath:/schema/inheritance_test.yaml#/components/schemas/Example1"));
+        System.out.println(schema.validate("{}", InputFormat.JSON, OutputFormat.HIERARCHICAL));
+    }
+
+    @Test
+    void example2() {
+        JsonSchema schema = JsonSchemaFactory.getInstance(VersionFlag.V202012)
+                .getSchema(SchemaLocation.of("classpath:/schema/inheritance_test.yaml#/components/schemas/Example2"));
+        System.out.println(schema.validate("{}", InputFormat.JSON, OutputFormat.HIERARCHICAL));
+    }
+
+    @Test
+    void example3() {
+        JsonSchema schema = JsonSchemaFactory.getInstance(VersionFlag.V202012)
+                .getSchema(SchemaLocation.of("classpath:/schema/inheritance_test.yaml#/components/schemas/Example3"));
+        System.out.println(schema.validate("{}", InputFormat.JSON, OutputFormat.HIERARCHICAL));
+    }
 }
