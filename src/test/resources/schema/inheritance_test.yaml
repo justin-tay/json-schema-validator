@@ -80,6 +80,11 @@ components:
       - $ref: '#/components/schemas/SampleData2'
       description: ""
       type: object
+    Example1a:
+      anyOf:
+      - $ref: '#/components/schemas/SampleData1a'
+      - $ref: '#/components/schemas/SampleData2a'
+      description: ""
     Example2:
       description: ""
       type: object
@@ -101,6 +106,11 @@ components:
       - $ref: '#/components/schemas/SampleDataB'
       description: ""
       type: object
+    SampleData1a:
+      oneOf:
+      - $ref: '#/components/schemas/SampleDataA'
+      - $ref: '#/components/schemas/SampleDataB'
+      description: ""
     SampleData2:
       oneOf:
       - type: object
@@ -108,6 +118,11 @@ components:
       - $ref: '#/components/schemas/SampleDataD'
       description: ""
       type: object
+    SampleData2a:
+      oneOf:
+      - $ref: '#/components/schemas/SampleDataC'
+      - $ref: '#/components/schemas/SampleDataD'
+      description: ""
     SampleData3:
       oneOf:
       - type: object

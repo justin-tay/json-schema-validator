@@ -184,4 +184,12 @@ public class NestedApplicatorTest {
                 .getSchema(SchemaLocation.of("classpath:/schema/inheritance_test.yaml#/components/schemas/Example3"));
         System.out.println(schema.validate("{}", InputFormat.JSON, OutputFormat.HIERARCHICAL));
     }
+
+    @Test
+    void example1a() {
+        JsonSchema schema = JsonSchemaFactory.getInstance(VersionFlag.V202012)
+                .getSchema(SchemaLocation.of("classpath:/schema/inheritance_test.yaml#/components/schemas/Example1a"));
+        System.out.println(schema.validate("{}", InputFormat.JSON, OutputFormat.HIERARCHICAL));
+    }
+
 }
