@@ -20,6 +20,10 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.SpecVersion.VersionFlag;
 
 /**
@@ -190,6 +194,84 @@ public class NestedApplicatorTest {
         JsonSchema schema = JsonSchemaFactory.getInstance(VersionFlag.V202012)
                 .getSchema(SchemaLocation.of("classpath:/schema/inheritance_test.yaml#/components/schemas/Example1a"));
         System.out.println(schema.validate("{}", InputFormat.JSON, OutputFormat.HIERARCHICAL));
+    }
+    
+    @Test
+    void t1() throws JsonMappingException, JsonProcessingException {
+        String schemaData = "{\r\n"
+                + "        \"type\" : \"object\",\r\n"
+                + "        \"allOf\" : [\r\n"
+                + "            {\r\n"
+                + "                \"type\" : \"object\",\r\n"
+                + "                \"anyOf\" : [\r\n"
+                + "                    {\r\n"
+                + "                        \"type\" : \"object\",\r\n"
+                + "                        \"properties\" : {\r\n"
+                + "                            \"data\" : {\r\n"
+                + "                                \"type\" : \"string\"\r\n"
+                + "                            }\r\n"
+                + "                        }\r\n"
+                + "                    },\r\n"
+                + "                    {\r\n"
+                + "                        \"type\" : \"object\",\r\n"
+                + "                        \"properties\" : {\r\n"
+                + "                            \"data\" : {\r\n"
+                + "                                \"type\" : \"number\"\r\n"
+                + "                            }\r\n"
+                + "                        }\r\n"
+                + "                    }\r\n"
+                + "                ]\r\n"
+                + "            },\r\n"
+                + "            {\r\n"
+                + "                \"type\" : \"object\",\r\n"
+                + "                \"anyOf\" : [\r\n"
+                + "                    {\r\n"
+                + "                        \"type\" : \"object\",\r\n"
+                + "                        \"properties\" : {\r\n"
+                + "                            \"data\" : {\r\n"
+                + "                                \"type\" : \"boolean\"\r\n"
+                + "                            }\r\n"
+                + "                        }\r\n"
+                + "                    },\r\n"
+                + "                    {\r\n"
+                + "                        \"type\" : \"object\",\r\n"
+                + "                        \"properties\" : {\r\n"
+                + "                            \"data\" : {\r\n"
+                + "                                \"type\" : \"string\",\r\n"
+                + "                                \"enum\" : [\r\n"
+                + "                                    \"value1\",\r\n"
+                + "                                    \"value2\"\r\n"
+                + "                                ]\r\n"
+                + "                            }\r\n"
+                + "                        }\r\n"
+                + "                    }\r\n"
+                + "                ]\r\n"
+                + "            }\r\n"
+                + "        ]\r\n"
+                + "    }";
+        JsonSchema schema = JsonSchemaFactory.getInstance(VersionFlag.V202012).getSchema(schemaData);
+        Set<ValidationMessage> messages = schema.validate("{}", InputFormat.JSON);
+        Assertions.assertTrue(messages.isEmpty());
+        messages = schema.validate("{\r\n"
+                + "        \"data\" : \"value1\"\r\n"
+                + "    }", InputFormat.JSON);
+        Assertions.assertTrue(messages.isEmpty());
+        messages = schema.validate("{\r\n"
+                + "        \"data\" : \"data\"\r\n"
+                + "    }", InputFormat.JSON);
+        Assertions.assertFalse(messages.isEmpty());
+        messages = schema.validate("{\r\n"
+                + "        \"data\" : true,\r\n"
+                + "        \"data\" : \"value1\"\r\n"
+                + "    }", InputFormat.JSON);
+        Assertions.assertTrue(messages.isEmpty());
+        
+        JsonNode node = new ObjectMapper().readValue("{\r\n"
+                + "        \"data\" : true,\r\n"
+                + "        \"data\" : \"value1\"\r\n"
+                + "    }", JsonNode.class);
+        System.out.println(node);
+
     }
 
 }
