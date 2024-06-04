@@ -2,11 +2,13 @@ package com.networknt.schema.regex;
 
 import java.nio.charset.StandardCharsets;
 
-import org.jcodings.specific.UTF8Encoding;
 import org.joni.Option;
 import org.joni.Regex;
 import org.joni.Syntax;
 
+/**
+ * ECMAScript {@link RegularExpression}.
+ */
 class JoniRegularExpression implements RegularExpression {
     private final Regex pattern;
 
@@ -21,7 +23,7 @@ class JoniRegularExpression implements RegularExpression {
             .replace("\\S", "[^ \\f\\n\\r\\t\\v\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]");
 
         byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
-        this.pattern = new Regex(bytes, 0, bytes.length, Option.SINGLELINE, UTF8Encoding.INSTANCE, Syntax.ECMAScript);
+        this.pattern = new Regex(bytes, 0, bytes.length, Option.SINGLELINE, ECMAEncoding.INSTANCE, Syntax.ECMAScript);
     }
 
     @Override
