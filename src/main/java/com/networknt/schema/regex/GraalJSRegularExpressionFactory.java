@@ -15,18 +15,51 @@
  */
 package com.networknt.schema.regex;
 
+import org.graalvm.polyglot.Context;
+
 /**
  * GraalJS {@link RegularExpressionFactory}.
+ * <p>
+ * This requires a dependency on org.graalvm.js:js which along with its
+ * dependency libraries are 50 mb.
  */
 public class GraalJSRegularExpressionFactory implements RegularExpressionFactory {
-    private static final GraalJSRegularExpressionFactory INSTANCE = new GraalJSRegularExpressionFactory();
-    
+    private static class Holder {
+        private static final GraalJSRegularExpressionFactory INSTANCE = new GraalJSRegularExpressionFactory();
+    }
+
+    private final GraalJSRegularExpressionContext context;
+
     public static GraalJSRegularExpressionFactory getInstance() {
-        return INSTANCE;
+        return Holder.INSTANCE;
+    }
+
+    /**
+     * Constructor.
+     * <p>
+     * This uses the context from {@link GraalJSContextFactory#getInstance()}.
+     * <p>
+     * It is the caller's responsibility to release the context when it is no longer
+     * required.
+     */
+    public GraalJSRegularExpressionFactory() {
+        this(GraalJSContextFactory.getInstance());
+    }
+
+    /**
+     * Constructor.
+     * <p>
+     * It is the caller's responsibility to release the context when it is no longer
+     * required.
+     * 
+     * @param context the context
+     */
+    public GraalJSRegularExpressionFactory(Context context) {
+        this.context = new GraalJSRegularExpressionContext(context);
     }
 
     @Override
     public RegularExpression getRegularExpression(String regex) {
-        return new GraalJSRegularExpression(regex);
+        return new GraalJSRegularExpression(regex, this.context);
     }
 }
