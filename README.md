@@ -526,6 +526,7 @@ The following is sample output from the Hierarchical format.
 | `locale`                              | The locale to use for generating messages in the `ValidationMessage`.                                                                                                                                                             | `Locale.getDefault()`
 | `failFast`                            | Whether to return failure immediately when an assertion is generated.                                                                                                                                                             | `false`
 | `formatAssertionsEnabled`             | The default is to generate format assertions from Draft 4 to Draft 7 and to only generate annotations from Draft 2019-09. Setting to `true` or `false` will override the default behavior.                                        | `null`
+| `regularExpressionFactory`            | The factory to use to create regular expressions.                                                                                                                                                                                 | `JDKRegularExpressionFactory.getInstance()`
 
 ## Performance Considerations
 

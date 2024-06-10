@@ -62,7 +62,7 @@ public class SchemaValidatorsConfig {
     private ApplyDefaultsStrategy applyDefaultsStrategy = ApplyDefaultsStrategy.EMPTY_APPLY_DEFAULTS_STRATEGY;
 
     /**
-     * When set to true, use ECMA-262 compatible validator
+     * Used to create {@link com.networknt.schema.regex.RegularExpression}.
      */
     private RegularExpressionFactory regularExpressionFactory = JDKRegularExpressionFactory.getInstance();
 
