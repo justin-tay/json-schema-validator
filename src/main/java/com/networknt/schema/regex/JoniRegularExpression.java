@@ -7,6 +7,7 @@ import org.jcodings.specific.UTF8Encoding;
 import org.joni.Option;
 import org.joni.Regex;
 import org.joni.Syntax;
+import org.joni.constants.SyntaxProperties;
 import org.joni.exception.SyntaxException;
 
 /**
@@ -19,9 +20,18 @@ class JoniRegularExpression implements RegularExpression {
     private final Regex pattern;
     private final Pattern INVALID_ESCAPE_PATTERN = Pattern.compile(
             ".*\\\\([aeg-moqyzACE-OQ-RT-VX-Z1-9]|c$|[pP]([^{]|$)|u([^{0-9]|$)|x([0-9a-fA-F][^0-9a-fA-F]|[^0-9a-fA-F][0-9a-fA-F]|[^0-9a-fA-F][^0-9a-fA-F]|.?$)).*");
+    
+    private final static Syntax SYNTAX;
 
+    static {
+        Syntax syntax = new Syntax(Syntax.ECMAScript.name, Syntax.ECMAScript.op,
+                Syntax.ECMAScript.op2 | SyntaxProperties.OP2_QMARK_LT_NAMED_GROUP, Syntax.ECMAScript.op3,
+                Syntax.ECMAScript.behavior, Syntax.ECMAScript.options, Syntax.ECMAScript.metaCharTable);
+        SYNTAX = syntax;
+    }
+    
     JoniRegularExpression(String regex) {
-        this(regex, Syntax.ECMAScript);
+        this(regex, SYNTAX);
     }
 
     JoniRegularExpression(String regex, Syntax syntax) {

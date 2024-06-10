@@ -18,6 +18,7 @@ package com.networknt.schema.regex;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.joni.exception.SyntaxException;
 import org.junit.jupiter.api.Test;
@@ -118,5 +119,11 @@ class JoniRegularExpressionTest {
         assertThrows(SyntaxException.class, () -> new JoniRegularExpression("\\P"));
         assertThrows(SyntaxException.class, () -> new JoniRegularExpression("\\pa"));
         assertThrows(SyntaxException.class, () -> new JoniRegularExpression("\\Pa"));
+    }
+
+    @Test
+    void pattern() {
+        RegularExpression regex = new JoniRegularExpression("((?<OrgOID>[^,. ]+)\\s*\\.\\s*(?<AOID>[^,. ]+))(?:\\s*,\\s*)?");
+        assertTrue(regex.matches("FFFF.12645,AAAA.6456"));
     }
 }

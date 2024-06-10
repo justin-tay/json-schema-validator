@@ -15,33 +15,17 @@
  */
 package com.networknt.schema.regex;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
 /**
- * Test for GraalJSRegularExpression.
+ * Tests for JDKRegularExpression.
  */
-class GraalJSRegularExpressionTest {
-    @Test
-    void digit() {
-        RegularExpression regex = new GraalJSRegularExpression("\\d");
-        assertTrue(regex.matches("1"));
-        assertFalse(regex.matches("a"));
-    }
-
-    @Test
-    void invalidEscape() {
-        RuntimeException e = assertThrows(RuntimeException.class, () -> new GraalJSRegularExpression("\\a"));
-        assertEquals("SyntaxError: Invalid escape", e.getMessage());
-    }
-    
+class JDKRegularExpressionTest {
     @Test
     void pattern() {
-        RegularExpression regex = new GraalJSRegularExpression("((?<OrgOID>[^,. ]+)\\s*\\.\\s*(?<AOID>[^,. ]+))(?:\\s*,\\s*)?");
+        RegularExpression regex = new JDKRegularExpression("((?<OrgOID>[^,. ]+)\\s*\\.\\s*(?<AOID>[^,. ]+))(?:\\s*,\\s*)?");
         assertTrue(regex.matches("FFFF.12645,AAAA.6456"));
     }
 }
