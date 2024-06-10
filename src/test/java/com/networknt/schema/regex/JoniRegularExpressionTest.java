@@ -121,6 +121,9 @@ class JoniRegularExpressionTest {
         assertThrows(SyntaxException.class, () -> new JoniRegularExpression("\\Pa"));
     }
 
+    /**
+     * SyntaxProperties.OP2_QMARK_LT_NAMED_GROUP.
+     */
     @Test
     void pattern() {
         RegularExpression regex = new JoniRegularExpression("((?<OrgOID>[^,. ]+)\\s*\\.\\s*(?<AOID>[^,. ]+))(?:\\s*,\\s*)?");

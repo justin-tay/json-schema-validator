@@ -20,6 +20,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,5 +47,43 @@ class GraalJSRegularExpressionTest {
     void pattern() {
         RegularExpression regex = new GraalJSRegularExpression("((?<OrgOID>[^,. ]+)\\s*\\.\\s*(?<AOID>[^,. ]+))(?:\\s*,\\s*)?");
         assertTrue(regex.matches("FFFF.12645,AAAA.6456"));
+    }
+
+    @Test
+    void concurrency() throws Exception {
+        RegularExpression regex = new GraalJSRegularExpression("\\d");
+        Exception[] instance = new Exception[1];
+        CountDownLatch latch = new CountDownLatch(1);
+        List<Thread> threads = new ArrayList<>();
+        for (int i = 0; i < 50; ++i) {
+            Runnable runner = new Runnable() {
+                public void run() {
+                    try {
+                        latch.await();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        assertTrue(regex.matches("1"));
+                    } catch (RuntimeException e) {
+                        instance[0] = e;
+                    }
+                }
+            };
+            Thread thread = new Thread(runner, "Thread" + i);
+            thread.start();
+            threads.add(thread);
+        }
+        latch.countDown(); // Release the latch for threads to run concurrently
+        threads.forEach(t -> {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        if (instance[0] != null) {
+            throw instance[0];
+        }
     }
 }
