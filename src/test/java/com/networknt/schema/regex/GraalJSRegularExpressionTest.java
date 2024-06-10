@@ -7,6 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Test for GraalJSRegularExpression.
+ */
 class GraalJSRegularExpressionTest {
     @Test
     void digit() {
@@ -16,7 +19,7 @@ class GraalJSRegularExpressionTest {
             assertFalse(regex.matches("a"));
         }
     }
-    
+
     @Test
     void invalidEscape() {
         RuntimeException e = assertThrows(RuntimeException.class, () -> new GraalJSRegularExpression("\\a"));
