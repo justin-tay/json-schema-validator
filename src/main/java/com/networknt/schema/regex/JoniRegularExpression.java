@@ -10,7 +10,10 @@ import org.joni.Syntax;
 import org.joni.exception.SyntaxException;
 
 /**
- * ECMAScript {@link RegularExpression}.
+ * Joni {@link RegularExpression}.
+ * <p>
+ * This requires a dependency on org.jruby.joni:joni which along with its
+ * dependency libraries are 2 mb.
  */
 class JoniRegularExpression implements RegularExpression {
     private final Regex pattern;
