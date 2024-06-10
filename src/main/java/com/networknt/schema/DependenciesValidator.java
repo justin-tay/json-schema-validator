@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * {@link JsonValidator} for dependencies.
@@ -43,9 +44,10 @@ public class DependenciesValidator extends BaseJsonValidator implements JsonVali
 
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.DEPENDENCIES, validationContext);
 
-        for (Iterator<String> it = schemaNode.fieldNames(); it.hasNext(); ) {
-            String pname = it.next();
-            JsonNode pvalue = schemaNode.get(pname);
+        for (Iterator<Entry<String, JsonNode>> it = schemaNode.fields(); it.hasNext();) {
+            Entry<String, JsonNode> entry = it.next();
+            String pname = entry.getKey();
+            JsonNode pvalue = entry.getValue();
             if (pvalue.isArray()) {
                 List<String> depsProps = propertyDeps.get(pname);
                 if (depsProps == null) {

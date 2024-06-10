@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -113,8 +114,9 @@ public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
         boolean failFast = executionContext.isFailFast();
         try {
             executionContext.setFailFast(false);
-            for (Iterator<String> it = node.fieldNames(); it.hasNext();) {
-                String fieldName = it.next();
+            for (Iterator<Entry<String, JsonNode>> it = node.fields(); it.hasNext();) {
+                Entry<String, JsonNode> fieldEntry = it.next();
+                String fieldName = fieldEntry.getKey();
                 if (!existingEvaluatedProperties.contains(fieldName)) {
                     evaluatedProperties.add(fieldName);
                     if (this.schemaNode.isBoolean() && this.schemaNode.booleanValue() == false) {
@@ -124,7 +126,7 @@ public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
                                 .failFast(executionContext.isFailFast()).build());
                     } else {
                         // Schema errors will be reported as is
-                        messages.addAll(this.schema.validate(executionContext, node.get(fieldName), node,
+                        messages.addAll(this.schema.validate(executionContext, fieldEntry.getValue(), node,
                                 instanceLocation.append(fieldName)));
                     }
                 }

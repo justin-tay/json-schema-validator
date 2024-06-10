@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * {@link JsonValidator} for patternProperties.
@@ -57,15 +58,14 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
         }
         Set<ValidationMessage> errors = null;
         Set<String> matchedInstancePropertyNames = null;
-        Iterator<String> names = node.fieldNames();
         boolean collectAnnotations = collectAnnotations() || collectAnnotations(executionContext);
-        while (names.hasNext()) {
-            String name = names.next();
-            JsonNode n = node.get(name);
+        for (Iterator<Entry<String, JsonNode>> it = node.fields(); it.hasNext();) {
+            Entry<String, JsonNode> fieldEntry = it.next();
+            String name = fieldEntry.getKey();
             for (Map.Entry<RegularExpression, JsonSchema> entry : schemas.entrySet()) {
                 if (entry.getKey().matches(name)) {
                     JsonNodePath path = instanceLocation.append(name);
-                    Set<ValidationMessage> results = entry.getValue().validate(executionContext, n, rootNode, path);
+                    Set<ValidationMessage> results = entry.getValue().validate(executionContext, fieldEntry.getValue(), rootNode, path);
                     if (results.isEmpty()) {
                         if (collectAnnotations) {
                             if (matchedInstancePropertyNames == null) {
