@@ -19,6 +19,9 @@ package com.networknt.schema;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.i18n.DefaultMessageSource;
 import com.networknt.schema.i18n.MessageSource;
+import com.networknt.schema.regex.ECMAScriptRegularExpressionFactory;
+import com.networknt.schema.regex.JDKRegularExpressionFactory;
+import com.networknt.schema.regex.RegularExpressionFactory;
 import com.networknt.schema.walk.DefaultItemWalkListenerRunner;
 import com.networknt.schema.walk.DefaultKeywordWalkListenerRunner;
 import com.networknt.schema.walk.DefaultPropertyWalkListenerRunner;
@@ -61,7 +64,7 @@ public class SchemaValidatorsConfig {
     /**
      * When set to true, use ECMA-262 compatible validator
      */
-    private boolean ecma262Validator;
+    private RegularExpressionFactory regularExpressionFactory = JDKRegularExpressionFactory.getInstance();
 
     /**
      * When set to true, use Java-specific semantics rather than native JavaScript
@@ -269,11 +272,20 @@ public class SchemaValidatorsConfig {
     }
 
     public boolean isEcma262Validator() {
-        return this.ecma262Validator;
+        return !(this.regularExpressionFactory instanceof JDKRegularExpressionFactory);
     }
 
     public void setEcma262Validator(boolean ecma262Validator) {
-        this.ecma262Validator = ecma262Validator;
+        this.regularExpressionFactory = ecma262Validator ? ECMAScriptRegularExpressionFactory.getInstance()
+                : JDKRegularExpressionFactory.getInstance();
+    }
+
+    public RegularExpressionFactory getRegularExpressionFactory() {
+        return regularExpressionFactory;
+    }
+
+    public void setRegularExpressionFactory(RegularExpressionFactory regularExpressionFactory) {
+        this.regularExpressionFactory = regularExpressionFactory;
     }
 
     public boolean isJavaSemantics() {
