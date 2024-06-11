@@ -33,7 +33,8 @@ import org.junit.jupiter.params.provider.EnumSource;
  * Test for GraalJSRegularExpression.
  */
 class GraalJSRegularExpressionTest {
-    private static GraalJSRegularExpressionContext CONTEXT = new GraalJSRegularExpressionContext(GraalJSContextFactory.getInstance());
+    private static GraalJSRegularExpressionContext CONTEXT = new GraalJSRegularExpressionContext(
+            GraalJSContextFactory.getInstance());
 
     enum InvalidEscapeInput {
         A("\\a"),
@@ -140,9 +141,20 @@ class GraalJSRegularExpressionTest {
     }
 
     @Test
-    void pattern() {
+    void namedCapturingGroup() {
         RegularExpression regex = new GraalJSRegularExpression("((?<OrgOID>[^,. ]+)\\s*\\.\\s*(?<AOID>[^,. ]+))(?:\\s*,\\s*)?", CONTEXT);
         assertTrue(regex.matches("FFFF.12645,AAAA.6456"));
+    }
+
+    @Test
+    void invalidNamedCapturingGroup() {
+        assertThrows(RuntimeException.class, () -> new GraalJSRegularExpression("(?<name>)(?<name>)", CONTEXT));
+    }
+
+    @Test
+    void namedBackreference() {
+        RegularExpression regex = new GraalJSRegularExpression("title=(?<quote>[\"'])(.*?)\\k<quote>", CONTEXT);
+        assertTrue(regex.matches("title=\"Named capturing groups\\' advantages\""));
     }
 
     @Test

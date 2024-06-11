@@ -17,6 +17,9 @@ package com.networknt.schema.regex;
 
 /**
  * Joni {@link RegularExpressionFactory}.
+ * <p>
+ * This requires a dependency on org.jruby.joni:joni which along with its
+ * dependency libraries are 2 MB.
  */
 public class JoniRegularExpressionFactory implements RegularExpressionFactory {
     private static final JoniRegularExpressionFactory INSTANCE = new JoniRegularExpressionFactory();

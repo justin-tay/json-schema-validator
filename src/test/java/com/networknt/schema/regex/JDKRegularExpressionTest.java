@@ -15,6 +15,7 @@
  */
 package com.networknt.schema.regex;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -24,8 +25,19 @@ import org.junit.jupiter.api.Test;
  */
 class JDKRegularExpressionTest {
     @Test
-    void pattern() {
+    void namedCapturingGroup() {
         RegularExpression regex = new JDKRegularExpression("((?<OrgOID>[^,. ]+)\\s*\\.\\s*(?<AOID>[^,. ]+))(?:\\s*,\\s*)?");
         assertTrue(regex.matches("FFFF.12645,AAAA.6456"));
+    }
+
+    @Test
+    void invalidNamedCapturingGroup() {
+        assertThrows(RuntimeException.class, () -> new JDKRegularExpression("(?<name>)(?<name>)"));
+    }
+
+    @Test
+    void namedBackreference() {
+        RegularExpression regex = new JDKRegularExpression("title=(?<quote>[\"'])(.*?)\\k<quote>");
+        assertTrue(regex.matches("title=\"Named capturing groups\\' advantages\""));
     }
 }

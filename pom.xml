@@ -139,14 +139,16 @@
 
     <dependency>
       <!-- Used to validate ECMA 262 regular expressions -->
+      <!-- Approximately 2 MB in dependencies -->
       <groupId>org.jruby.joni</groupId>
       <artifactId>joni</artifactId>
       <version>${version.joni}</version>
       <optional>true</optional>
     </dependency>
-    
+
     <dependency>
       <!-- Used to validate ECMA 262 regular expressions -->
+      <!-- Approximately 50 MB in dependencies -->
       <groupId>org.graalvm.js</groupId>
       <artifactId>js</artifactId>
       <version>${version.graaljs}</version>

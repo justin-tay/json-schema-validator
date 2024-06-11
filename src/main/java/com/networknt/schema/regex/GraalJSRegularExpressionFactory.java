@@ -21,7 +21,7 @@ import org.graalvm.polyglot.Context;
  * GraalJS {@link RegularExpressionFactory}.
  * <p>
  * This requires a dependency on org.graalvm.js:js which along with its
- * dependency libraries are 50 mb.
+ * dependency libraries are 50 MB.
  */
 public class GraalJSRegularExpressionFactory implements RegularExpressionFactory {
     private static class Holder {
@@ -40,7 +40,7 @@ public class GraalJSRegularExpressionFactory implements RegularExpressionFactory
      * This uses the context from {@link GraalJSContextFactory#getInstance()}.
      * <p>
      * It is the caller's responsibility to release the context when it is no longer
-     * required.
+     * required by using GraalJSContextFactory.getInstance().close().
      */
     public GraalJSRegularExpressionFactory() {
         this(GraalJSContextFactory.getInstance());
