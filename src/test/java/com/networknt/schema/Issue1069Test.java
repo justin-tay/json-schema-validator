@@ -9,8 +9,74 @@ import com.networknt.schema.SpecVersion.VersionFlag;
 import com.networknt.schema.oas.OpenApi30;
 
 public class Issue1069Test {
-    @Test 
+    @Test
     void test() {
+        JsonSchema schema = JsonSchemaFactory
+                .getInstance(VersionFlag.V202012,
+                        builder -> builder.metaSchema(OpenApi30.getInstance())
+                                .defaultMetaSchemaIri(OpenApi30.getInstance().getIri()))
+                .getSchema(SchemaLocation.of(
+                        "https://forge.3gpp.org/rep/sa5/MnS/-/raw/Integration_Rel16_SA5_155_YAML/OpenAPI/TS28532_FaultMnS.yaml#/components/schemas/NotifyNewAlarm"),
+                        SchemaValidatorsConfig.builder().build());
+         
+        String inputData = "{\r\n"
+                + "  \"event\": {\r\n"
+                + "    \"commonEventHeader\": {\r\n"
+                + "      \"version\": \"4\",\r\n"
+                + "      \"vesEventListenerVersion\": 7,\r\n"
+                + "      \"domain\": \"fault\",\r\n"
+                + "      \"eventId\": \"stndDefined-gNB_Nokia000001\",\r\n"
+                + "      \"eventName\": \"stndDefined-gNB-Nokia-PowerLost\",\r\n"
+                + "      \"stndDefinedNamespace\": \"3GPP-FaultSupervision\",\r\n"
+                + "      \"startEpochMicrosec\": 1413378172000000,\r\n"
+                + "      \"lastEpochMicrosec\": 1413378172000000,\r\n"
+                + "      \"reportingEntityName\": \"ibcx0001vm002oam001\",\r\n"
+                + "      \"sourceName\": \"scfx0001vm002cap001\",\r\n"
+                + "      \"sequence\": 1,\r\n"
+                + "      \"priority\": \"High\"\r\n"
+                + "    },\r\n"
+                + "    \"stndDefinedFields\": {\r\n"
+                + "      \"schemaReference\": \"http://localhost:8080/external1#components/schemas/NotifyNewAlarm\",\r\n"
+                + "      \"data\": {\r\n"
+                + "        \"href\": 1,\r\n"
+                + "        \"uri\": \"1\",\r\n"
+                + "        \"notificationId\": 1,\r\n"
+                + "        \"notificationType\": \"notifyNewAlarm\",\r\n"
+                + "        \"eventTime\": \"xyz\",\r\n"
+                + "        \"systemDN\": \"xyz\",\r\n"
+                + "        \"probableCause\": 1,\r\n"
+                + "        \"perceivedSeverity\": \"INDETERMINATE\",\r\n"
+                + "        \"rootCauseIndicator\": false,\r\n"
+                + "        \"specificProblem\": \"xyz\",\r\n"
+                + "        \"correlatedNotifications\": [],\r\n"
+                + "        \"backedUpStatus\": true,\r\n"
+                + "        \"backUpObject\": \"xyz\",\r\n"
+                + "        \"trendIndication\": \"MORE_SEVERE\",\r\n"
+                + "        \"thresholdInfo\": {\r\n"
+                + "          \"observedMeasurement\": \"new\",\r\n"
+                + "          \"observedValue\": 123\r\n"
+                + "        },\r\n"
+                + "        \"stateChangeDefinition\": {},\r\n"
+                + "        \"monitoredAttributes\": {\r\n"
+                + "          \"newAtt\": \"new\"\r\n"
+                + "        },\r\n"
+                + "        \"proposedRepairActions\": \"xyz\",\r\n"
+                + "        \"additionalText\": \"xyz\",\r\n"
+                + "        \"additionalInformation\": {\r\n"
+                + "          \"addInfo\": \"new\"\r\n"
+                + "        },\r\n"
+                + "        \"alarmId\": 1,\r\n"
+                + "        \"alarmType\": \"COMMUNICATIONS_ALARM_INVALID\"\r\n"
+                + "      },\r\n"
+                + "      \"stndDefinedFieldsVersion\": \"1.0\"\r\n"
+                + "    }\r\n"
+                + "  }\r\n"
+                + "}"; 
+        System.out.println(schema.validate(inputData, InputFormat.JSON, OutputFormat.HIERARCHICAL));
+    }
+
+    @Test
+    void test2() {
         String document_TS28532_FileDataReportingMnS = "openapi: 3.0.1\r\n"
                 + "info:\r\n"
                 + "  title: File Data Reporting MnS\r\n"
