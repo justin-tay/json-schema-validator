@@ -135,7 +135,7 @@ public class OneOfValidator extends BaseJsonValidator {
                         // found is null triggers on the correct schema
                         childErrors = new SetView<>();
                         childErrors.union(schemaErrors);
-                    } else if (currentDiscriminatorContext.isDiscriminatorIgnore()) {
+                    } else if (currentDiscriminatorContext.isDiscriminatorIgnore() || !currentDiscriminatorContext.isActive()) {
                         // This is the normal handling when discriminators aren't enabled
                         if (childErrors == null) {
                             childErrors = new SetView<>();
