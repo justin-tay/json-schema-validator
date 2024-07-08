@@ -1,2 +1,10 @@
 [
+{
+  "name":"com.networknt.schema.output.OutputUnit",
+  "allDeclaredMethods":true
+},
+{
+  "name":"com.networknt.schema.output.OutputFlag",
+  "allDeclaredMethods":true
+}
 ]
