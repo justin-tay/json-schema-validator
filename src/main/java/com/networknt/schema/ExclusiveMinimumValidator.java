@@ -31,7 +31,7 @@ import java.util.Set;
  * {@link JsonValidator} for exclusiveMinimum.
  */
 public class ExclusiveMinimumValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(ExclusiveMinimumValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(ExclusiveMinimumValidator.class);
 
     /**
      * In order to limit number of `if` statements in `validate` method, all the

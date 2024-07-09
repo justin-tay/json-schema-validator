@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public class MaxItemsValidator extends BaseJsonValidator implements JsonValidator {
 
-    private static final Logger logger = LoggerFactory.getLogger(MaxItemsValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(MaxItemsValidator.class);
 
     private final int max;
 

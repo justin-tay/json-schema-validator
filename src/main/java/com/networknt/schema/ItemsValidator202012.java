@@ -31,7 +31,7 @@ import java.util.*;
  * {@link JsonValidator} for items from V2012-12.
  */
 public class ItemsValidator202012 extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(ItemsValidator202012.class);
+    private final Logger logger = LoggerFactory.getLogger(ItemsValidator202012.class);
 
     private final JsonSchema schema;
     private final int prefixCount;

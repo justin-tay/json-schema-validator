@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * This treats unknown keywords as annotations.
  */
 public class UnknownKeywordFactory implements KeywordFactory {
-    private static final Logger logger = LoggerFactory.getLogger(UnknownKeywordFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(UnknownKeywordFactory.class);
 
     private final Map<String, Keyword> keywords = new ConcurrentHashMap<>();
 

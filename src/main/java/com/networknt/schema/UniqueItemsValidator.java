@@ -28,7 +28,7 @@ import java.util.Set;
  * {@link JsonValidator} for uniqueItems.
  */
 public class UniqueItemsValidator extends BaseJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(UniqueItemsValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(UniqueItemsValidator.class);
 
     private final boolean unique;
 

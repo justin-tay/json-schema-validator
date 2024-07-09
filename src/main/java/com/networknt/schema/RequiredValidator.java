@@ -26,7 +26,7 @@ import java.util.*;
  * {@link JsonValidator} for required.
  */
 public class RequiredValidator extends BaseJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(RequiredValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(RequiredValidator.class);
 
     private final List<String> fieldNames;
 

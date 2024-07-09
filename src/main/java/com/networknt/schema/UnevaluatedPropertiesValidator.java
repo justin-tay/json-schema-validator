@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * {@link JsonValidator} for unevaluatedProperties.
  */
 public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(UnevaluatedPropertiesValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(UnevaluatedPropertiesValidator.class);
 
     private final JsonSchema schema;
 

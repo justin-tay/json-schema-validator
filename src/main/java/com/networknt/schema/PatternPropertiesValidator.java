@@ -29,7 +29,7 @@ import java.util.*;
  */
 public class PatternPropertiesValidator extends BaseJsonValidator {
     public static final String PROPERTY = "patternProperties";
-    private static final Logger logger = LoggerFactory.getLogger(PatternPropertiesValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(PatternPropertiesValidator.class);
     private final Map<RegularExpression, JsonSchema> schemas = new IdentityHashMap<>();
 
     private Boolean hasUnevaluatedPropertiesValidator = null;

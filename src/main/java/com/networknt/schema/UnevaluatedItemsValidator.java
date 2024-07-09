@@ -33,7 +33,7 @@ import static com.networknt.schema.VersionCode.MinV202012;
  * {@link JsonValidator} for unevaluatedItems.
  */
 public class UnevaluatedItemsValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(UnevaluatedItemsValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(UnevaluatedItemsValidator.class);
 
     private final JsonSchema schema;
 

@@ -28,7 +28,7 @@ import java.util.function.Supplier;
  * {@link JsonValidator} that resolves $recursiveRef.
  */
 public class RecursiveRefValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(RecursiveRefValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(RecursiveRefValidator.class);
 
     protected final JsonSchemaRef schema;
 

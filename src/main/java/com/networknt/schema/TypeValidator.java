@@ -27,7 +27,7 @@ import java.util.*;
  * {@link JsonValidator} for type.
  */
 public class TypeValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(TypeValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(TypeValidator.class);
 
     private final JsonType schemaType;
     private final UnionTypeValidator unionTypeValidator;

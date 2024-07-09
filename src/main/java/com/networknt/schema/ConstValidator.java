@@ -26,7 +26,7 @@ import java.util.Set;
  * {@link JsonValidator} for const.
  */
 public class ConstValidator extends BaseJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(ConstValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(ConstValidator.class);
 
     public ConstValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
             JsonSchema parentSchema, ValidationContext validationContext) {

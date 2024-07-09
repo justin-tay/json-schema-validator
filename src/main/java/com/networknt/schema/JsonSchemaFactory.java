@@ -50,7 +50,7 @@ import java.util.function.Consumer;
  * modified.
  */
 public class JsonSchemaFactory {
-    private static final Logger logger = LoggerFactory.getLogger(JsonSchemaFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(JsonSchemaFactory.class);
 
     public static class Builder {
         private ObjectMapper jsonMapper = null;

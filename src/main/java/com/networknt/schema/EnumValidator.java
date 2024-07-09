@@ -32,7 +32,7 @@ import java.util.Set;
  * {@link JsonValidator} for enum.
  */
 public class EnumValidator extends BaseJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(EnumValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(EnumValidator.class);
 
     private final Set<JsonNode> nodes;
     private final String error;

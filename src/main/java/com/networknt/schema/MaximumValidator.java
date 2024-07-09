@@ -31,7 +31,7 @@ import java.util.Set;
  * {@link JsonValidator} for maxmimum.
  */
 public class MaximumValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(MaximumValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(MaximumValidator.class);
     private static final String PROPERTY_EXCLUSIVE_MAXIMUM = "exclusiveMaximum";
 
     private final boolean excludeEqual;

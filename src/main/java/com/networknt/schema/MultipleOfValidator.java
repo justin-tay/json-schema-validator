@@ -30,7 +30,7 @@ import java.util.Set;
  * {@link JsonValidator} for multipleOf.
  */
 public class MultipleOfValidator extends BaseJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(MultipleOfValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(MultipleOfValidator.class);
 
     private final BigDecimal divisor;
 

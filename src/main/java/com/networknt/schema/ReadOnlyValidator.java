@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * {@link JsonValidator} for readOnly.
  */
 public class ReadOnlyValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(ReadOnlyValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(ReadOnlyValidator.class);
 
     private final boolean readOnly;
 

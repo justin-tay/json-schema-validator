@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.networknt.schema.format.IdnHostnameFormat;
 
 public class UCDLoader {
-    private static final Logger logger = LoggerFactory.getLogger(UCDLoader.class);
-
     static void loadMapping(String filename, Function<String, BitSet> selector) {
         try (
             InputStream is = IdnHostnameFormat.class.getResourceAsStream(filename);
@@ -36,6 +34,7 @@ public class UCDLoader {
                 }
             });
         } catch (IllegalStateException | IOException e) {
+            Logger logger = LoggerFactory.getLogger(UCDLoader.class);
             logger.error("unable to load Unicode data from file '{}': {}", filename, e.getMessage());
         }
     }

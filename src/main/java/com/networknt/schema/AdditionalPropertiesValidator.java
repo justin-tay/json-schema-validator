@@ -36,7 +36,7 @@ import java.util.Set;
  * {@link JsonValidator} for additionalProperties.
  */
 public class AdditionalPropertiesValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(AdditionalPropertiesValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(AdditionalPropertiesValidator.class);
 
     private final boolean allowAdditionalProperties;
     private final JsonSchema additionalPropertiesSchema;

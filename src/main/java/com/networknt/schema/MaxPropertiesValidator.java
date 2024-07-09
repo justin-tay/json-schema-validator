@@ -27,7 +27,7 @@ import java.util.Set;
  * {@link JsonValidator}for maxProperties.
  */
 public class MaxPropertiesValidator extends BaseJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(MaxPropertiesValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(MaxPropertiesValidator.class);
 
     private final int max;
 

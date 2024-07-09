@@ -27,7 +27,7 @@ import java.util.*;
  * {@link JsonValidator} for not.
  */
 public class NotValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(NotValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(NotValidator.class);
 
     private final JsonSchema schema;
 

@@ -35,7 +35,7 @@ import com.networknt.schema.serialization.JsonMapperFactory;
  * Note that since 2019-09 this keyword only generates annotations and not assertions.
  */
 public class ContentMediaTypeValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(ContentMediaTypeValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(ContentMediaTypeValidator.class);
     private static final String PATTERN_STRING = "(application|audio|font|example|image|message|model|multipart|text|video|x-(?:[0-9A-Za-z!#$%&'*+.^_`|~-]+))/([0-9A-Za-z!#$%&'*+.^_`|~-]+)((?:[ \t]*;[ \t]*[0-9A-Za-z!#$%&'*+.^_`|~-]+=(?:[0-9A-Za-z!#$%&'*+.^_`|~-]+|\"(?:[^\"\\\\]|\\.)*\"))*)";
     private static final Pattern PATTERN = Pattern.compile(PATTERN_STRING);
     private final String contentMediaType;

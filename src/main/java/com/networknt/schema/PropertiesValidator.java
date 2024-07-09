@@ -40,7 +40,7 @@ import java.util.Set;
  */
 public class PropertiesValidator extends BaseJsonValidator {
     public static final String PROPERTY = "properties";
-    private static final Logger logger = LoggerFactory.getLogger(PropertiesValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(PropertiesValidator.class);
     private final Map<String, JsonSchema> schemas = new LinkedHashMap<>();
     
     private Boolean hasUnevaluatedPropertiesValidator;

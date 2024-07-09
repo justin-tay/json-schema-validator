@@ -29,7 +29,7 @@ import java.util.Set;
  * {@link JsonValidator} for type union.
  */
 public class UnionTypeValidator extends BaseJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(UnionTypeValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(UnionTypeValidator.class);
 
     private final List<JsonValidator> schemas;
     private final String error;

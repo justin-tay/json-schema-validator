@@ -34,7 +34,7 @@ import com.networknt.schema.utils.SetView;
  * {@link JsonValidator} for oneOf.
  */
 public class OneOfValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(OneOfValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(OneOfValidator.class);
 
     private final List<JsonSchema> schemas;
 

@@ -26,7 +26,7 @@ import java.util.*;
  * {@link JsonValidator} for notAllowed.
  */
 public class NotAllowedValidator extends BaseJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(NotAllowedValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(NotAllowedValidator.class);
 
     private final List<String> fieldNames;
 

@@ -26,7 +26,7 @@ import java.util.Set;
  * {@link JsonValidator} for false.
  */
 public class FalseValidator extends BaseJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(FalseValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(FalseValidator.class);
 
     private final String reason;
 

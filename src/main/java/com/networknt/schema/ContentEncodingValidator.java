@@ -31,7 +31,7 @@ import java.util.Set;
  * assertions.
  */
 public class ContentEncodingValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(ContentEncodingValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(ContentEncodingValidator.class);
     private final String contentEncoding;
 
     /**

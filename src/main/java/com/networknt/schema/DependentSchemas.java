@@ -26,7 +26,7 @@ import java.util.*;
  * {@link JsonValidator} for dependentSchemas.
  */
 public class DependentSchemas extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(DependentSchemas.class);
+    private final Logger logger = LoggerFactory.getLogger(DependentSchemas.class);
     private final Map<String, JsonSchema> schemaDependencies = new HashMap<>();
 
     public DependentSchemas(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {

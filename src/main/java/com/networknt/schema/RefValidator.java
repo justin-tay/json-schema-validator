@@ -28,7 +28,7 @@ import java.util.function.Supplier;
  * {@link JsonValidator} that resolves $ref.
  */
 public class RefValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(RefValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(RefValidator.class);
 
     protected final JsonSchemaRef schema;
 

@@ -30,7 +30,7 @@ import java.util.regex.PatternSyntaxException;
  * Validator for Format.
  */
 public class FormatValidator extends BaseFormatJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(FormatValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(FormatValidator.class);
 
     private final Format format;
     

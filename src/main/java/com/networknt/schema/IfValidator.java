@@ -27,7 +27,7 @@ import java.util.*;
  * {@link JsonValidator} for if.
  */
 public class IfValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(IfValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(IfValidator.class);
 
     private static final List<String> KEYWORDS = Arrays.asList("if", "then", "else");
 

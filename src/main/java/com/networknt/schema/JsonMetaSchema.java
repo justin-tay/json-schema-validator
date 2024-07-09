@@ -34,7 +34,7 @@ import java.util.function.Consumer;
  * Represents a meta-schema which is uniquely identified by its IRI.
  */
 public class JsonMetaSchema {
-    private static final Logger logger = LoggerFactory.getLogger(JsonMetaSchema.class);
+    private final Logger logger = LoggerFactory.getLogger(JsonMetaSchema.class);
 
     /**
      * Factory for creating a format keyword.

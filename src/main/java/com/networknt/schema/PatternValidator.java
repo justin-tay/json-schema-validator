@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class PatternValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(PatternValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(PatternValidator.class);
     private String pattern;
     private RegularExpression compiledPattern;
 

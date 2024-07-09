@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * Unknown keyword factory that rejects unknown keywords.
  */
 public class DisallowUnknownKeywordFactory implements KeywordFactory {
-    private static final Logger logger = LoggerFactory.getLogger(DisallowUnknownKeywordFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(DisallowUnknownKeywordFactory.class);
 
     @Override
     public Keyword getKeyword(String value, ValidationContext validationContext) {

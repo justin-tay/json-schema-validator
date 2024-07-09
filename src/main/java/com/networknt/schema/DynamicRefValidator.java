@@ -28,7 +28,7 @@ import java.util.function.Supplier;
  * {@link JsonValidator} that resolves $dynamicRef.
  */
 public class DynamicRefValidator extends BaseJsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(DynamicRefValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(DynamicRefValidator.class);
 
     protected final JsonSchemaRef schema;
 

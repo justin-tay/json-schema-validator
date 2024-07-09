@@ -17,8 +17,6 @@ import com.networknt.schema.utils.Classes;
  * Format for date-time.
  */
 public class DateTimeFormat implements Format {
-    private static final Logger logger = LoggerFactory.getLogger(DateTimeFormat.class);
-
     private static final boolean ETHLO_PRESENT = Classes.isPresent("com.ethlo.time.ITU", DateTimeFormat.class.getClassLoader());
 
     /**
@@ -75,6 +73,7 @@ public class DateTimeFormat implements Format {
         try {
             return VALIDATE.test(value);
         } catch (Exception ex) {
+            Logger logger = LoggerFactory.getLogger(DateTimeFormat.class);
             logger.debug("Invalid {}: {}", "date-time", ex.getMessage());
             return false;
         }

@@ -27,7 +27,7 @@ import java.util.Set;
  * {@link JsonValidator} for minProperties.
  */
 public class MinPropertiesValidator extends BaseJsonValidator implements JsonValidator {
-    private static final Logger logger = LoggerFactory.getLogger(MinPropertiesValidator.class);
+    private final Logger logger = LoggerFactory.getLogger(MinPropertiesValidator.class);
 
     protected final int min;
 
