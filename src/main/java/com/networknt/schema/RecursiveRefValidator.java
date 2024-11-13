@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -87,7 +87,7 @@ public class RecursiveRefValidator extends BaseJsonValidator {
     }
     
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
         JsonSchema refSchema = this.schema.getSchema();
         if (refSchema == null) {
@@ -101,7 +101,7 @@ public class RecursiveRefValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
         // This is important because if we use same JsonSchemaFactory for creating multiple JSONSchema instances,
         // these schemas will be cached along with config. We have to replace the config for cached $ref references
@@ -127,7 +127,7 @@ public class RecursiveRefValidator extends BaseJsonValidator {
                 }
             }
             if (circularDependency) {
-                return Collections.emptySet();
+                return Collections.emptyList();
             }
         }
         return refSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);

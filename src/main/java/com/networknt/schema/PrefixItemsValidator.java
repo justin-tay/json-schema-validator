@@ -16,20 +16,18 @@
 
 package com.networknt.schema;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.networknt.schema.annotation.JsonNodeAnnotation;
-import com.networknt.schema.utils.JsonSchemaRefs;
-import com.networknt.schema.utils.SetView;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.networknt.schema.annotation.JsonNodeAnnotation;
+import com.networknt.schema.utils.JsonSchemaRefs;
+import com.networknt.schema.utils.ListView;
 
 /**
  * {@link JsonValidator} for prefixItems.
@@ -58,18 +56,18 @@ public class PrefixItemsValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
         // ignores non-arrays
         if (node.isArray()) {
-            SetView<ValidationMessage> errors = null;
+            ListView<ValidationMessage> errors = null;
             int count = Math.min(node.size(), this.tupleSchema.size());
             for (int i = 0; i < count; ++i) {
                 JsonNodePath path = instanceLocation.append(i);
-                Set<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node.get(i), rootNode, path);
+                List<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node.get(i), rootNode, path);
                 if (!results.isEmpty()) {
                     if (errors == null) {
-                        errors = new SetView<>();
+                        errors = new ListView<>();
                     }
                     errors.union(results);
                 }
@@ -94,15 +92,15 @@ public class PrefixItemsValidator extends BaseJsonValidator {
                                     .keyword(getKeyword()).value(true).build());
                 }
             }
-            return errors == null || errors.isEmpty() ? Collections.emptySet() : errors;
+            return errors == null || errors.isEmpty() ? Collections.emptyList() : errors;
         } else {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-        Set<ValidationMessage> validationMessages = new LinkedHashSet<>();
+    public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+        List<ValidationMessage> validationMessages = new ArrayList<>();
         if (node instanceof ArrayNode) {
             ArrayNode array = (ArrayNode) node;
             int count = this.tupleSchema.size();
@@ -160,14 +158,14 @@ public class PrefixItemsValidator extends BaseJsonValidator {
         return result;
     }
 
-    private void doWalk(ExecutionContext executionContext, Set<ValidationMessage> validationMessages, int i,
+    private void doWalk(ExecutionContext executionContext, List<ValidationMessage> validationMessages, int i,
             JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         walkSchema(executionContext, this.tupleSchema.get(i), node, rootNode, instanceLocation.append(i),
                 shouldValidateSchema, validationMessages);
     }
 
     private void walkSchema(ExecutionContext executionContext, JsonSchema walkSchema, JsonNode node, JsonNode rootNode,
-            JsonNodePath instanceLocation, boolean shouldValidateSchema, Set<ValidationMessage> validationMessages) {
+            JsonNodePath instanceLocation, boolean shouldValidateSchema, List<ValidationMessage> validationMessages) {
         //@formatter:off
         boolean executeWalk = this.validationContext.getConfig().getItemWalkListenerRunner().runPreWalkListeners(
             executionContext,

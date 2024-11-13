@@ -17,7 +17,7 @@
 package com.networknt.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.networknt.schema.utils.SetView;
+import com.networknt.schema.utils.ListView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,19 +54,19 @@ public class AnyOfValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation) {
         return validate(executionContext, node, rootNode, instanceLocation, false);
     }
 
-    protected Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    protected List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean walk) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()) {
             executionContext.enterDiscriminatorContext(new DiscriminatorContext(), instanceLocation);
         }
-        SetView<ValidationMessage> allErrors = null;
+        ListView<ValidationMessage> allErrors = null;
 
         int numberOfValidSubSchemas = 0;
         try {
@@ -75,7 +75,7 @@ public class AnyOfValidator extends BaseJsonValidator {
             try {
                 executionContext.setFailFast(false);
                 for (JsonSchema schema : this.schemas) {
-                    Set<ValidationMessage> errors = Collections.emptySet();
+                    List<ValidationMessage> errors = Collections.emptyList();
                     TypeValidator typeValidator = schema.getTypeValidator();
                     if (typeValidator != null) {
                         // If schema has type validator and node type doesn't match with schemaType then
@@ -83,7 +83,7 @@ public class AnyOfValidator extends BaseJsonValidator {
                         // For union type, it is a must to call TypeValidator
                         if (typeValidator.getSchemaType() != JsonType.UNION && !typeValidator.equalsToSchemaType(node)) {
                             if (allErrors == null) {
-                                allErrors = new SetView<>();
+                                allErrors = new ListView<>();
                             }
                             allErrors.union(typeValidator.validate(executionContext, node, rootNode, instanceLocation));
                             continue;
@@ -116,10 +116,10 @@ public class AnyOfValidator extends BaseJsonValidator {
                                 // which is generally discarded as it returns errors but the allErrors
                                 // is getting processed in finally
                                 if (allErrors == null) {
-                                    allErrors = new SetView<>();
+                                    allErrors = new ListView<>();
                                 }
                                 allErrors.union(Collections
-                                        .singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+                                        .singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                                                 .locale(executionContext.getExecutionConfig().getLocale())
                                                 .failFast(executionContext.isFailFast()).arguments(DISCRIMINATOR_REMARK)
                                                 .build()));
@@ -131,7 +131,7 @@ public class AnyOfValidator extends BaseJsonValidator {
                         }
                     }
                     if (allErrors == null) {
-                        allErrors = new SetView<>();
+                        allErrors = new ListView<>();
                     }
                     allErrors.union(errors);
                 }
@@ -143,7 +143,7 @@ public class AnyOfValidator extends BaseJsonValidator {
             if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()
                     && executionContext.getCurrentDiscriminatorContext().isActive()
                     && !executionContext.getCurrentDiscriminatorContext().isDiscriminatorIgnore()) {
-                return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+                return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                         .locale(executionContext.getExecutionConfig().getLocale())
                         .arguments(
                                 "based on the provided discriminator. No alternative could be chosen based on the discriminator property")
@@ -155,20 +155,20 @@ public class AnyOfValidator extends BaseJsonValidator {
             }
         }
         if (numberOfValidSubSchemas >= 1) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
-        return allErrors != null ? allErrors : Collections.emptySet();
+        return allErrors != null ? allErrors : Collections.emptyList();
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         if (shouldValidateSchema) {
             return validate(executionContext, node, rootNode, instanceLocation, true);
         }
         for (JsonSchema schema : this.schemas) {
             schema.walk(executionContext, node, rootNode, instanceLocation, false);
         }
-        return new LinkedHashSet<>();
+        return new ArrayList<>();
     }
 
     /**

@@ -1,16 +1,17 @@
 package com.networknt.schema;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class Issue366FailFastTest {
 
@@ -51,7 +52,7 @@ class Issue366FailFastTest {
         List<JsonNode> testNodes = node.findValues("tests");
         JsonNode testNode = testNodes.get(0).get(0);
         JsonNode dataNode = testNode.get("data");
-        Set<ValidationMessage> errors = jsonSchema.validate(dataNode);
+        List<ValidationMessage> errors = jsonSchema.validate(dataNode);
         assertTrue(errors.isEmpty());
     }
 
@@ -64,7 +65,7 @@ class Issue366FailFastTest {
         List<JsonNode> testNodes = node.findValues("tests");
         JsonNode testNode = testNodes.get(0).get(1);
         JsonNode dataNode = testNode.get("data");
-        Set<ValidationMessage> errors = jsonSchema.validate(dataNode);
+        List<ValidationMessage> errors = jsonSchema.validate(dataNode);
         assertTrue(errors.isEmpty());
     }
 

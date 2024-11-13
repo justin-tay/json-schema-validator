@@ -109,7 +109,7 @@ class CollectorContextTest {
         ObjectMapper objectMapper = new ObjectMapper();
         ExecutionContext executionContext = jsonSchemaForCombine.createExecutionContext();
         executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
-        Set<ValidationMessage> messages = jsonSchemaForCombine.validate(executionContext, objectMapper
+        List<ValidationMessage> messages = jsonSchemaForCombine.validate(executionContext, objectMapper
                 .readTree("{\"property1\":\"sample1\",\"property2\":\"sample2\",\"property3\":\"sample3\" }"));
         ValidationResult validationResult = new ValidationResult(messages, executionContext);
         CollectorContext collectorContext = validationResult.getCollectorContext();
@@ -285,17 +285,17 @@ class CollectorContextTest {
         }
 
         @Override
-        public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+        public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
                 JsonNodePath instanceLocation) {
             CollectorContext collectorContext = executionContext.getCollectorContext();
             CustomCollector customCollector = (CustomCollector) collectorContext.getCollectorMap().computeIfAbsent(SAMPLE_COLLECTOR,
                     key -> new CustomCollector());
             customCollector.combine(node.textValue());
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         @Override
-        public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+        public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
             // Ignore this method for testing.
             return null;
         }
@@ -360,7 +360,7 @@ class CollectorContextTest {
 
         @SuppressWarnings("unchecked")
         @Override
-        public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+        public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
             // Get an instance of collector context.
             CollectorContext collectorContext = executionContext.getCollectorContext();
             // If collector type is not added to context add one.
@@ -369,11 +369,11 @@ class CollectorContextTest {
             synchronized(returnList) {
                 returnList.add(node.textValue());
             }
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         @Override
-        public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+        public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
             // Ignore this method for testing.
             return null;
         }
@@ -382,7 +382,7 @@ class CollectorContextTest {
     private ValidationResult validate(String jsonData) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         ExecutionContext executionContext = this.jsonSchema.createExecutionContext();
-        Set<ValidationMessage> messages = this.jsonSchema.validate(executionContext, objectMapper.readTree(jsonData));
+        List<ValidationMessage> messages = this.jsonSchema.validate(executionContext, objectMapper.readTree(jsonData));
         executionContext.getCollectorContext().loadCollectors();
         return new ValidationResult(messages, executionContext);
     }
@@ -432,17 +432,17 @@ class CollectorContextTest {
         }
 
         @Override
-        public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+        public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
             // Get an instance of collector context.
             CollectorContext collectorContext = executionContext.getCollectorContext();
             AtomicInteger count = (AtomicInteger) collectorContext.getCollectorMap().computeIfAbsent("collect",
                     (key) -> new AtomicInteger(0));
             count.incrementAndGet();
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         @Override
-        public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+        public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
                 JsonNodePath instanceLocation, boolean shouldValidateSchema) {
             if (!shouldValidateSchema) {
                 CollectorContext collectorContext = executionContext.getCollectorContext();

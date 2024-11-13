@@ -1,17 +1,18 @@
 package com.networknt.schema;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.walk.JsonSchemaWalkListener;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Validating anyOf walker
@@ -77,7 +78,7 @@ class Issue451Test {
         }
 
         @Override
-        public void onWalkEnd(WalkEvent walkEvent, Set<ValidationMessage> validationMessages) {
+        public void onWalkEnd(WalkEvent walkEvent, List<ValidationMessage> validationMessages) {
 
         }
 

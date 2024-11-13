@@ -6,7 +6,7 @@ import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.JsonNodePath;
 import com.networknt.schema.ValidationMessage;
 
-import java.util.Set;
+import java.util.List;
 
 public interface JsonSchemaWalker {
 	/**
@@ -28,6 +28,6 @@ public interface JsonSchemaWalker {
 	 * @param shouldValidateSchema boolean
 	 * @return a set of validation messages if shouldValidateSchema is true.
 	 */
-    Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema);
 }

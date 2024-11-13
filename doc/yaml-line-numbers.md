@@ -200,7 +200,7 @@ With the pieces we now have, we just need to tell the YAML library to make of us
     {    
         ObjectReader rdr = mapper.reader(new MyNodeFactory(yp));
         JsonNode jsonNode = rdr.readTree(yp);
-        Set<ValidationMessage> msgs = mySchema.validate(jsonNode);
+        List<ValidationMessage> msgs = mySchema.validate(jsonNode);
 
         if (msgs.isEmpty())
         {

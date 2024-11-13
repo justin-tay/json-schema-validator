@@ -21,7 +21,7 @@ String input = "{\r\n"
         + "  \"petType\": \"dog\",\r\n"
         + "  \"bark\": \"woof\"\r\n"
         + "}";
-Set<ValidationMessage> messages = schema.validate(input, InputFormat.JSON);
+List<ValidationMessage> messages = schema.validate(input, InputFormat.JSON);
 ```
 
 ## Validating an OpenAPI document
@@ -44,5 +44,5 @@ JsonSchema schema = JsonSchemaFactory
                 builder -> builder.schemaMappers(schemaMappers -> schemaMappers
                         .mapPrefix("https://spec.openapis.org/oas/3.1", "classpath:oas/3.1")))
         .getSchema(SchemaLocation.of("https://spec.openapis.org/oas/3.1/schema-base/2022-10-07"), config);
-Set<ValidationMessage> messages = schema.validate(openApiDocument, InputFormat.JSON);
+List<ValidationMessage> messages = schema.validate(openApiDocument, InputFormat.JSON);
 ```

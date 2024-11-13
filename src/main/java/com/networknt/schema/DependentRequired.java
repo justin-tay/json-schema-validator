@@ -27,7 +27,7 @@ import java.util.*;
  */
 public class DependentRequired extends BaseJsonValidator implements JsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(DependentRequired.class);
-    private final Map<String, List<String>> propertyDependencies = new HashMap<>();
+    private final Map<String, List<String>> propertyDependencies = new HashMap<String, List<String>>();
 
     public DependentRequired(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, JsonSchema parentSchema, ValidationContext validationContext) {
 
@@ -46,10 +46,10 @@ public class DependentRequired extends BaseJsonValidator implements JsonValidato
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
-        Set<ValidationMessage> errors = new LinkedHashSet<>();
+        List<ValidationMessage> errors = new ArrayList<>();
 
         for (Iterator<String> it = node.fieldNames(); it.hasNext(); ) {
             String pname = it.next();
@@ -66,7 +66,7 @@ public class DependentRequired extends BaseJsonValidator implements JsonValidato
             }
         }
 
-        return Collections.unmodifiableSet(errors);
+        return Collections.unmodifiableList(errors);
     }
 
 }

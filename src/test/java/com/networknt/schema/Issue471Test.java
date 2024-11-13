@@ -1,16 +1,17 @@
 package com.networknt.schema;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.io.InputStream;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class Issue471Test {
     private final String DATA_PATH = "/data/issue471.json";
@@ -69,11 +70,11 @@ class Issue471Test {
         InputStream dataInputStream = Issue471Test.class.getResourceAsStream(DATA_PATH);
         JsonNode node = getJsonNodeFromStreamContent(dataInputStream);
 
-        Set<ValidationMessage> validationMessages = schema.validate(node);
+        List<ValidationMessage> validationMessages = schema.validate(node);
         return convertValidationMessagesToMap(validationMessages);
     }
 
-    private Map<String, String> convertValidationMessagesToMap(Set<ValidationMessage> validationMessages) {
+    private Map<String, String> convertValidationMessagesToMap(List<ValidationMessage> validationMessages) {
         return validationMessages.stream().collect(Collectors.toMap(m -> m.getInstanceLocation().toString(), ValidationMessage::getMessage));
     }
 

@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -89,7 +90,7 @@ public class EnumValidator extends BaseJsonValidator implements JsonValidator {
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         if (node.isNumber()) {
@@ -98,12 +99,12 @@ public class EnumValidator extends BaseJsonValidator implements JsonValidator {
             node = processArrayNode((ArrayNode) node);
         }
         if (!nodes.contains(node) && !( this.validationContext.getConfig().isTypeLoose() && isTypeLooseContainsInEnum(node))) {
-            return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+            return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                     .locale(executionContext.getExecutionConfig().getLocale())
                     .failFast(executionContext.isFailFast()).arguments(error).build());
         }
 
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
     /**

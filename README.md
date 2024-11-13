@@ -273,7 +273,7 @@ String input = "{\r\n"
     + "  }\r\n"
     + "}";
 
-Set<ValidationMessage> assertions = schema.validate(input, InputFormat.JSON, executionContext -> {
+List<ValidationMessage> assertions = schema.validate(input, InputFormat.JSON, executionContext -> {
     // By default since Draft 2019-09 the format keyword only generates annotations and not assertions
     executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
 });
@@ -308,7 +308,7 @@ String input = "{\r\n"
     + "    }\r\n"
     + "  }\r\n"
     + "}";
-Set<ValidationMessage> assertions = schema.validate(input, InputFormat.JSON, executionContext -> {
+List<ValidationMessage> assertions = schema.validate(input, InputFormat.JSON, executionContext -> {
     // By default since Draft 2019-09 the format keyword only generates annotations and not assertions
     executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
 });
@@ -376,7 +376,7 @@ JsonSchemaFactory factory = JsonSchemaFactory.getInstance(VersionFlag.V202012,
         builder -> builder.jsonNodeReader(JsonNodeReader.builder().locationAware().build()));
 SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
 JsonSchema schema = factory.getSchema(schemaData, InputFormat.JSON, config);
-Set<ValidationMessage> messages = schema.validate(inputData, InputFormat.JSON, executionContext -> {
+List<ValidationMessage> messages = schema.validate(inputData, InputFormat.JSON, executionContext -> {
     executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
 });
 List<ValidationMessage> list = messages.stream().collect(Collectors.toList());

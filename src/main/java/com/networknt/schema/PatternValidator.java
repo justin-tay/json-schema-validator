@@ -22,8 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public class PatternValidator extends BaseJsonValidator {
     private static final Logger logger = LoggerFactory.getLogger(PatternValidator.class);
@@ -48,17 +48,17 @@ public class PatternValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getConfig());
         if (nodeType != JsonType.STRING) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         try {
             if (!matches(node.asText())) {
-                return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+                return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                         .locale(executionContext.getExecutionConfig().getLocale())
                         .failFast(executionContext.isFailFast()).arguments(this.pattern).build());
             }
@@ -69,6 +69,6 @@ public class PatternValidator extends BaseJsonValidator {
             throw e;
         }
 
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 }

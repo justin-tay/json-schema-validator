@@ -17,7 +17,7 @@
 package com.networknt.schema;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.walk.JsonSchemaWalker;
@@ -37,7 +37,7 @@ public interface JsonValidator extends JsonSchemaWalker {
      * @return A list of ValidationMessage if there is any validation error, or an empty
      * list if there is no error.
      */
-    Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation);
 
     /**
@@ -57,14 +57,14 @@ public interface JsonValidator extends JsonSchemaWalker {
      * validate method if shouldValidateSchema is enabled.
      */
     @Override
-    default Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    default List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         if (node == null) {
             // Note that null is not the same as NullNode
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
         return shouldValidateSchema ? validate(executionContext, node, rootNode, instanceLocation)
-                : Collections.emptySet();
+                : Collections.emptyList();
     }
 
     /**

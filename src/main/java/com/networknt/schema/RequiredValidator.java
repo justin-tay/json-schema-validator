@@ -42,21 +42,21 @@ public class RequiredValidator extends BaseJsonValidator implements JsonValidato
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         if (!node.isObject()) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
-        Set<ValidationMessage> errors = null;
+        List<ValidationMessage> errors = null;
 
         for (String fieldName : fieldNames) {
             JsonNode propertyNode = node.get(fieldName);
 
             if (propertyNode == null) {
                 if (errors == null) {
-                    errors = new LinkedHashSet<>();
+                    errors = new ArrayList<>();
                 }
                 /**
                  * Note that for the required validation the instanceLocation does not contain the missing property
@@ -69,7 +69,7 @@ public class RequiredValidator extends BaseJsonValidator implements JsonValidato
             }
         }
 
-        return errors == null ? Collections.emptySet() : Collections.unmodifiableSet(errors);
+        return errors == null ? Collections.emptyList() : Collections.unmodifiableList(errors);
     }
 
 }

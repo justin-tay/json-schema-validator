@@ -53,9 +53,9 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         if (!node.isArray()) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         debug(logger, executionContext, node, rootNode, instanceLocation);
@@ -149,7 +149,7 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
                 }
             }
         }
-        Set<ValidationMessage> messages = null;
+        List<ValidationMessage> messages = null;
         if (!valid) {
             // Get all the "contains" for the instanceLocation
             List<JsonNodeAnnotation> contains = instanceLocationAnnotations.stream()
@@ -167,7 +167,7 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
                 }
             }
 
-            messages = new LinkedHashSet<>();
+            messages = new ArrayList<>();
             if (!containsEvaluatedAll) {
                 // Start evaluating from the valid count
                 for (int x = validCount; x < node.size(); x++) {
@@ -203,6 +203,6 @@ public class UnevaluatedItemsValidator extends BaseJsonValidator {
                             .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
                             .keyword("unevaluatedItems").value(true).build());
         }
-        return messages == null || messages.isEmpty() ? Collections.emptySet() : messages;
+        return messages == null || messages.isEmpty() ? Collections.emptyList() : messages;
     }
 }

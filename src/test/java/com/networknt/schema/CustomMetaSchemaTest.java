@@ -16,17 +16,16 @@
 
 package com.networknt.schema;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class CustomMetaSchemaTest {
 
@@ -59,14 +58,14 @@ class CustomMetaSchemaTest {
             }
 
             @Override
-            public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+            public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
                 String value = node.asText();
                 int idx = enumValues.indexOf(value);
                 if (idx < 0) {
                     throw new IllegalArgumentException("value not found in enum. value: " + value + " enum: " + enumValues);
                 }
                 String valueName = enumNames.get(idx);
-                Set<ValidationMessage> messages = new HashSet<>();
+                List<ValidationMessage> messages = new ArrayList<>();
                 ValidationMessage validationMessage = ValidationMessage.builder().type(keyword)
                         .schemaNode(node)
                         .instanceNode(node)
@@ -130,7 +129,7 @@ class CustomMetaSchemaTest {
                 "  \"enumNames\": [\"Foo !\", \"Bar !\"]\n" +
                 "}");
 
-        Set<ValidationMessage> messages = schema.validate(objectMapper.readTree("\"foo\""));
+        List<ValidationMessage> messages = schema.validate(objectMapper.readTree("\"foo\""));
         assertEquals(1, messages.size());
 
         ValidationMessage message = messages.iterator().next();
