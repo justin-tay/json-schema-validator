@@ -45,9 +45,9 @@ public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         if (!node.isObject()) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         debug(logger, executionContext, node, rootNode, instanceLocation);
@@ -106,7 +106,7 @@ public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
             }
         }
 
-        Set<ValidationMessage> messages = new LinkedHashSet<>();
+        List<ValidationMessage> messages = new ArrayList<>();
         // Save flag as nested schema evaluation shouldn't trigger fail fast
         boolean failFast = executionContext.isFailFast();
         try {
@@ -134,6 +134,6 @@ public class UnevaluatedPropertiesValidator extends BaseJsonValidator {
                 .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation).evaluationPath(this.evaluationPath)
                         .schemaLocation(this.schemaLocation).keyword(getKeyword()).value(evaluatedProperties).build());
 
-        return messages == null || messages.isEmpty() ? Collections.emptySet() : messages;
+        return messages == null || messages.isEmpty() ? Collections.emptyList() : messages;
     }
 }

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.networknt.schema.annotation.JsonNodeAnnotation;
 import com.networknt.schema.utils.JsonSchemaRefs;
-import com.networknt.schema.utils.SetView;
+import com.networknt.schema.utils.ListView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,25 +63,25 @@ public class ItemsValidator202012 extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         // ignores non-arrays
         if (node.isArray()) {
-            SetView<ValidationMessage> errors = null;
+            ListView<ValidationMessage> errors = null;
             boolean evaluated = false;
             for (int i = this.prefixCount; i < node.size(); ++i) {
                 JsonNodePath path = instanceLocation.append(i);
                 // validate with item schema (the whole array has the same item schema)
-                Set<ValidationMessage> results = null;
+                List<ValidationMessage> results = null;
                 if (additionalItems) {
                     results = this.schema.validate(executionContext, node.get(i), rootNode, path);
                 } else {
                     // This handles the case where "items": false as the boolean false schema doesn't
                     // generate a helpful message
                     int x = i;
-                    results = Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+                    results = Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                             .locale(executionContext.getExecutionConfig().getLocale())
                             .failFast(executionContext.isFailFast()).arguments(x).build());
                 }
@@ -89,7 +89,7 @@ public class ItemsValidator202012 extends BaseJsonValidator {
 //                    evaluatedItems.add(path);
                 } else {
                     if (errors == null) {
-                        errors = new SetView<>();
+                        errors = new ListView<>();
                     }
                     errors.union(results);
                 }
@@ -104,16 +104,16 @@ public class ItemsValidator202012 extends BaseJsonValidator {
                                     .keyword(getKeyword()).value(true).build());
                 }
             }
-            return errors == null || errors.isEmpty() ? Collections.emptySet() : errors;
+            return errors == null || errors.isEmpty() ? Collections.emptyList() : errors;
         } else {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-        Set<ValidationMessage> validationMessages = new LinkedHashSet<>();
+        List<ValidationMessage> validationMessages = new ArrayList<>();
 
         if (node instanceof ArrayNode) {
             ArrayNode arrayNode = (ArrayNode) node;
@@ -167,7 +167,7 @@ public class ItemsValidator202012 extends BaseJsonValidator {
     }
 
     private void walkSchema(ExecutionContext executionContext, JsonSchema walkSchema, JsonNode node, JsonNode rootNode,
-            JsonNodePath instanceLocation, boolean shouldValidateSchema, Set<ValidationMessage> validationMessages) {
+            JsonNodePath instanceLocation, boolean shouldValidateSchema, List<ValidationMessage> validationMessages) {
         //@formatter:off
         boolean executeWalk = this.validationContext.getConfig().getItemWalkListenerRunner().runPreWalkListeners(
             executionContext,

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.networknt.schema.annotation.JsonNodeAnnotation;
 import com.networknt.schema.utils.JsonSchemaRefs;
-import com.networknt.schema.utils.SetView;
+import com.networknt.schema.utils.ListView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,12 +87,12 @@ public class ItemsValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         if (!node.isArray() && !this.validationContext.getConfig().isTypeLoose()) {
             // ignores non-arrays
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
         boolean collectAnnotations = collectAnnotations();
 
@@ -125,7 +125,7 @@ public class ItemsValidator extends BaseJsonValidator {
         }
 
         boolean hasAdditionalItem = false;
-        SetView<ValidationMessage> errors = new SetView<>();
+        ListView<ValidationMessage> errors = new ListView<>();
         if (node.isArray()) {
             int i = 0;
             for (JsonNode n : node) {
@@ -149,10 +149,10 @@ public class ItemsValidator extends BaseJsonValidator {
                                 .keyword("additionalItems").value(true).build());
             }
         }
-        return errors.isEmpty() ? Collections.emptySet() : errors;
+        return errors.isEmpty() ? Collections.emptyList() : errors;
     }
 
-    private boolean doValidate(ExecutionContext executionContext, SetView<ValidationMessage> errors, int i, JsonNode node,
+    private boolean doValidate(ExecutionContext executionContext, ListView<ValidationMessage> errors, int i, JsonNode node,
             JsonNode rootNode, JsonNodePath instanceLocation) {
         boolean isAdditionalItem = false;
         JsonNodePath path = instanceLocation.append(i);
@@ -160,14 +160,14 @@ public class ItemsValidator extends BaseJsonValidator {
         if (this.schema != null) {
             // validate with item schema (the whole array has the same item
             // schema)
-            Set<ValidationMessage> results = this.schema.validate(executionContext, node, rootNode, path);
+            List<ValidationMessage> results = this.schema.validate(executionContext, node, rootNode, path);
             if (!results.isEmpty()) {
                 errors.union(results);
             }
         } else if (this.tupleSchema != null) {
             if (i < this.tupleSchema.size()) {
                 // validate against tuple schema
-                Set<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
+                List<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
                 if (!results.isEmpty()) {
                     errors.union(results);
                 }
@@ -178,7 +178,7 @@ public class ItemsValidator extends BaseJsonValidator {
 
                 if (this.additionalSchema != null) {
                     // validate against additional item schema
-                    Set<ValidationMessage> results = this.additionalSchema.validate(executionContext, node, rootNode, path);
+                    List<ValidationMessage> results = this.additionalSchema.validate(executionContext, node, rootNode, path);
                     if (!results.isEmpty()) {
                         errors.union(results);
                     }
@@ -187,7 +187,7 @@ public class ItemsValidator extends BaseJsonValidator {
 //                        evaluatedItems.add(path);
                     } else {
                         // no additional item allowed, return error
-                        errors.union(Collections.singleton(message().instanceNode(rootNode).instanceLocation(instanceLocation)
+                        errors.union(Collections.singletonList(message().instanceNode(rootNode).instanceLocation(instanceLocation)
                                 .type("additionalItems")
                                 .messageKey("additionalItems")
                                 .evaluationPath(this.additionalItemsEvaluationPath)
@@ -203,8 +203,8 @@ public class ItemsValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-        Set<ValidationMessage> validationMessages = new LinkedHashSet<>();
+    public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+        List<ValidationMessage> validationMessages = new ArrayList<>();
         boolean collectAnnotations = collectAnnotations();
 
         // Add items annotation
@@ -339,7 +339,7 @@ public class ItemsValidator extends BaseJsonValidator {
     }
 
     private void walkSchema(ExecutionContext executionContext, JsonSchema walkSchema, JsonNode node, JsonNode rootNode,
-            JsonNodePath instanceLocation, boolean shouldValidateSchema, Set<ValidationMessage> validationMessages, String keyword) {
+            JsonNodePath instanceLocation, boolean shouldValidateSchema, List<ValidationMessage> validationMessages, String keyword) {
         boolean executeWalk = this.validationContext.getConfig().getItemWalkListenerRunner().runPreWalkListeners(executionContext, keyword,
                 node, rootNode, instanceLocation, walkSchema, this);
         if (executeWalk) {

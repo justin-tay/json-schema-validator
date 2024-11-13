@@ -17,7 +17,7 @@
 package com.networknt.schema;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -141,7 +141,7 @@ public interface Format {
      * @param formatValidator the format validator
      * @return the messages
      */
-    default Set<ValidationMessage> validate(ExecutionContext executionContext, ValidationContext validationContext,
+    default List<ValidationMessage> validate(ExecutionContext executionContext, ValidationContext validationContext,
             JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean assertionsEnabled,
             Supplier<MessageSourceValidationMessage.Builder> message,
             FormatValidator formatValidator) {
@@ -149,10 +149,10 @@ public interface Format {
             if (!matches(executionContext, validationContext, node, rootNode, instanceLocation, assertionsEnabled,
                     formatValidator)) {
                 return Collections
-                        .singleton(message.get()
+                        .singletonList(message.get()
                                 .arguments(this.getName(), this.getErrorMessageDescription(), node.asText()).build());
             }
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 }

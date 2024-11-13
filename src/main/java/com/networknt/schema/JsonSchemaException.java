@@ -17,7 +17,7 @@
 package com.networknt.schema;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Represents an error when processing the JsonSchema.
@@ -49,10 +49,10 @@ public class JsonSchemaException extends RuntimeException {
         return this.validationMessage;
     }
 
-    public Set<ValidationMessage> getValidationMessages() {
+    public List<ValidationMessage> getValidationMessages() {
         if (validationMessage == null) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
-        return Collections.singleton(validationMessage);
+        return Collections.singletonList(validationMessage);
     }
 }

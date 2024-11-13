@@ -4,15 +4,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 class JsonWalkApplyDefaultsTest {
@@ -79,7 +81,7 @@ class JsonWalkApplyDefaultsTest {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode inputNode = objectMapper.readTree(getClass().getClassLoader().getResourceAsStream("data/walk-data-default.json"));
         JsonNode inputNodeOriginal = objectMapper.readTree(getClass().getClassLoader().getResourceAsStream("data/walk-data-default.json"));
-        Set<ValidationMessage> validationMessages;
+        List<ValidationMessage> validationMessages;
         switch (method) {
             case "walkWithEmptyStrategy": {
                 JsonSchema jsonSchema = createSchema(new ApplyDefaultsStrategy(false, false, false));

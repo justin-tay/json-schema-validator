@@ -56,7 +56,7 @@ public class RegularExpressionTest {
         JsonSchema schema = factory.getSchema("{\r\n"
                 + "  \"format\": \"regex\"\r\n"
                 + "}", config);
-        Set<ValidationMessage> errors = schema.validate("\"\\\\a\"", InputFormat.JSON, executionContext -> {
+        List<ValidationMessage> errors = schema.validate("\"\\\\a\"", InputFormat.JSON, executionContext -> {
             executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
         });
         assertFalse(errors.isEmpty());

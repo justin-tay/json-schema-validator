@@ -16,6 +16,19 @@
 
 package com.networknt.schema;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.SpecVersion.VersionFlag;
@@ -27,19 +40,6 @@ import com.networknt.schema.resource.SchemaMappers;
 import com.networknt.schema.serialization.JsonMapperFactory;
 import com.networknt.schema.serialization.JsonNodeReader;
 import com.networknt.schema.serialization.YamlMapperFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
 
 /**
  * Factory for building {@link JsonSchema} instances. The factory should be

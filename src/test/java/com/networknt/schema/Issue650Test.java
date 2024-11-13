@@ -1,9 +1,11 @@
 package com.networknt.schema;
 
 import java.io.InputStream;
-import java.util.Set;
+import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,7 +48,7 @@ class Issue650Test {
         JsonNode node = mapper.valueToTree(model);
 
         // validate:
-        Set<ValidationMessage> errors = schema.validate(node);
+        List<ValidationMessage> errors = schema.validate(node);
 
         // check result:
         Assertions.assertTrue(errors.isEmpty());

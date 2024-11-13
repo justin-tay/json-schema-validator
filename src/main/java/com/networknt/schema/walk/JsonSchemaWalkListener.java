@@ -2,7 +2,7 @@ package com.networknt.schema.walk;
 
 import com.networknt.schema.ValidationMessage;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * 
@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public interface JsonSchemaWalkListener {
 
-	WalkFlow onWalkStart(WalkEvent walkEvent);
+	public WalkFlow onWalkStart(WalkEvent walkEvent);
 
-	void onWalkEnd(WalkEvent walkEvent, Set<ValidationMessage> validationMessages);
+	void onWalkEnd(WalkEvent walkEvent, List<ValidationMessage> validationMessages);
 }

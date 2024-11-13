@@ -1,12 +1,13 @@
 package com.networknt.schema;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStream;
+import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.InputStream;
-import java.util.Set;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 class Issue550Test {
@@ -30,7 +31,7 @@ class Issue550Test {
         JsonSchema schema = getJsonSchemaFromStreamContentV7(schemaPath);
         JsonNode node = getJsonNodeFromStreamContent(dataPath);
 
-        Set<ValidationMessage> errors = schema.validate(node);
+        List<ValidationMessage> errors = schema.validate(node);
         ValidationMessage validationMessage = errors.stream().findFirst().get();
 
         Assertions.assertEquals("https://example.com/person.schema.json#/properties/age/minimum", validationMessage.getSchemaLocation().toString());
@@ -44,7 +45,7 @@ class Issue550Test {
         JsonSchema schema = getJsonSchemaFromStreamContentV7(schemaPath);
         JsonNode node = getJsonNodeFromStreamContent(dataPath);
 
-        Set<ValidationMessage> errors = schema.validate(node);
+        List<ValidationMessage> errors = schema.validate(node);
         ValidationMessage validationMessage = errors.stream().findFirst().get();
 
         // Instead of capturing all subSchema within oneOf, a pointer to oneOf should be provided.

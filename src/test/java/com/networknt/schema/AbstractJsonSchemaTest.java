@@ -1,16 +1,16 @@
 package com.networknt.schema;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.serialization.JsonMapperFactory;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.networknt.schema.serialization.JsonMapperFactory;
 
 /**
  * Abstract class to use if the data JSON has a declared schema node at root level
@@ -25,13 +25,13 @@ abstract class AbstractJsonSchemaTest {
     private static final String ASSERT_MSG_ERROR_CODE = "Validation result should contain {0} error code";
     private static final String ASSERT_MSG_TYPE = "Validation result should contain {0} type";
 
-    protected Set<ValidationMessage> validate(String dataPath) {
+    protected List<ValidationMessage> validate(String dataPath) {
         JsonNode dataNode = getJsonNodeFromPath(dataPath);
         return getJsonSchemaFromDataNode(dataNode).validate(dataNode);
     }
 
     protected void assertValidatorType(String filename, ValidatorTypeCode validatorTypeCode) {
-        Set<ValidationMessage> validationMessages = validate(getDataTestFolder() + filename);
+        List<ValidationMessage> validationMessages = validate(getDataTestFolder() + filename);
 
         assertTrue(
                 validationMessages.stream().anyMatch(vm -> validatorTypeCode.getErrorCode().equals(vm.getCode())),
