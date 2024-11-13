@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 /**
  * {@link JsonValidator} for const.
@@ -33,20 +33,20 @@ public class ConstValidator extends BaseJsonValidator implements JsonValidator {
         super(schemaLocation, evaluationPath, schemaNode, parentSchema, ValidatorTypeCode.CONST, validationContext);
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         if (schemaNode.isNumber() && node.isNumber()) {
             if (schemaNode.decimalValue().compareTo(node.decimalValue()) != 0) {
-                return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+                return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                         .locale(executionContext.getExecutionConfig().getLocale())
                         .failFast(executionContext.isFailFast()).arguments(schemaNode.asText(), node.asText())
                         .build());
             }
         } else if (!schemaNode.equals(node)) {
-            return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+            return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                     .locale(executionContext.getExecutionConfig().getLocale()).arguments(schemaNode.asText(), node.asText()).build());
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 }

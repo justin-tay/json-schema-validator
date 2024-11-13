@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * {@link JsonValidator} for type union.
@@ -67,7 +66,7 @@ public class UnionTypeValidator extends BaseJsonValidator implements JsonValidat
         error = errorBuilder.toString();
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         JsonType nodeType = TypeFactory.getValueNodeType(node, validationContext.getConfig());
@@ -79,7 +78,7 @@ public class UnionTypeValidator extends BaseJsonValidator implements JsonValidat
         try {
             executionContext.setFailFast(false);
             for (JsonValidator schema : schemas) {
-                Set<ValidationMessage> errors = schema.validate(executionContext, node, rootNode, instanceLocation);
+                List<ValidationMessage> errors = schema.validate(executionContext, node, rootNode, instanceLocation);
                 if (errors == null || errors.isEmpty()) {
                     valid = true;
                     break;
@@ -91,14 +90,14 @@ public class UnionTypeValidator extends BaseJsonValidator implements JsonValidat
         }
 
         if (!valid) {
-            return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+            return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                     .type("type")
                     .locale(executionContext.getExecutionConfig().getLocale())
                     .failFast(executionContext.isFailFast()).arguments(nodeType.toString(), error)
                     .build());
         }
 
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
     @Override

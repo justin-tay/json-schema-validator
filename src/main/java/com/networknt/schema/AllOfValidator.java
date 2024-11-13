@@ -20,7 +20,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.networknt.schema.utils.SetView;
+import com.networknt.schema.utils.ListView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,17 +52,17 @@ public class AllOfValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         return validate(executionContext, node, rootNode, instanceLocation, false);
     }
 
-    protected Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean walk) {
+    protected List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean walk) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
-        SetView<ValidationMessage> childSchemaErrors = null;
+        ListView<ValidationMessage> childSchemaErrors = null;
 
         for (JsonSchema schema : this.schemas) {
-            Set<ValidationMessage> localErrors = null;
+            List<ValidationMessage> localErrors = null;
 
             if (!walk) {
                 localErrors = schema.validate(executionContext, node, rootNode, instanceLocation);
@@ -72,7 +72,7 @@ public class AllOfValidator extends BaseJsonValidator {
             
             if (localErrors != null && !localErrors.isEmpty()) {
                 if (childSchemaErrors == null) {
-                    childSchemaErrors = new SetView<>();
+                    childSchemaErrors = new ListView<>();
                 }
                 childSchemaErrors.union(localErrors);
             }
@@ -107,11 +107,11 @@ public class AllOfValidator extends BaseJsonValidator {
             }
         }
 
-        return childSchemaErrors != null ? childSchemaErrors : Collections.emptySet();
+        return childSchemaErrors != null ? childSchemaErrors : Collections.emptyList();
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         if (shouldValidateSchema && node != null) {
             return validate(executionContext, node, rootNode, instanceLocation, true);
         }
@@ -119,7 +119,7 @@ public class AllOfValidator extends BaseJsonValidator {
             // Walk through the schema
             schema.walk(executionContext, node, rootNode, instanceLocation, false);
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
     @Override

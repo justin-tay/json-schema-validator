@@ -16,15 +16,15 @@
 
 package com.networknt.schema;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.networknt.schema.format.BaseFormatJsonValidator;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.regex.PatternSyntaxException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.format.BaseFormatJsonValidator;
 
 /**
  * Validator for Format.
@@ -58,7 +58,7 @@ public class FormatValidator extends BaseFormatJsonValidator implements JsonVali
         return this.schemaNode.isTextual() ? schemaNode.textValue() : null;
     }
     
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
         /*
          * Annotations must be collected even if the format is unknown according to the specification.
@@ -85,7 +85,7 @@ public class FormatValidator extends BaseFormatJsonValidator implements JsonVali
                 // String is considered valid if pattern is invalid
                 logger.error("Failed to apply pattern on {}: Invalid RE syntax [{}]", instanceLocation,
                         format.getName(), pse);
-                return Collections.emptySet();
+                return Collections.emptyList();
             }
         } else {
             return validateUnknownFormat(executionContext, node, rootNode, instanceLocation);
@@ -101,17 +101,17 @@ public class FormatValidator extends BaseFormatJsonValidator implements JsonVali
      * @param instanceLocation the instance location
      * @return the messages
      */
-    protected Set<ValidationMessage> validateUnknownFormat(ExecutionContext executionContext,
+    protected List<ValidationMessage> validateUnknownFormat(ExecutionContext executionContext,
             JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         /*
          * Unknown formats should create an assertion if the vocab is specified
          * according to the specification.
          */
         if (createUnknownFormatAssertions(executionContext) && this.schemaNode.isTextual()) {
-            return Collections.singleton(message().instanceLocation(instanceLocation).instanceNode(node)
+            return Collections.singletonList(message().instanceLocation(instanceLocation).instanceNode(node)
                     .messageKey("format.unknown").arguments(schemaNode.textValue()).build());
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
     /**

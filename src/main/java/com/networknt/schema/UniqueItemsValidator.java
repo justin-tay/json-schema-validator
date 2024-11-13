@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -41,21 +42,21 @@ public class UniqueItemsValidator extends BaseJsonValidator implements JsonValid
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         if (unique) {
             Set<JsonNode> set = new HashSet<>();
             for (JsonNode n : node) {
                 if (!set.add(n)) {
-                    return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+                    return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                             .locale(executionContext.getExecutionConfig().getLocale())
                             .failFast(executionContext.isFailFast()).build());
                 }
             }
         }
 
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
 }

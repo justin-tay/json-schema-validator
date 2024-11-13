@@ -17,8 +17,8 @@
 package com.networknt.schema;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Thrown when an assertion happens and the evaluation can fail fast.
@@ -57,8 +57,8 @@ public class FailFastAssertionException extends RuntimeException {
      * 
      * @return the validation message
      */
-    public Set<ValidationMessage> getValidationMessages() {
-        return Collections.singleton(this.validationMessage);
+    public List<ValidationMessage> getValidationMessages() {
+        return Collections.singletonList(this.validationMessage);
     }
 
     @Override

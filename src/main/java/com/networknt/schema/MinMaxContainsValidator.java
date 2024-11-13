@@ -2,8 +2,10 @@ package com.networknt.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,7 +61,7 @@ public class MinMaxContainsValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation) {
         return this.analysis != null ? this.analysis.stream()
                 .map(analysis -> message().instanceNode(node)
@@ -68,7 +70,7 @@ public class MinMaxContainsValidator extends BaseJsonValidator {
                         .failFast(executionContext.isFailFast())
                         .type(analysis.getMessageKey())
                         .arguments(parentSchema.getSchemaNode().toString()).build())
-                .collect(Collectors.toCollection(LinkedHashSet::new)) : Collections.emptySet();
+                .collect(Collectors.toCollection(ArrayList::new)) : Collections.emptyList();
     }
     
     public static class Analysis {

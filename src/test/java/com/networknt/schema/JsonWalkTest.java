@@ -1,5 +1,16 @@
 package com.networknt.schema;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -7,18 +18,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.networknt.schema.walk.JsonSchemaWalkListener;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.TreeSet;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JsonWalkTest {
 
@@ -168,14 +167,14 @@ class JsonWalkTest {
             }
 
             @Override
-            public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
-                return new TreeSet<>();
+            public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+                return new ArrayList<>();
             }
 
             @Override
-            public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+            public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
                     JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-                return new LinkedHashSet<ValidationMessage>();
+                return new ArrayList<ValidationMessage>();
             }
         }
     }
@@ -199,7 +198,7 @@ class JsonWalkTest {
         }
 
         @Override
-        public void onWalkEnd(WalkEvent keywordWalkEvent, Set<ValidationMessage> validationMessages) {
+        public void onWalkEnd(WalkEvent keywordWalkEvent, List<ValidationMessage> validationMessages) {
 
         }
     }
@@ -220,7 +219,7 @@ class JsonWalkTest {
         }
 
         @Override
-        public void onWalkEnd(WalkEvent keywordWalkEvent, Set<ValidationMessage> validationMessages) {
+        public void onWalkEnd(WalkEvent keywordWalkEvent, List<ValidationMessage> validationMessages) {
 
         }
     }
@@ -237,7 +236,7 @@ class JsonWalkTest {
         }
 
         @Override
-        public void onWalkEnd(WalkEvent keywordWalkEvent, Set<ValidationMessage> validationMessages) {
+        public void onWalkEnd(WalkEvent keywordWalkEvent, List<ValidationMessage> validationMessages) {
 
         }
     }

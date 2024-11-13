@@ -51,7 +51,7 @@ abstract class AbstractJsonSchemaTestSuite extends HTTPServiceSupport {
     }
 
     private static void executeTest(JsonSchema schema, TestSpec testSpec) {
-        Set<ValidationMessage> errors = schema.validate(testSpec.getData(), OutputFormat.DEFAULT, (executionContext, validationContext) -> {
+        List<ValidationMessage> errors = schema.validate(testSpec.getData(), OutputFormat.DEFAULT, (executionContext, validationContext) -> {
             if (testSpec.getTestCase().getSource().getPath().getParent().toString().endsWith("format")
                     || "ecmascript-regex.json"
                             .equals(testSpec.getTestCase().getSource().getPath().getFileName().toString())) {

@@ -1,17 +1,17 @@
 package com.networknt.schema;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.resource.InputStreamSource;
 import com.networknt.schema.resource.SchemaLoader;
-
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Set;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 class CustomUriTest {
     @Test
@@ -24,7 +24,7 @@ class CustomUriTest {
         final JsonNode value = mapper.readTree("{\"customAnyOf\": null,\"customOneOf\": null}");
 
         /* When */
-        final Set<ValidationMessage> errors = schema.validate(value);
+        final List<ValidationMessage> errors = schema.validate(value);
 
         /* Then */
         assertThat(errors.isEmpty(), is(true));

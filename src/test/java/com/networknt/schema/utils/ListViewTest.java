@@ -21,30 +21,30 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
 /**
- * Test for SetView.
+ * Test for ListView.
  */
-class SetViewTest {
+class ListViewTest {
 
     @Test
     void testUnion() {
-        Set<Integer> a = new LinkedHashSet<>();
-        Set<Integer> b = new LinkedHashSet<>();
-        Set<Integer> c = new LinkedHashSet<>();
+        List<Integer> a = new ArrayList<>();
+        List<Integer> b = new ArrayList<>();
+        List<Integer> c = new ArrayList<>();
         a.add(1);
         a.add(2);
         c.add(3);
 
-        Set<Integer> view = new SetView<Integer>().union(a).union(b).union(c);
+        List<Integer> view = new ListView<Integer>().union(a).union(b).union(c);
         assertEquals(3, view.size());
         List<Integer> values = view.stream().collect(Collectors.toList());
         assertEquals(1, values.get(0));
@@ -54,25 +54,25 @@ class SetViewTest {
 
     @Test
     void testToString() {
-        Set<Integer> a = new LinkedHashSet<>();
-        Set<Integer> b = new LinkedHashSet<>();
-        Set<Integer> c = new LinkedHashSet<>();
+        List<Integer> a = new ArrayList<>();
+        List<Integer> b = new ArrayList<>();
+        List<Integer> c = new ArrayList<>();
         a.add(1);
         a.add(2);
         c.add(3);
 
-        Set<Integer> view = new SetView<Integer>().union(a).union(b).union(c);
+        List<Integer> view = new ListView<Integer>().union(a).union(b).union(c);
         String value = view.toString();
         assertEquals("[1, 2, 3]", value);
     }
 
     @Test
     void testIsEmpty() {
-        Set<Integer> a = new LinkedHashSet<>();
+        List<Integer> a = new ArrayList<>();
         a.add(1);
         a.add(2);
 
-        SetView<Integer> view = new SetView<>();
+        ListView<Integer> view = new ListView<>();
         assertTrue(view.isEmpty());
         view.union(a);
         assertFalse(view.isEmpty());
@@ -80,17 +80,17 @@ class SetViewTest {
 
     @Test
     void testEquals() {
-        Set<Integer> a = new LinkedHashSet<>();
-        Set<Integer> b = new LinkedHashSet<>();
-        Set<Integer> c = new LinkedHashSet<>();
+        List<Integer> a = new ArrayList<>();
+        List<Integer> b = new ArrayList<>();
+        List<Integer> c = new ArrayList<>();
         a.add(1);
         a.add(2);
         c.add(3);
 
-        Set<Integer> view = new SetView<Integer>().union(a).union(b).union(c);
+        List<Integer> view = new ListView<Integer>().union(a).union(b).union(c);
         assertEquals(3, view.size());
 
-        Set<Integer> result = new HashSet<>();
+        List<Integer> result = new ArrayList<>();
         result.add(1);
         result.add(2);
         result.add(3);
@@ -99,14 +99,14 @@ class SetViewTest {
 
     @Test
     void testContains() {
-        Set<Integer> a = new LinkedHashSet<>();
-        Set<Integer> b = new LinkedHashSet<>();
-        Set<Integer> c = new LinkedHashSet<>();
+        List<Integer> a = new ArrayList<>();
+        List<Integer> b = new ArrayList<>();
+        List<Integer> c = new ArrayList<>();
         a.add(1);
         a.add(2);
         c.add(3);
 
-        Set<Integer> view = new SetView<Integer>().union(a).union(b).union(c);
+        List<Integer> view = new ListView<Integer>().union(a).union(b).union(c);
         assertTrue(view.contains(1));
         assertTrue(view.contains(2));
         assertTrue(view.contains(3));
@@ -115,15 +115,15 @@ class SetViewTest {
 
     @Test
     void testContainsAll() {
-        Set<Integer> a = new LinkedHashSet<>();
-        Set<Integer> b = new LinkedHashSet<>();
-        Set<Integer> c = new LinkedHashSet<>();
+        List<Integer> a = new ArrayList<>();
+        List<Integer> b = new ArrayList<>();
+        List<Integer> c = new ArrayList<>();
         a.add(1);
         a.add(2);
         c.add(3);
 
-        Set<Integer> view = new SetView<Integer>().union(a).union(b).union(c);
-        Set<Integer> result = new HashSet<>();
+        List<Integer> view = new ListView<Integer>().union(a).union(b).union(c);
+        List<Integer> result = new ArrayList<>();
         result.add(1);
         result.add(2);
         result.add(3);
@@ -134,14 +134,14 @@ class SetViewTest {
 
     @Test
     void testToArray() {
-        Set<Integer> a = new LinkedHashSet<>();
-        Set<Integer> b = new LinkedHashSet<>();
-        Set<Integer> c = new LinkedHashSet<>();
+        List<Integer> a = new ArrayList<>();
+        List<Integer> b = new ArrayList<>();
+        List<Integer> c = new ArrayList<>();
         a.add(1);
         a.add(2);
         c.add(3);
 
-        Set<Integer> view = new SetView<Integer>().union(a).union(b).union(c);
+        List<Integer> view = new ListView<Integer>().union(a).union(b).union(c);
         assertEquals(3, view.size());
 
         Object[] result = view.toArray();
@@ -153,14 +153,14 @@ class SetViewTest {
 
     @Test
     void testToArrayArray() {
-        Set<Integer> a = new LinkedHashSet<>();
-        Set<Integer> b = new LinkedHashSet<>();
-        Set<Integer> c = new LinkedHashSet<>();
+        List<Integer> a = new ArrayList<>();
+        List<Integer> b = new ArrayList<>();
+        List<Integer> c = new ArrayList<>();
         a.add(1);
         a.add(2);
         c.add(3);
 
-        Set<Integer> view = new SetView<Integer>().union(a).union(b).union(c);
+        List<Integer> view = new ListView<Integer>().union(a).union(b).union(c);
         assertEquals(3, view.size());
 
         Integer[] result = view.toArray(new Integer[0]);
@@ -172,38 +172,50 @@ class SetViewTest {
 
     @Test
     void testAddAll() {
-        Set<Integer> view = new SetView<>();
+        List<Integer> view = new ListView<>();
         assertThrows(UnsupportedOperationException.class, () -> view.addAll(Collections.singleton(1)));
     }
 
     @Test
     void testAdd() {
-        Set<Integer> view = new SetView<>();
+        List<Integer> view = new ListView<>();
         assertThrows(UnsupportedOperationException.class, () -> view.add(1));
     }
 
     @Test
     void testClear() {
-        Set<Integer> view = new SetView<>();
+        List<Integer> view = new ListView<>();
         assertThrows(UnsupportedOperationException.class, () -> view.clear());
     }
 
     @Test
     void testRemove() {
-        Set<Integer> view = new SetView<>();
+        List<Integer> view = new ListView<>();
         assertThrows(UnsupportedOperationException.class, () -> view.remove(1));
     }
 
     @Test
     void testRemoveAll() {
-        Set<Integer> view = new SetView<>();
+        List<Integer> view = new ListView<>();
         assertThrows(UnsupportedOperationException.class, () -> view.removeAll(Collections.singleton(1)));
     }
 
     @Test
     void testRetainAll() {
-        Set<Integer> view = new SetView<>();
+        List<Integer> view = new ListView<>();
         assertThrows(UnsupportedOperationException.class, () -> view.retainAll(Collections.singleton(1)));
     }
 
+    @Test
+    void testGetShouldThrowIfIndexOutOfRange() {
+        List<Integer> view = new ListView<>();
+        assertThrows(IndexOutOfBoundsException.class, () -> view.get(0));
+    }
+
+    @Test
+    void testNextShouldThrowNoSuchElementException() {
+        List<Integer> view = new ListView<>();
+        Iterator<Integer> iterator = view.listIterator();
+        assertThrows(NoSuchElementException.class, () -> iterator.next());
+    }
 }

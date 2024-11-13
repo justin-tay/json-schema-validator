@@ -37,7 +37,7 @@ JsonSchemaFactory factory = JsonSchemaFactory.getInstance(VersionFlag.V202012,
         builder -> builder.jsonNodeReader(jsonNodeReader).build());
 SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
 JsonSchema schema = factory.getSchema(schemaData, InputFormat.YAML, config);
-Set<ValidationMessage> messages = schema.validate(inputData, InputFormat.YAML, executionContext -> {
+List<ValidationMessage> messages = schema.validate(inputData, InputFormat.YAML, executionContext -> {
     executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
 });
 ```

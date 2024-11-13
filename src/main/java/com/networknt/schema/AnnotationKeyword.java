@@ -19,7 +19,7 @@ package com.networknt.schema;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Used for Keywords that have no validation aspect, but are part of the metaschema, where annotations may need to be collected.
@@ -33,7 +33,7 @@ public class AnnotationKeyword extends AbstractKeyword {
         }
 
         @Override
-        public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+        public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
             if (collectAnnotations(executionContext)) {
                 Object value = getAnnotationValue(getSchemaNode());
                 if (value != null) {
@@ -41,7 +41,7 @@ public class AnnotationKeyword extends AbstractKeyword {
                             annotation -> annotation.instanceLocation(instanceLocation).value(value));
                 }
             }
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         private Object getAnnotationValue(JsonNode schemaNode) {

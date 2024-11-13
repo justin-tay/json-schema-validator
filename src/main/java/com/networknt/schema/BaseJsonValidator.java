@@ -26,8 +26,8 @@ import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -317,7 +317,7 @@ public abstract class BaseJsonValidator extends ValidationMessageHandler impleme
         return this.suppressSubSchemaRetrieval ? null : obtainSubSchemaNode(this.schemaNode, validationContext);
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node) {
         return validate(executionContext, node, node, atRoot());
     }
 

@@ -1,14 +1,14 @@
 package com.networknt.schema;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.IOException;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class Issue784Test {
 
@@ -56,7 +56,7 @@ class Issue784Test {
     }
 
 
-    private Set<ValidationMessage> validate(JsonSchema jsonSchema, String myDateTimeContent) throws JsonProcessingException {
+    private List<ValidationMessage> validate(JsonSchema jsonSchema, String myDateTimeContent) throws JsonProcessingException {
         return jsonSchema.validate(new ObjectMapper().readTree(" { \"my-date-time\": \"" + myDateTimeContent + "\" } "));
     }
 

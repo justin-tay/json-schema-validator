@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 /**
  * {@link JsonValidator}for maxProperties.
@@ -41,18 +41,18 @@ public class MaxPropertiesValidator extends BaseJsonValidator implements JsonVal
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         if (node.isObject()) {
             if (node.size() > max) {
-                return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+                return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                         .locale(executionContext.getExecutionConfig().getLocale())
                         .failFast(executionContext.isFailFast()).arguments(max).build());
             }
         }
 
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
 }

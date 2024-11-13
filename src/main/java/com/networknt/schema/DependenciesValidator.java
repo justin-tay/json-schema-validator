@@ -62,10 +62,10 @@ public class DependenciesValidator extends BaseJsonValidator implements JsonVali
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
-        Set<ValidationMessage> errors = null;
+        List<ValidationMessage> errors = null;
 
         for (Iterator<String> it = node.fieldNames(); it.hasNext(); ) {
             String pname = it.next();
@@ -74,7 +74,7 @@ public class DependenciesValidator extends BaseJsonValidator implements JsonVali
                 for (String field : deps) {
                     if (node.get(field) == null) {
                         if (errors == null) {
-                            errors = new LinkedHashSet<>();
+                            errors = new ArrayList<>();
                         }
                         errors.add(message().instanceNode(node).property(pname).instanceLocation(instanceLocation)
                                 .locale(executionContext.getExecutionConfig().getLocale())
@@ -85,16 +85,16 @@ public class DependenciesValidator extends BaseJsonValidator implements JsonVali
             }
             JsonSchema schema = schemaDeps.get(pname);
             if (schema != null) {
-                Set<ValidationMessage> schemaDepsErrors = schema.validate(executionContext, node, rootNode, instanceLocation);
+                List<ValidationMessage> schemaDepsErrors = schema.validate(executionContext, node, rootNode, instanceLocation);
                 if (!schemaDepsErrors.isEmpty()) {
                     if (errors == null) {
-                        errors = new LinkedHashSet<>();
+                        errors = new ArrayList<>();
                     }
                     errors.addAll(schemaDepsErrors);
                 }
             }
         }
-        return errors == null || errors.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(errors);
+        return errors == null || errors.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(errors);
     }
 
     @Override
