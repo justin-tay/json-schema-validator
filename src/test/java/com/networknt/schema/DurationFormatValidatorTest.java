@@ -16,15 +16,15 @@
 
 package com.networknt.schema;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class DurationFormatValidatorTest {
 
@@ -38,7 +38,7 @@ class DurationFormatValidatorTest {
         final JsonSchemaFactory validatorFactory = JsonSchemaFactory.builder(JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909)).build();
         final JsonSchema validatorSchema = validatorFactory.getSchema(schema);
 
-        Set<ValidationMessage> messages = validatorSchema.validate(validTargetNode);
+        List<ValidationMessage> messages = validatorSchema.validate(validTargetNode);
         assertEquals(0, messages.size());
 
         messages = validatorSchema.validate(invalidTargetNode, OutputFormat.DEFAULT, (executionContext, validationContext) -> {

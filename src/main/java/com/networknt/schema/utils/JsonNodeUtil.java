@@ -9,7 +9,6 @@ import com.networknt.schema.JsonType;
 import com.networknt.schema.PathType;
 import com.networknt.schema.SchemaValidatorsConfig;
 import com.networknt.schema.SpecVersion.VersionFlag;
-import com.networknt.schema.SpecVersionDetector;
 import com.networknt.schema.TypeFactory;
 import com.networknt.schema.ValidationContext;
 

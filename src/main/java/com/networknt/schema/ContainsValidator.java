@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 
 import static com.networknt.schema.VersionCode.MinV201909;
 
@@ -81,11 +80,11 @@ public class ContainsValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         // ignores non-arrays
-        Set<ValidationMessage> results = null;
+        List<ValidationMessage> results = null;
         int actual = 0, i = 0;
         List<Integer> indexes = new ArrayList<>(); // for the annotation
         if (null != this.schema && node.isArray()) {
@@ -172,7 +171,7 @@ public class ContainsValidator extends BaseJsonValidator {
                 }
             }
         }
-        return results == null ? Collections.emptySet() : results;
+        return results == null ? Collections.emptyList() : results;
     }
 
     @Override
@@ -181,7 +180,7 @@ public class ContainsValidator extends BaseJsonValidator {
         collectAnnotations(); // cache the flag
     }
 
-    private Set<ValidationMessage> boundsViolated(ValidatorTypeCode validatorTypeCode, Locale locale, boolean failFast,
+    private List<ValidationMessage> boundsViolated(ValidatorTypeCode validatorTypeCode, Locale locale, boolean failFast,
             JsonNode instanceNode, JsonNodePath instanceLocation, int bounds) {
         String messageKey = "contains";
         if (ValidatorTypeCode.MIN_CONTAINS.equals(validatorTypeCode)) {
@@ -190,7 +189,7 @@ public class ContainsValidator extends BaseJsonValidator {
             messageKey = CONTAINS_MAX;
         }
         return Collections
-                .singleton(message().instanceNode(instanceNode).instanceLocation(instanceLocation).messageKey(messageKey)
+                .singletonList(message().instanceNode(instanceNode).instanceLocation(instanceLocation).messageKey(messageKey)
                         .locale(locale).failFast(failFast).arguments(String.valueOf(bounds), this.schema.getSchemaNode().toString())
                         .code(validatorTypeCode.getErrorCode()).type(validatorTypeCode.getValue()).build());
     }

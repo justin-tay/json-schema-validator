@@ -64,7 +64,7 @@ public class IfValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         boolean ifConditionPassed = false;
@@ -84,7 +84,7 @@ public class IfValidator extends BaseJsonValidator {
         } else if (!ifConditionPassed && this.elseSchema != null) {
             return this.elseSchema.validate(executionContext, node, rootNode, instanceLocation);
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
     @Override
@@ -101,7 +101,7 @@ public class IfValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         boolean checkCondition = node != null && shouldValidateSchema;
         boolean ifConditionPassed = false;
 
@@ -129,7 +129,7 @@ public class IfValidator extends BaseJsonValidator {
                 return this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
             }
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
 }

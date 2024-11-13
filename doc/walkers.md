@@ -29,7 +29,7 @@ public interface JsonSchemaWalker {
      * @param shouldValidateSchema boolean
      * @return a set of validation messages if shouldValidateSchema is true.
      */
-    Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema);
 }
 
@@ -43,7 +43,7 @@ The JSONValidator interface extends this new interface thus allowing all the val
      * validate method if shouldValidateSchema is enabled.
      */
     @Override
-    default Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    default List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         return shouldValidateSchema ? validate(executionContext, node, rootNode, instanceLocation)
                 : Collections.emptySet();
@@ -58,9 +58,9 @@ A new walk method added to the JSONSchema class allows us to walk through the JS
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-        Set<ValidationMessage> errors = new LinkedHashSet<>();
+        List<ValidationMessage> errors = new LinkedHashSet<>();
         // Walk through all the JSONWalker's.
         for (JsonValidator validator : getValidators()) {
             JsonNodePath evaluationPathWithKeyword = validator.getEvaluationPath();
@@ -70,7 +70,7 @@ A new walk method added to the JSONSchema class allows us to walk through the JS
                 if (this.validationContext.getConfig().getKeywordWalkListenerRunner().runPreWalkListeners(executionContext,
                         evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
                         this, validator)) {
-                    Set<ValidationMessage> results = null;
+                    List<ValidationMessage> results = null;
                     try {
                         results = validator.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
                     } finally {
@@ -107,7 +107,7 @@ public interface JsonSchemaWalkListener {
 
 	public WalkFlow onWalkStart(WalkEvent walkEvent);
 
-	public void onWalkEnd(WalkEvent walkEvent, Set<ValidationMessage> validationMessages);
+	public void onWalkEnd(WalkEvent walkEvent, List<ValidationMessage> validationMessages);
 }
 ```
 
@@ -126,7 +126,7 @@ private static class PropertiesKeywordListener implements JsonSchemaWalkListener
         }
 
         @Override
-        public void onWalkEnd(WalkEvent keywordWalkEvent, Set<ValidationMessage> validationMessages) {
+        public void onWalkEnd(WalkEvent keywordWalkEvent, List<ValidationMessage> validationMessages) {
 
         }
     }

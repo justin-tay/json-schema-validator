@@ -59,7 +59,7 @@ JsonSchema schema = factory.getSchema(source, config);
 Locale locale = Locales.findSupported("it;q=0.9,fr;q=1.0");
 ExecutionContext executionContext = jsonSchema.createExecutionContext();
 executionContext.getExecutionConfig().setLocale(locale);
-Set<ValidationMessage> messages = jsonSchema.validate(executionContext, rootNode);
+List<ValidationMessage> messages = jsonSchema.validate(executionContext, rootNode);
 
 // Uses the it locale for this user
 locale = Locales.findSupported("it;q=1.0,fr;q=0.9");

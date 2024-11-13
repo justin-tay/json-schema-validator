@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 /**
  * {@link JsonValidator} for maxLength.
@@ -40,20 +40,20 @@ public class MaxLengthValidator extends BaseJsonValidator implements JsonValidat
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getConfig());
         if (nodeType != JsonType.STRING) {
             // ignore no-string typs
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
         if (node.textValue().codePointCount(0, node.textValue().length()) > this.maxLength) {
-            return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+            return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                     .locale(executionContext.getExecutionConfig().getLocale())
                     .failFast(executionContext.isFailFast()).arguments(this.maxLength).build());
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
 }

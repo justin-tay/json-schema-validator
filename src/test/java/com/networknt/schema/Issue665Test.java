@@ -1,13 +1,13 @@
 package com.networknt.schema;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class Issue665Test extends BaseJsonSchemaValidatorTest {
 
@@ -16,9 +16,9 @@ class Issue665Test extends BaseJsonSchemaValidatorTest {
         JsonSchema schema = getJsonSchemaFromClasspath("draft7/urn/issue665.json", SpecVersion.VersionFlag.V7);
         Assertions.assertNotNull(schema);
         Assertions.assertDoesNotThrow(schema::initializeValidators);
-        Set<ValidationMessage> messages = schema.validate(getJsonNodeFromStringContent(
+        List<ValidationMessage> messages = schema.validate(getJsonNodeFromStringContent(
                 "{\"myData\": {\"value\": \"hello\"}}"));
-        Assertions.assertEquals(messages, Collections.emptySet());
+        Assertions.assertEquals(messages, Collections.emptyList());
     }
 
     @Test
@@ -36,9 +36,9 @@ class Issue665Test extends BaseJsonSchemaValidatorTest {
             JsonSchema schema = factory.getSchema(is);
             Assertions.assertNotNull(schema);
             Assertions.assertDoesNotThrow(schema::initializeValidators);
-            Set<ValidationMessage> messages = schema.validate(getJsonNodeFromStringContent(
+            List<ValidationMessage> messages = schema.validate(getJsonNodeFromStringContent(
                     "{\"myData\": {\"value\": \"hello\"}}"));
-            Assertions.assertEquals(messages, Collections.emptySet());
+            Assertions.assertEquals(messages, Collections.emptyList());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

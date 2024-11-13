@@ -58,7 +58,7 @@ public class GroovyKeyword extends AbstractKeyword {
         String config = schemaNode.asText();
         return new AbstractJsonValidator(this.getValue()) {
             @Override
-            public Set<ValidationMessage> validate(JsonNode node, JsonNode rootNode, String at) {
+            public List<ValidationMessage> validate(JsonNode node, JsonNode rootNode, String at) {
                 // you can do validate here
                 logger.info("config:{} path:{} node:{}", config, at, node);
 

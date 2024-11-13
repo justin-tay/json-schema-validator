@@ -46,10 +46,10 @@ public class DependentRequired extends BaseJsonValidator implements JsonValidato
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
-        Set<ValidationMessage> errors = new LinkedHashSet<ValidationMessage>();
+        List<ValidationMessage> errors = new ArrayList<ValidationMessage>();
 
         for (Iterator<String> it = node.fieldNames(); it.hasNext(); ) {
             String pname = it.next();
@@ -66,7 +66,7 @@ public class DependentRequired extends BaseJsonValidator implements JsonValidato
             }
         }
 
-        return Collections.unmodifiableSet(errors);
+        return Collections.unmodifiableList(errors);
     }
 
 }

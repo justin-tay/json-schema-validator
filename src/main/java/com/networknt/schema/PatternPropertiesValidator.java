@@ -49,13 +49,13 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         if (!node.isObject()) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
-        Set<ValidationMessage> errors = null;
+        List<ValidationMessage> errors = null;
         Set<String> matchedInstancePropertyNames = null;
         Iterator<String> names = node.fieldNames();
         boolean collectAnnotations = collectAnnotations() || collectAnnotations(executionContext);
@@ -65,7 +65,7 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
             for (Map.Entry<RegularExpression, JsonSchema> entry : schemas.entrySet()) {
                 if (entry.getKey().matches(name)) {
                     JsonNodePath path = instanceLocation.append(name);
-                    Set<ValidationMessage> results = entry.getValue().validate(executionContext, n, rootNode, path);
+                    List<ValidationMessage> results = entry.getValue().validate(executionContext, n, rootNode, path);
                     if (results.isEmpty()) {
                         if (collectAnnotations) {
                             if (matchedInstancePropertyNames == null) {
@@ -75,7 +75,7 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
                         }
                     } else {
                         if (errors == null) {
-                            errors = new LinkedHashSet<>();
+                            errors = new ArrayList<>();
                         }
                         errors.addAll(results);
                     }
@@ -91,7 +91,7 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
                                     : Collections.emptySet())
                             .build());
         }
-        return errors == null ? Collections.emptySet() : Collections.unmodifiableSet(errors);
+        return errors == null ? Collections.emptyList() : Collections.unmodifiableList(errors);
     }
     
     private boolean collectAnnotations() {

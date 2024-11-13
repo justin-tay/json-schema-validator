@@ -1,16 +1,17 @@
 package com.networknt.schema;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.InputStream;
-import java.util.Set;
-import java.util.stream.Stream;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This project uses a dependency (com.ethlo.time:itu) to validate time representations. Version 1.51 of this library
@@ -79,7 +80,7 @@ class Issue575Test {
     @ParameterizedTest
     @MethodSource("validTimeZoneOffsets")
     void testValidTimeZoneOffsets(String jsonObject) throws JsonProcessingException {
-        Set<ValidationMessage> errors = schema.validate(new ObjectMapper().readTree(jsonObject));
+        List<ValidationMessage> errors = schema.validate(new ObjectMapper().readTree(jsonObject));
         Assertions.assertTrue(errors.isEmpty());
     }
 
@@ -121,7 +122,7 @@ class Issue575Test {
     @ParameterizedTest
     @MethodSource("invalidTimeRepresentations")
     void testInvalidTimeRepresentations(String jsonObject) throws JsonProcessingException {
-        Set<ValidationMessage> errors = schema.validate(new ObjectMapper().readTree(jsonObject), OutputFormat.DEFAULT, (executionContext, validationContext) -> {
+        List<ValidationMessage> errors = schema.validate(new ObjectMapper().readTree(jsonObject), OutputFormat.DEFAULT, (executionContext, validationContext) -> {
             executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
         });
         Assertions.assertFalse(errors.isEmpty());

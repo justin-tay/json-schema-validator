@@ -81,17 +81,17 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation) {
         return validate(executionContext, node, rootNode, instanceLocation, false);
     }
 
-    protected Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    protected List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean walk) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
         if (!node.isObject()) {
             // ignore no object
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         Set<String> matchedInstancePropertyNames = null;
@@ -108,7 +108,7 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
             }
         }
 
-        Set<ValidationMessage> errors = null;
+        List<ValidationMessage> errors = null;
 
         for (Iterator<Entry<String, JsonNode>> it = node.fields(); it.hasNext(); ) {
             Entry<String, JsonNode> entry = it.next();
@@ -120,7 +120,7 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
             if (!allowedProperties.contains(pname) && !handledByPatternProperties(pname)) {
                 if (!allowAdditionalProperties) {
                     if (errors == null) {
-                        errors = new LinkedHashSet<>();
+                        errors = new ArrayList<>();
                     }
                     errors.add(message().instanceNode(node).property(pname)
                             .instanceLocation(instanceLocation)
@@ -128,14 +128,14 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
                             .failFast(executionContext.isFailFast()).arguments(pname).build());
                 } else {
                     if (additionalPropertiesSchema != null) {
-                        Set<ValidationMessage> results = !walk
+                        List<ValidationMessage> results = !walk
                                 ? additionalPropertiesSchema.validate(executionContext, entry.getValue(), rootNode,
                                         instanceLocation.append(pname))
                                 : additionalPropertiesSchema.walk(executionContext, entry.getValue(), rootNode,
                                         instanceLocation.append(pname), true);
                         if (!results.isEmpty()) {
                             if (errors == null) {
-                                errors = new LinkedHashSet<>();
+                                errors = new ArrayList<>();
                             }
                             errors.addAll(results);
                         }
@@ -149,18 +149,18 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
                     .value(matchedInstancePropertyNames != null ? matchedInstancePropertyNames : Collections.emptySet())
                     .build());
         }
-        return errors == null ? Collections.emptySet() : Collections.unmodifiableSet(errors);
+        return errors == null ? Collections.emptyList() : Collections.unmodifiableList(errors);
     }
 
     @Override
-    public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
+    public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         if (shouldValidateSchema && node != null) {
             return validate(executionContext, node, rootNode, instanceLocation, true);
         }
 
         if (node == null || !node.isObject()) {
             // ignore no object
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         // Else continue walking.
@@ -179,7 +179,7 @@ public class AdditionalPropertiesValidator extends BaseJsonValidator {
                 }
             }
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
     private boolean handledByPatternProperties(String pname) {

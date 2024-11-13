@@ -51,7 +51,7 @@ public class TypeValidator extends BaseJsonValidator {
     }
 
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         if (this.schemaType == JsonType.UNION) {
@@ -60,11 +60,11 @@ public class TypeValidator extends BaseJsonValidator {
 
         if (!equalsToSchemaType(node)) {
             JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getConfig());
-            return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+            return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                     .locale(executionContext.getExecutionConfig().getLocale())
                     .failFast(executionContext.isFailFast())
                     .arguments(nodeType.toString(), this.schemaType.toString()).build());
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 }

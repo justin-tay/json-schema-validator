@@ -43,17 +43,17 @@ public class NotAllowedValidator extends BaseJsonValidator implements JsonValida
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
-        Set<ValidationMessage> errors = null;
+        List<ValidationMessage> errors = null;
 
         for (String fieldName : fieldNames) {
             JsonNode propertyNode = node.get(fieldName);
 
             if (propertyNode != null) {
                 if (errors == null) {
-                    errors = new LinkedHashSet<>();
+                    errors = new ArrayList<>();
                 }
                 errors.add(message().property(fieldName).instanceNode(node)
                         .instanceLocation(instanceLocation.append(fieldName))
@@ -62,7 +62,7 @@ public class NotAllowedValidator extends BaseJsonValidator implements JsonValida
             }
         }
 
-        return errors == null ? Collections.emptySet() : Collections.unmodifiableSet(errors);
+        return errors == null ? Collections.emptyList() : Collections.unmodifiableList(errors);
     }
 
 }

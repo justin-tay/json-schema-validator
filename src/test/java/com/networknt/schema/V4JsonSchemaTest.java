@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,7 +46,7 @@ class V4JsonSchemaTest extends HTTPServiceSupport {
      */
     @Test
     void testFailFast_AllErrors() throws IOException {
-        Set<ValidationMessage> messages = validateFailingFastSchemaFor("extra/product/product.schema.json",
+        List<ValidationMessage> messages = validateFailingFastSchemaFor("extra/product/product.schema.json",
                 "extra/product/product-all-errors-data.json");
         assertEquals(1, messages.size());
     }
@@ -55,7 +56,7 @@ class V4JsonSchemaTest extends HTTPServiceSupport {
      */
     @Test
     void testFailFast_OneErrors() throws IOException {
-        Set<ValidationMessage> messages = validateFailingFastSchemaFor("extra/product/product.schema.json",
+        List<ValidationMessage> messages = validateFailingFastSchemaFor("extra/product/product.schema.json",
                 "extra/product/product-one-error-data.json");
         assertEquals(1, messages.size());
     }
@@ -65,7 +66,7 @@ class V4JsonSchemaTest extends HTTPServiceSupport {
      */
     @Test
     void testFailFast_TwoErrors() throws IOException {
-        Set<ValidationMessage> messages = validateFailingFastSchemaFor("extra/product/product.schema.json",
+        List<ValidationMessage> messages = validateFailingFastSchemaFor("extra/product/product.schema.json",
                 "extra/product/product-two-errors-data.json");
         assertEquals(1, messages.size());
     }
@@ -76,12 +77,12 @@ class V4JsonSchemaTest extends HTTPServiceSupport {
      */
     @Test
     void testFailFast_NoErrors() throws IOException {
-        final Set<ValidationMessage> messages = validateFailingFastSchemaFor("extra/product/product.schema.json",
+        final List<ValidationMessage> messages = validateFailingFastSchemaFor("extra/product/product.schema.json",
                 "extra/product/product-no-errors-data.json");
         assertTrue(messages.isEmpty());
     }
 
-    private Set<ValidationMessage> validateFailingFastSchemaFor(final String schemaFileName, final String dataFileName) throws IOException {
+    private List<ValidationMessage> validateFailingFastSchemaFor(final String schemaFileName, final String dataFileName) throws IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final JsonNode schema = getJsonNodeFromResource(objectMapper, schemaFileName);
         final JsonNode dataFile = getJsonNodeFromResource(objectMapper, dataFileName);

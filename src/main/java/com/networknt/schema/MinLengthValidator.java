@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 /**
  * {@link JsonValidator} for minLength.
@@ -39,21 +39,21 @@ public class MinLengthValidator extends BaseJsonValidator implements JsonValidat
         }
     }
 
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getConfig());
         if (nodeType != JsonType.STRING) {
             // ignore non-string types
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         if (node.textValue().codePointCount(0, node.textValue().length()) < minLength) {
-            return Collections.singleton(message().instanceNode(node).instanceLocation(instanceLocation)
+            return Collections.singletonList(message().instanceNode(node).instanceLocation(instanceLocation)
                     .locale(executionContext.getExecutionConfig().getLocale())
                     .failFast(executionContext.isFailFast()).arguments(minLength).build());
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
 }

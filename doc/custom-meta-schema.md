@@ -39,7 +39,7 @@ public class EqualsValidator extends BaseJsonValidator {
         this.value = schemaNode.textValue();
     }
     @Override
-    public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
+    public List<ValidationMessage> validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation) {
         if (!node.asText().equals(value)) {
             return Collections

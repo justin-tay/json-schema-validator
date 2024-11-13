@@ -1,16 +1,17 @@
 package com.networknt.schema;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.serialization.JsonMapperFactory;
 import com.networknt.schema.walk.JsonSchemaWalkListener;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.util.Set;
 
 class Issue461Test {
     protected ObjectMapper mapper = JsonMapperFactory.getInstance();
@@ -42,7 +43,7 @@ class Issue461Test {
 
         @Override
         public void onWalkEnd(final WalkEvent walkEvent,
-                              final Set<ValidationMessage> validationMessages) {
+                              final List<ValidationMessage> validationMessages) {
         }
     }
 }
