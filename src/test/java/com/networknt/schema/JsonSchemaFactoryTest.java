@@ -17,6 +17,8 @@ package com.networknt.schema;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -87,5 +89,25 @@ class JsonSchemaFactoryTest {
             }
         });
         assertFalse(failed.get());
+    }
+
+    @Test
+    void cache() throws URISyntaxException {
+        String input = "{\r\n"
+                + "  \"properties\": {\r\n"
+                + "    \"field1\": {\r\n"
+                + "      \"type\": \"invalid-type\",\r\n"
+                + "      \"description\": \"string\"\r\n"
+                + "    }\r\n"
+                + "  }\r\n"
+                + "}";
+        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(VersionFlag.V202012);
+        //SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
+        JsonSchema schema = factory.getSchema(new URI("classpath:schema/issue313-v7.json"));
+        schema.validate(input, InputFormat.JSON);
+        for (int x = 0; x < 9990000; x++) {
+            schema = factory.getSchema(new URI("classpath:schema/issue313-v7.json"));
+            schema.validate(input, InputFormat.JSON);
+        }
     }
 }
