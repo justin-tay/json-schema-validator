@@ -60,14 +60,18 @@ public class AllOfValidator extends BaseJsonValidator {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         ListView<ValidationMessage> childSchemaErrors = null;
-
+        int index = 0;
         for (JsonSchema schema : this.schemas) {
             List<ValidationMessage> localErrors = null;
-
-            if (!walk) {
-                localErrors = schema.validate(executionContext, node, rootNode, instanceLocation);
-            } else {
-                localErrors = schema.walk(executionContext, node, rootNode, instanceLocation, true);
+            executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(index));
+            try {
+                if (!walk) {
+                    localErrors = schema.validate(executionContext, node, rootNode, instanceLocation);
+                } else {
+                    localErrors = schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                }
+            } finally {
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
             }
             
             if (localErrors != null && !localErrors.isEmpty()) {
@@ -105,6 +109,7 @@ public class AllOfValidator extends BaseJsonValidator {
                     }
                 }
             }
+            index++;
         }
 
         return childSchemaErrors != null ? childSchemaErrors : Collections.emptyList();

@@ -91,11 +91,16 @@ public class OneOfValidator extends BaseJsonValidator {
             executionContext.setFailFast(false);
             for (JsonSchema schema : this.schemas) {
                 List<ValidationMessage> schemaErrors = Collections.emptyList();
-                if (!walk) {
-                    schemaErrors = schema.validate(executionContext, node, rootNode, instanceLocation);
-                } else {
-                    schemaErrors = schema.walk(executionContext, node, rootNode, instanceLocation,
-                            true);
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(index));
+                try {
+                    if (!walk) {
+                        schemaErrors = schema.validate(executionContext, node, rootNode, instanceLocation);
+                    } else {
+                        schemaErrors = schema.walk(executionContext, node, rootNode, instanceLocation,
+                                true);
+                    }
+                } finally {
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
                 }
 
                 // check if any validation errors have occurred

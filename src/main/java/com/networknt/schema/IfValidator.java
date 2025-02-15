@@ -80,8 +80,10 @@ public class IfValidator extends BaseJsonValidator {
         }
 
         if (ifConditionPassed && this.thenSchema != null) {
+            executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent().append("then"));
             return this.thenSchema.validate(executionContext, node, rootNode, instanceLocation);
         } else if (!ifConditionPassed && this.elseSchema != null) {
+            executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent().append("else"));
             return this.elseSchema.validate(executionContext, node, rootNode, instanceLocation);
         }
         return Collections.emptyList();
@@ -116,16 +118,20 @@ public class IfValidator extends BaseJsonValidator {
         }
         if (!checkCondition) {
             if (this.thenSchema != null) {
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent().append("then"));
                 this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
             }
             if (this.elseSchema != null) {
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent().append("else"));
                 this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
             }
         } else {
             if (this.thenSchema != null && ifConditionPassed) {
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent().append("then"));
                 return this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
             }
             else if (this.elseSchema != null && !ifConditionPassed) {
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent().append("else"));
                 return this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
             }
         }

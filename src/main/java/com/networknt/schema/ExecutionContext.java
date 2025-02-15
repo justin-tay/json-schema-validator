@@ -19,6 +19,9 @@ package com.networknt.schema;
 import com.networknt.schema.annotation.JsonNodeAnnotations;
 import com.networknt.schema.result.JsonNodeResults;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.Stack;
 
 /**
@@ -30,7 +33,68 @@ public class ExecutionContext {
     private Stack<DiscriminatorContext> discriminatorContexts = null;
     private JsonNodeAnnotations annotations = null;
     private JsonNodeResults results = null;
-    
+
+    private JsonNodePath evaluationPath = new JsonNodePath(PathType.JSON_POINTER);
+    private Deque<EvaluationState> evaluationStateStack = new ArrayDeque<>();
+
+    public JsonNodePath getEvaluationPath() {
+        return evaluationPath;
+    }
+
+    public void setEvaluationPath(JsonNodePath evaluationPath) {
+        this.evaluationPath = evaluationPath;
+    }
+
+    public Deque<EvaluationState> getEvaluationStateStack() {
+        return evaluationStateStack;
+    }
+
+    public void setEvaluationSchemaStack(Deque<EvaluationState> evaluationStateStack) {
+        this.evaluationStateStack = evaluationStateStack;
+    }
+
+    /**
+     * Determines if the keyword exists adjacent in the evaluation path.
+     * <p>
+     * This does not check if the keyword exists in the current meta schema as this
+     * can be a cross-draft case where the properties keyword is in a Draft 7 schema
+     * and the unevaluatedProperties keyword is in an outer Draft 2020-12 schema.
+     * <p>
+     * The fact that the validator exists in the evaluation path implies that the
+     * keyword was valid in whatever meta schema for that schema it was created for.
+     * 
+     * @param keyword the keyword to check
+     * @return true if found
+     */
+    protected boolean hasAdjacentKeywordInEvaluationPath(String keyword) {
+        Iterator<EvaluationState> evaluationStateIterator = this.evaluationStateStack.iterator();
+        
+        // Skip the first
+        if (evaluationStateIterator.hasNext()) {
+            evaluationStateIterator.next();
+        }
+        
+        while (evaluationStateIterator.hasNext()) {
+            EvaluationState state = evaluationStateIterator.next();;
+            JsonSchema schema = state.getEvaluationSchema();
+            JsonNodePath evaluationPath = state.getEvaluationPath();
+            for (JsonValidator validator : schema.getValidators()) {
+                if (keyword.equals(validator.getKeyword())) {
+                    return true;
+                }
+            }
+//            if (schema.getEvaluationPath().compareTo(evaluationPath) != 0) {
+//                throw new RuntimeException("fail");
+//            }
+            Object element = evaluationPath.getElement(-1);
+            if ("properties".equals(element) || "items".equals(element)) {
+                // If there is a change in instance location then return false
+                return false;
+            }
+        }
+        return false;
+    }
+
     /**
      * This is used during the execution to determine if the validator should fail fast.
      * <p>
