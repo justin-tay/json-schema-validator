@@ -19,6 +19,8 @@ package com.networknt.schema;
 import com.networknt.schema.annotation.JsonNodeAnnotations;
 import com.networknt.schema.result.JsonNodeResults;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Stack;
 
 /**
@@ -30,7 +32,26 @@ public class ExecutionContext {
     private Stack<DiscriminatorContext> discriminatorContexts = null;
     private JsonNodeAnnotations annotations = null;
     private JsonNodeResults results = null;
-    
+
+    private JsonNodePath evaluationPath = new JsonNodePath(PathType.JSON_POINTER);
+    private Deque<JsonSchema> evaluationSchemaStack = new ArrayDeque<>();
+
+    public JsonNodePath getEvaluationPath() {
+        return evaluationPath;
+    }
+
+    public void setEvaluationPath(JsonNodePath evaluationPath) {
+        this.evaluationPath = evaluationPath;
+    }
+
+    public Deque<JsonSchema> getEvaluationSchemaStack() {
+        return evaluationSchemaStack;
+    }
+
+    public void setEvaluationSchemaStack(Deque<JsonSchema> evaluationSchemaStack) {
+        this.evaluationSchemaStack = evaluationSchemaStack;
+    }
+
     /**
      * This is used during the execution to determine if the validator should fail fast.
      * <p>
