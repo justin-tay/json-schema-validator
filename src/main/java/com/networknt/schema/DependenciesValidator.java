@@ -85,12 +85,18 @@ public class DependenciesValidator extends BaseJsonValidator implements JsonVali
             }
             JsonSchema schema = schemaDeps.get(pname);
             if (schema != null) {
-                Set<ValidationMessage> schemaDepsErrors = schema.validate(executionContext, node, rootNode, instanceLocation);
-                if (!schemaDepsErrors.isEmpty()) {
-                    if (errors == null) {
-                        errors = new LinkedHashSet<>();
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath()
+                        .append(schema.getSchemaLocation().getFragment().getName(-1)));
+                try {
+                    Set<ValidationMessage> schemaDepsErrors = schema.validate(executionContext, node, rootNode, instanceLocation);
+                    if (!schemaDepsErrors.isEmpty()) {
+                        if (errors == null) {
+                            errors = new LinkedHashSet<>();
+                        }
+                        errors.addAll(schemaDepsErrors);
                     }
-                    errors.addAll(schemaDepsErrors);
+                } finally {
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
                 }
             }
         }

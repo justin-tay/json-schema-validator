@@ -58,14 +58,20 @@ public class DependentSchemas extends BaseJsonValidator {
             String pname = it.next();
             JsonSchema schema = this.schemaDependencies.get(pname);
             if (schema != null) {
-                Set<ValidationMessage> schemaDependenciesErrors = !walk
-                        ? schema.validate(executionContext, node, rootNode, instanceLocation)
-                        : schema.walk(executionContext, node, rootNode, instanceLocation, true);
-                if (!schemaDependenciesErrors.isEmpty()) {
-                    if (errors == null) {
-                        errors = new LinkedHashSet<>();
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath()
+                        .append(schema.getSchemaLocation().getFragment().getName(-1)));
+                try {
+                    Set<ValidationMessage> schemaDependenciesErrors = !walk
+                            ? schema.validate(executionContext, node, rootNode, instanceLocation)
+                            : schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                    if (!schemaDependenciesErrors.isEmpty()) {
+                        if (errors == null) {
+                            errors = new LinkedHashSet<>();
+                        }
+                        errors.addAll(schemaDependenciesErrors);
                     }
-                    errors.addAll(schemaDependenciesErrors);
+                } finally {
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
                 }
             }
         }
@@ -83,7 +89,13 @@ public class DependentSchemas extends BaseJsonValidator {
             return validate(executionContext, node, rootNode, instanceLocation, true);
         }
         for (JsonSchema schema : this.schemaDependencies.values()) {
-            schema.walk(executionContext, node, rootNode, instanceLocation, false);
+            executionContext.setEvaluationPath(
+                    executionContext.getEvaluationPath().append(schema.getSchemaLocation().getFragment().getName(-1)));
+            try {
+                schema.walk(executionContext, node, rootNode, instanceLocation, false);
+            } finally {
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
+            }
         }
         return Collections.emptySet();
     }

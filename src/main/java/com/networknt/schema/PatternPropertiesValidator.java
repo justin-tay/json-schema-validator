@@ -65,19 +65,25 @@ public class PatternPropertiesValidator extends BaseJsonValidator {
             for (Map.Entry<RegularExpression, JsonSchema> entry : schemas.entrySet()) {
                 if (entry.getKey().matches(name)) {
                     JsonNodePath path = instanceLocation.append(name);
-                    Set<ValidationMessage> results = entry.getValue().validate(executionContext, n, rootNode, path);
-                    if (results.isEmpty()) {
-                        if (collectAnnotations) {
-                            if (matchedInstancePropertyNames == null) {
-                                matchedInstancePropertyNames = new LinkedHashSet<>();
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath()
+                            .append(entry.getValue().getSchemaLocation().getFragment().getName(-1)));
+                    try {
+                        Set<ValidationMessage> results = entry.getValue().validate(executionContext, n, rootNode, path);
+                        if (results.isEmpty()) {
+                            if (collectAnnotations) {
+                                if (matchedInstancePropertyNames == null) {
+                                    matchedInstancePropertyNames = new LinkedHashSet<>();
+                                }
+                                matchedInstancePropertyNames.add(name);
                             }
-                            matchedInstancePropertyNames.add(name);
+                        } else {
+                            if (errors == null) {
+                                errors = new LinkedHashSet<>();
+                            }
+                            errors.addAll(results);
                         }
-                    } else {
-                        if (errors == null) {
-                            errors = new LinkedHashSet<>();
-                        }
-                        errors.addAll(results);
+                    } finally {
+                        executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
                     }
                 }
             }

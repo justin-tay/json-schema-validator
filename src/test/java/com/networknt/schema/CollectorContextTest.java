@@ -355,7 +355,7 @@ class CollectorContextTest {
      */
     private class CustomValidator1 extends AbstractJsonValidator {
         public CustomValidator1(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode) {
-            super(schemaLocation, evaluationPath,new CustomKeyword(), schemaNode);
+            super(schemaLocation, evaluationPath,new CustomKeyword1(), schemaNode);
         }
 
         @SuppressWarnings("unchecked")

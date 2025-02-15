@@ -167,9 +167,14 @@ public class ItemsValidator extends BaseJsonValidator {
         } else if (this.tupleSchema != null) {
             if (i < this.tupleSchema.size()) {
                 // validate against tuple schema
-                Set<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
-                if (!results.isEmpty()) {
-                    errors.union(results);
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(i));
+                try {
+                    Set<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
+                    if (!results.isEmpty()) {
+                        errors.union(results);
+                    }
+                } finally {
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
                 }
             } else {
                 if ((this.additionalItems != null && this.additionalItems) || this.additionalSchema != null) {
@@ -178,6 +183,7 @@ public class ItemsValidator extends BaseJsonValidator {
 
                 if (this.additionalSchema != null) {
                     // validate against additional item schema
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent().append(PROPERTY_ADDITIONAL_ITEMS));
                     Set<ValidationMessage> results = this.additionalSchema.validate(executionContext, node, rootNode, path);
                     if (!results.isEmpty()) {
                         errors.union(results);
@@ -275,11 +281,22 @@ public class ItemsValidator extends BaseJsonValidator {
                             n = defaultNode;
                         }
                     }
-                    walkSchema(executionContext, this.tupleSchema.get(i), n, rootNode, instanceLocation.append(i),
-                            shouldValidateSchema, validationMessages, ValidatorTypeCode.ITEMS.getValue());
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(i));
+                    try {
+                        walkSchema(executionContext, this.tupleSchema.get(i), n, rootNode, instanceLocation.append(i),
+                                shouldValidateSchema, validationMessages, ValidatorTypeCode.ITEMS.getValue());
+                    } finally {
+                        executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
+                    }
                 } else {
-                    walkSchema(executionContext, this.tupleSchema.get(i), null, rootNode, instanceLocation.append(i),
-                            shouldValidateSchema, validationMessages, ValidatorTypeCode.ITEMS.getValue());
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(i));
+                    try {
+                        walkSchema(executionContext, this.tupleSchema.get(i), null, rootNode,
+                                instanceLocation.append(i), shouldValidateSchema, validationMessages,
+                                ValidatorTypeCode.ITEMS.getValue());
+                    } finally {
+                        executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
+                    }
                 }
             }
             if (this.additionalSchema != null) {
@@ -302,12 +319,16 @@ public class ItemsValidator extends BaseJsonValidator {
                                 n = defaultNode;
                             }
                         }
+                        executionContext.setEvaluationPath(
+                                executionContext.getEvaluationPath().getParent().append(PROPERTY_ADDITIONAL_ITEMS));
                         walkSchema(executionContext, this.additionalSchema, n, rootNode, instanceLocation.append(i),
                                 shouldValidateSchema, validationMessages, PROPERTY_ADDITIONAL_ITEMS);
                         if (n != null) {
                             hasAdditionalItem = true;
                         }
                     } else {
+                        executionContext.setEvaluationPath(
+                                executionContext.getEvaluationPath().getParent().append(PROPERTY_ADDITIONAL_ITEMS));
                         walkSchema(executionContext, this.additionalSchema, null, rootNode, instanceLocation.append(i),
                                 shouldValidateSchema, validationMessages, PROPERTY_ADDITIONAL_ITEMS);
                     }

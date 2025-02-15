@@ -68,6 +68,7 @@ public class PropertiesValidator extends BaseJsonValidator {
         SetView<ValidationMessage> errors = null;
 
         Set<String> matchedInstancePropertyNames = null;
+        executionContext.hasAdjacentKeywordInEvaluationPath("unevaluatedProperties");
         boolean collectAnnotations = collectAnnotations() || collectAnnotations(executionContext);
         for (Entry<String, JsonSchema> entry : this.schemas.entrySet()) {
             JsonNode propertyNode = node.get(entry.getKey());
@@ -81,20 +82,30 @@ public class PropertiesValidator extends BaseJsonValidator {
                 }
                 if (!walk) {
                     //validate the child element(s)
-                    Set<ValidationMessage> result = entry.getValue().validate(executionContext, propertyNode, rootNode,
-                            path);
-                    if (!result.isEmpty()) {
-                        if (errors == null) {
-                            errors = new SetView<>();
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(entry.getKey()));
+                    try {
+                        Set<ValidationMessage> result = entry.getValue().validate(executionContext, propertyNode, rootNode,
+                                path);
+                        if (!result.isEmpty()) {
+                            if (errors == null) {
+                                errors = new SetView<>();
+                            }
+                            errors.union(result);
                         }
-                        errors.union(result);
+                    } finally {
+                        executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
                     }
                 } else {
                     // check if walker is enabled. If it is enabled it is upto the walker implementation to decide about the validation.
                     if (errors == null) {
                         errors = new SetView<>();
                     }
-                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, errors, this.validationContext.getConfig().getPropertyWalkListenerRunner());
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(entry.getKey()));
+                    try {
+                        walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, errors, this.validationContext.getConfig().getPropertyWalkListenerRunner());
+                    } finally {
+                        executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
+                    }
                 }
             } else {
                 if (walk) {
@@ -106,7 +117,12 @@ public class PropertiesValidator extends BaseJsonValidator {
                     if (errors == null) {
                         errors = new SetView<>();
                     }
-                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, errors, this.validationContext.getConfig().getPropertyWalkListenerRunner());
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(entry.getKey()));
+                    try {
+                        walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, errors, this.validationContext.getConfig().getPropertyWalkListenerRunner());
+                    } finally {
+                        executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
+                    }
                 }
             }
         }

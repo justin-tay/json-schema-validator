@@ -600,65 +600,84 @@ public class JsonSchema extends BaseJsonValidator {
 
     @Override
     public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode jsonNode, JsonNode rootNode, JsonNodePath instanceLocation) {
-        if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()) {
-            ObjectNode discriminator = (ObjectNode) schemaNode.get("discriminator");
-            if (null != discriminator && null != executionContext.getCurrentDiscriminatorContext()) {
-                executionContext.getCurrentDiscriminatorContext().registerDiscriminator(schemaLocation,
-                        discriminator);
-            }
-        }
-
-        SetView<ValidationMessage> errors = null;
-        for (JsonValidator v : getValidators()) {
-            Set<ValidationMessage> results = null;
-
-            try {
-                results = v.validate(executionContext, jsonNode, rootNode, instanceLocation);
-            } finally {
-                if (results != null && !results.isEmpty()) {
-                    if (errors == null) {
-                        errors = new SetView<>();
-                    }
-                    errors.union(results);
+        executionContext.getEvaluationStateStack().push(new EvaluationState(executionContext.getEvaluationPath(), this));
+//        System.out.println(executionContext.getEvaluationPath());
+//        if (executionContext.getEvaluationPath().compareTo(this.getEvaluationPath()) != 0) {
+//            System.out.println("Current : " + executionContext.getEvaluationPath());
+//            System.out.println("Expected: " + this.getEvaluationPath());
+//            throw new RuntimeException("bad");
+//        }
+        try {
+            if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()) {
+                ObjectNode discriminator = (ObjectNode) schemaNode.get("discriminator");
+                if (null != discriminator && null != executionContext.getCurrentDiscriminatorContext()) {
+                    executionContext.getCurrentDiscriminatorContext().registerDiscriminator(schemaLocation,
+                            discriminator);
                 }
             }
-        }
 
-        if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()) {
-            ObjectNode discriminator = (ObjectNode) this.schemaNode.get("discriminator");
-            if (null != discriminator) {
-                final DiscriminatorContext discriminatorContext = executionContext
-                        .getCurrentDiscriminatorContext();
-                if (null != discriminatorContext) {
-                    final ObjectNode discriminatorToUse;
-                    final ObjectNode discriminatorFromContext = discriminatorContext
-                            .getDiscriminatorForPath(this.schemaLocation);
-                    if (null == discriminatorFromContext) {
-                        // register the current discriminator. This can only happen when the current context discriminator
-                        // was not registered via allOf. In that case we have a $ref to the schema with discriminator that gets
-                        // used for validation before allOf validation has kicked in
-                        discriminatorContext.registerDiscriminator(this.schemaLocation, discriminator);
-                        discriminatorToUse = discriminator;
-                    } else {
-                        discriminatorToUse = discriminatorFromContext;
+            SetView<ValidationMessage> errors = null;
+            for (JsonValidator v : getValidators()) {
+                Set<ValidationMessage> results = null;
+
+                try {
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath()
+                            .append(v.getSchemaLocation().getFragment().getName(-1)));
+//                    if (executionContext.getEvaluationPath().compareTo(v.getEvaluationPath()) != 0) {
+//                        System.out.println("Current : " + executionContext.getEvaluationPath());
+//                        System.out.println("Expected: " + v.getEvaluationPath());
+//                        throw new RuntimeException("bad");
+//                    }
+                    results = v.validate(executionContext, jsonNode, rootNode, instanceLocation);
+                } finally {
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
+                    if (results != null && !results.isEmpty()) {
+                        if (errors == null) {
+                            errors = new SetView<>();
+                        }
+                        errors.union(results);
                     }
-
-                    final String discriminatorPropertyName = discriminatorToUse.get("propertyName").asText();
-                    final JsonNode discriminatorNode = jsonNode.get(discriminatorPropertyName);
-                    final String discriminatorPropertyValue = discriminatorNode == null ? null
-                            : discriminatorNode.asText();
-                    checkDiscriminatorMatch(discriminatorContext, discriminatorToUse, discriminatorPropertyValue,
-                            this);
                 }
             }
-        }
 
-        if (errors != null && !errors.isEmpty()) {
-            // Failed with assertion set result and drop all annotations from this schema
-            // and all subschemas
-            executionContext.getResults().setResult(instanceLocation, getSchemaLocation(), getEvaluationPath(), false);
+            if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()) {
+                ObjectNode discriminator = (ObjectNode) this.schemaNode.get("discriminator");
+                if (null != discriminator) {
+                    final DiscriminatorContext discriminatorContext = executionContext
+                            .getCurrentDiscriminatorContext();
+                    if (null != discriminatorContext) {
+                        final ObjectNode discriminatorToUse;
+                        final ObjectNode discriminatorFromContext = discriminatorContext
+                                .getDiscriminatorForPath(this.schemaLocation);
+                        if (null == discriminatorFromContext) {
+                            // register the current discriminator. This can only happen when the current context discriminator
+                            // was not registered via allOf. In that case we have a $ref to the schema with discriminator that gets
+                            // used for validation before allOf validation has kicked in
+                            discriminatorContext.registerDiscriminator(this.schemaLocation, discriminator);
+                            discriminatorToUse = discriminator;
+                        } else {
+                            discriminatorToUse = discriminatorFromContext;
+                        }
+
+                        final String discriminatorPropertyName = discriminatorToUse.get("propertyName").asText();
+                        final JsonNode discriminatorNode = jsonNode.get(discriminatorPropertyName);
+                        final String discriminatorPropertyValue = discriminatorNode == null ? null
+                                : discriminatorNode.asText();
+                        checkDiscriminatorMatch(discriminatorContext, discriminatorToUse, discriminatorPropertyValue,
+                                this);
+                    }
+                }
+            }
+
+            if (errors != null && !errors.isEmpty()) {
+                // Failed with assertion set result and drop all annotations from this schema
+                // and all subschemas
+                executionContext.getResults().setResult(instanceLocation, getSchemaLocation(), getEvaluationPath(), false);
+            }
+            return errors == null ? Collections.emptySet() : errors;
+        } finally {
+            executionContext.getEvaluationStateStack().pop();
         }
-        return errors == null ? Collections.emptySet() : errors;
     }
 
     /**
@@ -920,10 +939,13 @@ public class JsonSchema extends BaseJsonValidator {
             executionCustomizer.customize(executionContext, this.validationContext);
         }
         Set<ValidationMessage> validationMessages = null;
+        executionContext.setEvaluationPath(this.getSchemaLocation().getFragment());
         try {
             validationMessages = validate(executionContext, node);
         } catch (FailFastAssertionException e) {
             validationMessages = e.getValidationMessages();
+        } finally {
+            executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
         }
         return format.format(this, validationMessages, executionContext, this.validationContext);
     }
@@ -1263,33 +1285,41 @@ public class JsonSchema extends BaseJsonValidator {
     @Override
     public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-        Set<ValidationMessage> errors = new LinkedHashSet<>();
-        // Walk through all the JSONWalker's.
-        for (JsonValidator validator : getValidators()) {
-            JsonNodePath evaluationPathWithKeyword = validator.getEvaluationPath();
-            try {
-                // Call all the pre-walk listeners. If at least one of the pre walk listeners
-                // returns SKIP, then skip the walk.
-                if (this.validationContext.getConfig().getKeywordWalkListenerRunner().runPreWalkListeners(executionContext,
-                        evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
-                        this, validator)) {
-                    Set<ValidationMessage> results = null;
-                    try {
-                        results = validator.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
-                    } finally {
-                        if (results != null && !results.isEmpty()) {
-                            errors.addAll(results);
+        executionContext.getEvaluationStateStack().push(new EvaluationState(executionContext.getEvaluationPath(), this));
+        try {
+            Set<ValidationMessage> errors = new LinkedHashSet<>();
+            // Walk through all the JSONWalker's.
+            for (JsonValidator validator : getValidators()) {
+                JsonNodePath evaluationPathWithKeyword = validator.getEvaluationPath();
+                try {
+                    // Call all the pre-walk listeners. If at least one of the pre walk listeners
+                    // returns SKIP, then skip the walk.
+                    if (this.validationContext.getConfig().getKeywordWalkListenerRunner().runPreWalkListeners(executionContext,
+                            evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
+                            this, validator)) {
+                        Set<ValidationMessage> results = null;
+                        try {
+                            executionContext.setEvaluationPath(executionContext.getEvaluationPath()
+                                    .append(validator.getSchemaLocation().getFragment().getName(-1)));
+                            results = validator.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                        } finally {
+                            executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
+                            if (results != null && !results.isEmpty()) {
+                                errors.addAll(results);
+                            }
                         }
                     }
+                } finally {
+                    // Call all the post-walk listeners.
+                    this.validationContext.getConfig().getKeywordWalkListenerRunner().runPostWalkListeners(executionContext,
+                            evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
+                            this, validator, errors);
                 }
-            } finally {
-                // Call all the post-walk listeners.
-                this.validationContext.getConfig().getKeywordWalkListenerRunner().runPostWalkListeners(executionContext,
-                        evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
-                        this, validator, errors);
             }
+            return errors;
+        } finally {
+            executionContext.getEvaluationStateStack().pop();
         }
-        return errors;
     }
 
     /************************ END OF WALK METHODS **********************************/

@@ -66,12 +66,17 @@ public class PrefixItemsValidator extends BaseJsonValidator {
             int count = Math.min(node.size(), this.tupleSchema.size());
             for (int i = 0; i < count; ++i) {
                 JsonNodePath path = instanceLocation.append(i);
-                Set<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node.get(i), rootNode, path);
-                if (!results.isEmpty()) {
-                    if (errors == null) {
-                        errors = new SetView<>();
+                executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(i));
+                try {
+                    Set<ValidationMessage> results = this.tupleSchema.get(i).validate(executionContext, node.get(i), rootNode, path);
+                    if (!results.isEmpty()) {
+                        if (errors == null) {
+                            errors = new SetView<>();
+                        }
+                        errors.union(results);
                     }
-                    errors.union(results);
+                } finally {
+                    executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
                 }
             }
 
@@ -162,8 +167,13 @@ public class PrefixItemsValidator extends BaseJsonValidator {
 
     private void doWalk(ExecutionContext executionContext, Set<ValidationMessage> validationMessages, int i,
             JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-        walkSchema(executionContext, this.tupleSchema.get(i), node, rootNode, instanceLocation.append(i),
-                shouldValidateSchema, validationMessages);
+        executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(i));
+        try {
+            walkSchema(executionContext, this.tupleSchema.get(i), node, rootNode, instanceLocation.append(i),
+                    shouldValidateSchema, validationMessages);
+        } finally {
+            executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
+        }
     }
 
     private void walkSchema(ExecutionContext executionContext, JsonSchema walkSchema, JsonNode node, JsonNode rootNode,

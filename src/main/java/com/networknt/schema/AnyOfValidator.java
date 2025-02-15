@@ -69,6 +69,7 @@ public class AnyOfValidator extends BaseJsonValidator {
         SetView<ValidationMessage> allErrors = null;
 
         int numberOfValidSubSchemas = 0;
+        int index = 0;
         try {
             // Save flag as nested schema evaluation shouldn't trigger fail fast
             boolean failFast = executionContext.isFailFast();
@@ -86,13 +87,19 @@ public class AnyOfValidator extends BaseJsonValidator {
                                 allErrors = new SetView<>();
                             }
                             allErrors.union(typeValidator.validate(executionContext, node, rootNode, instanceLocation));
+                            index++;
                             continue;
                         }
                     }
-                    if (!walk) {
-                        errors = schema.validate(executionContext, node, rootNode, instanceLocation);
-                    } else {
-                        errors = schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                    try {
+                        executionContext.setEvaluationPath(executionContext.getEvaluationPath().append(index));
+                        if (!walk) {
+                            errors = schema.validate(executionContext, node, rootNode, instanceLocation);
+                        } else {
+                            errors = schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                        }
+                    } finally {
+                        executionContext.setEvaluationPath(executionContext.getEvaluationPath().getParent());
                     }
 
                     // check if any validation errors have occurred
@@ -134,6 +141,7 @@ public class AnyOfValidator extends BaseJsonValidator {
                         allErrors = new SetView<>();
                     }
                     allErrors.union(errors);
+                    index++;
                 }
             } finally {
                 // Restore flag
