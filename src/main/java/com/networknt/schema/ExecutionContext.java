@@ -21,6 +21,7 @@ import com.networknt.schema.result.JsonNodeResults;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.Stack;
 
 /**
@@ -35,6 +36,7 @@ public class ExecutionContext {
 
     private JsonNodePath evaluationPath = new JsonNodePath(PathType.JSON_POINTER);
     private Deque<JsonSchema> evaluationSchemaStack = new ArrayDeque<>();
+    private Deque<JsonNodePath> evaluationSchemaPathStack = new ArrayDeque<>();
 
     public JsonNodePath getEvaluationPath() {
         return evaluationPath;
@@ -50,6 +52,58 @@ public class ExecutionContext {
 
     public void setEvaluationSchemaStack(Deque<JsonSchema> evaluationSchemaStack) {
         this.evaluationSchemaStack = evaluationSchemaStack;
+    }
+    
+    public Deque<JsonNodePath> getEvaluationSchemaPathStack() {
+        return evaluationSchemaPathStack;
+    }
+
+    public void setEvaluationSchemaPathStack(Deque<JsonNodePath> evaluationSchemaPathStack) {
+        this.evaluationSchemaPathStack = evaluationSchemaPathStack;
+    }
+
+    /**
+     * Determines if the keyword exists adjacent in the evaluation path.
+     * <p>
+     * This does not check if the keyword exists in the current meta schema as this
+     * can be a cross-draft case where the properties keyword is in a Draft 7 schema
+     * and the unevaluatedProperties keyword is in an outer Draft 2020-12 schema.
+     * <p>
+     * The fact that the validator exists in the evaluation path implies that the
+     * keyword was valid in whatever meta schema for that schema it was created for.
+     * 
+     * @param keyword the keyword to check
+     * @return true if found
+     */
+    protected boolean hasAdjacentKeywordInEvaluationPath(String keyword) {
+        Iterator<JsonSchema> evaluationSchemaIterator = this.evaluationSchemaStack.iterator();
+        Iterator<JsonNodePath> evaluationPathIterator = this.evaluationSchemaPathStack.iterator();
+        
+        // Skip the first
+        if (evaluationSchemaIterator.hasNext()) {
+            evaluationSchemaIterator.next();
+            evaluationPathIterator.next();
+        }
+        
+        while (evaluationSchemaIterator.hasNext()) {
+            JsonSchema schema = evaluationSchemaIterator.next();
+            JsonNodePath evaluationPath = evaluationPathIterator.next();
+            for (JsonValidator validator : schema.getValidators()) {
+                if (keyword.equals(validator.getKeyword())) {
+                    return true;
+                }
+            }
+            if (!schema.getEvaluationPath().equals(evaluationPath) ) {
+                throw new RuntimeException("fail");
+            }
+            Object element = evaluationPath.getElement(-1);
+            if ("properties".equals(element) || "items".equals(element)) {
+                // If there is a change in instance location then return false
+                return false;
+            }
+            evaluationPath = evaluationPath.getParent();
+        }
+        return false;
     }
 
     /**

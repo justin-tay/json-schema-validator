@@ -602,6 +602,10 @@ public class JsonSchema extends BaseJsonValidator {
     public Set<ValidationMessage> validate(ExecutionContext executionContext, JsonNode jsonNode, JsonNode rootNode, JsonNodePath instanceLocation) {
         boolean popEvaluationPath = false;
         try {
+            if (executionContext.getEvaluationSchemaStack().isEmpty()) {
+                // First path should be the path to the first schema
+                executionContext.setEvaluationPath(this.getSchemaLocation().getFragment());
+            }
             executionContext.getEvaluationSchemaStack().push(this);
             Object name = this.getSchemaLocation().getFragment().getElement(-1);
             if (name != null) {
@@ -615,6 +619,7 @@ public class JsonSchema extends BaseJsonValidator {
                     }
                 }
             }
+            executionContext.getEvaluationSchemaPathStack().push(executionContext.getEvaluationPath());
 
             if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()) {
                 ObjectNode discriminator = (ObjectNode) schemaNode.get("discriminator");
@@ -1288,6 +1293,10 @@ public class JsonSchema extends BaseJsonValidator {
     public Set<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         boolean popEvaluationPath = false;
+        if (executionContext.getEvaluationSchemaStack().isEmpty()) {
+            // First path should be the path to the first schema
+            executionContext.setEvaluationPath(this.getSchemaLocation().getFragment());
+        }
         executionContext.getEvaluationSchemaStack().push(this);
         try {
             Object name = this.getSchemaLocation().getFragment().getElement(-1);
@@ -1302,6 +1311,7 @@ public class JsonSchema extends BaseJsonValidator {
                     }
                 }
             }        
+            executionContext.getEvaluationSchemaPathStack().push(executionContext.getEvaluationPath());
             Set<ValidationMessage> errors = new LinkedHashSet<>();
             // Walk through all the JSONWalker's.
             for (JsonValidator validator : getValidators()) {
