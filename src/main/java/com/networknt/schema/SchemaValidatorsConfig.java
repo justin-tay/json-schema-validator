@@ -40,6 +40,10 @@ import java.util.function.Consumer;
  * Configuration for validators. 
  */
 public class SchemaValidatorsConfig {
+	public NodeAccessor<JsonNode> getNodeAccessor() {
+		return JacksonNodeAccessor.INSTANCE;
+	}
+	
     // This is just a constant for listening to all Keywords.
     public static final String ALL_KEYWORD_WALK_LISTENER_KEY = "com.networknt.AllKeywordWalkListener";
 
