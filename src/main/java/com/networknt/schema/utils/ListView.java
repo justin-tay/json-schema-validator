@@ -20,6 +20,7 @@ import java.util.function.UnaryOperator;
  */
 public class ListView<E> implements List<E> {
     private final List<List<E>> lists = new ArrayList<>();
+    private int size = 0;
 
     /**
      * Adds a list to the view.
@@ -30,22 +31,19 @@ public class ListView<E> implements List<E> {
     public ListView<E> union(List<E> list) {
         if (list != null && !list.isEmpty()) {
             this.lists.add(list);
+            this.size += list.size();
         }
         return this;
     }
 
     @Override
     public int size() {
-        int size = 0;
-        for (List<E> list : lists) {
-            size += list.size();
-        }
-        return size;
+        return this.size;
     }
 
     @Override
     public boolean isEmpty() {
-        return lists.isEmpty();
+        return this.size == 0;
     }
 
     @Override
@@ -67,9 +65,11 @@ public class ListView<E> implements List<E> {
     public Object[] toArray() {
         int size = size();
         Object[] result = new Object[size];
-        Iterator<?> iterator = iterator();
-        for (int x = 0; x < size; x++) {
-            result[x] = iterator.hasNext() ? iterator.next() : null;
+        int destPos = 0;
+        for (List<E> list : lists) {
+            for (int i = 0; i < list.size(); i++) {
+                result[destPos++] = list.get(i);
+            }
         }
         return result;
     }
@@ -78,10 +78,12 @@ public class ListView<E> implements List<E> {
     @Override
     public <T> T[] toArray(T[] a) {
         int size = size();
-        T[] result = size <= a.length ? a : (T[]) Array.newInstance(a.getClass().getComponentType(), size);
-        Iterator<?> iterator = iterator();
-        for (int x = 0; x < size; x++) {
-            result[x] = iterator.hasNext() ? (T) iterator.next() : null;
+        T[] result = (T[]) (size <= a.length ? a : Array.newInstance(a.getClass().getComponentType(), size));
+        int destPos = 0;
+        for (List<E> list : lists) {
+            for (int i = 0; i < list.size(); i++) {
+                result[destPos++] = (T) list.get(i);
+            }
         }
         return result;
     }
