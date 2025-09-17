@@ -44,7 +44,7 @@ public abstract class AbstractKeyword implements Keyword {
 
     @Override
     public int hashCode() {
-        return Objects.hash(value);
+        return value.hashCode();
     }
 
     @Override
@@ -61,6 +61,6 @@ public abstract class AbstractKeyword implements Keyword {
 
     @Override
     public String toString() {
-        return getValue();
+        return this.value;
     }
 }

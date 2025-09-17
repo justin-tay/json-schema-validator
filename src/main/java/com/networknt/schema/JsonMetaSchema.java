@@ -516,7 +516,7 @@ public class JsonMetaSchema {
 
     @Override
     public int hashCode() {
-        return Objects.hash(iri);
+        return iri.hashCode();
     }
 
     @Override

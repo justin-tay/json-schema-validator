@@ -60,7 +60,7 @@ A new walk method added to the JSONSchema class allows us to walk through the JS
     @Override
     public List<ValidationMessage> walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-        List<ValidationMessage> errors = new LinkedHashSet<>();
+        List<ValidationMessage> errors = new ArrayList<>();
         // Walk through all the JSONWalker's.
         for (JsonValidator validator : getValidators()) {
             JsonNodePath evaluationPathWithKeyword = validator.getEvaluationPath();

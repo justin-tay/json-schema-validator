@@ -218,4 +218,50 @@ class ListViewTest {
         Iterator<Integer> iterator = view.listIterator();
         assertThrows(NoSuchElementException.class, () -> iterator.next());
     }
+
+    @Test
+    void testIndexOf() {
+        List<Integer> a = new ArrayList<>();
+        List<Integer> b = new ArrayList<>();
+        List<Integer> c = new ArrayList<>();
+        a.add(1);
+        a.add(2);
+        a.add(3);
+        c.add(4);
+        c.add(5);
+        c.add(null);
+        c.add(3);
+
+        List<Integer> view = new ListView<Integer>().union(a).union(b).union(c);
+        assertEquals(0, view.indexOf(1));
+        assertEquals(1, view.indexOf(2));
+        assertEquals(2, view.indexOf(3));
+        assertEquals(3, view.indexOf(4));
+        assertEquals(4, view.indexOf(5));
+        assertEquals(5, view.indexOf(null));
+        assertEquals(-1, view.indexOf(10));
+    }
+
+    @Test
+    void testLastIndexOf() {
+        List<Integer> a = new ArrayList<>();
+        List<Integer> b = new ArrayList<>();
+        List<Integer> c = new ArrayList<>();
+        a.add(1);
+        a.add(2);
+        a.add(3);
+        c.add(4);
+        c.add(5);
+        c.add(null);
+        c.add(3);
+
+        List<Integer> view = new ListView<Integer>().union(a).union(b).union(c);
+        assertEquals(0, view.lastIndexOf(1));
+        assertEquals(1, view.lastIndexOf(2));
+        assertEquals(6, view.lastIndexOf(3));
+        assertEquals(3, view.lastIndexOf(4));
+        assertEquals(4, view.lastIndexOf(5));
+        assertEquals(5, view.lastIndexOf(null));
+        assertEquals(-1, view.lastIndexOf(10));
+    }
 }

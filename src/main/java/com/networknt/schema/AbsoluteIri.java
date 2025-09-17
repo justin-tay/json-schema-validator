@@ -218,7 +218,7 @@ public class AbsoluteIri {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.value);
+        return this.value.hashCode();
     }
 
     @Override

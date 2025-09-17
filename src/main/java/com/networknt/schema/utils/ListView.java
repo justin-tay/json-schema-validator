@@ -3,16 +3,18 @@ package com.networknt.schema.utils;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.function.UnaryOperator;
 
 /**
  * View of a list of lists.
  * <p>
- * This is used for performance to reduce copies .
+ * This is used for performance to reduce copies and also follows the same
+ * semantics as UnmodifiableList.
  * 
  * @param <E> the type contains in the list
  */
@@ -110,6 +112,15 @@ public class ListView<E> implements List<E> {
     }
 
     @Override
+    public void replaceAll(UnaryOperator<E> operator) {
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public void sort(Comparator<? super E> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean removeAll(Collection<?> coll) {
         throw new UnsupportedOperationException();
     }
@@ -203,7 +214,7 @@ public class ListView<E> implements List<E> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(lists);
+        return lists.hashCode();
     }
 
     @Override
@@ -279,12 +290,31 @@ public class ListView<E> implements List<E> {
 
     @Override
     public int indexOf(Object o) {
-        throw new UnsupportedOperationException();
+    	int currentIndex = 0;
+        for (List<E> list : lists) {
+        	int found = list.indexOf(o);
+        	if (found != -1) {
+        		return found + currentIndex;
+        	} else {
+        		currentIndex = currentIndex + list.size();
+        	}
+        }
+        return -1;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        throw new UnsupportedOperationException();
+    	int listsSize = lists.size();
+    	int size = size();
+    	for (int x = listsSize - 1; x >= 0; x--) {
+    		List<E> list = lists.get(x);
+    		size = size - list.size();
+    		int found = list.lastIndexOf(o);
+    		if (found != -1) {
+    			return size + found;
+    		}
+    	}
+    	return -1;
     }
 
     @Override
