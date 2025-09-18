@@ -92,6 +92,7 @@
     <version.nexus-staging-maven>1.7.0</version.nexus-staging-maven>
     <version.maven-gpg>3.2.7</version.maven-gpg>
 
+    <version.jmh>1.37</version.jmh>
     <argLine>-Duser.language=en -Duser.region=GB</argLine> <!-- For surefire -->
   </properties>
 
@@ -184,10 +185,21 @@
       <version>${version.slf4j}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>${version.jmh}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>${version.jmh}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
-
     <resources>
       <resource>
         <filtering>false</filtering>
@@ -475,7 +487,43 @@
         </plugins>
       </build>
     </profile>
-
+    <profile>
+      <id>benchmark</id>
+      <properties>
+        <skipTests>true</skipTests>
+      </properties>
+      <build>
+        <finalName>benchmarks</finalName>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.7.1</version>
+            <configuration>
+              <descriptors>
+                <descriptor>src/test/assembly/assembly.xml</descriptor>
+              </descriptors>
+            </configuration>
+            <executions>
+              <execution>
+                <id>make-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <archive>
+                    <manifest>
+                      <mainClass>org.openjdk.jmh.Main</mainClass>
+                    </manifest>
+                  </archive>
+                  <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
 </project>
