@@ -80,7 +80,6 @@
     <version.graaljs>21.3.10</version.graaljs> <!-- 22.x and above is not Java 8 compatible -->
     <version.hamcrest>3.0</version.hamcrest>
     <version.junit>5.11.3</version.junit>
-    <version.undertow>2.2.37.Final</version.undertow> <!-- 2.3.x and above is not Java 8 compatible -->
     <version.jacoco-maven-plugin>0.8.12</version.jacoco-maven-plugin>
     <version.maven-compiler-plugin>3.13.0</version.maven-compiler-plugin>
     <version.maven-bundle-plugin>5.1.9</version.maven-bundle-plugin>
@@ -122,13 +121,6 @@
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-yaml</artifactId>
       <version>${version.jackson}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.undertow</groupId>
-      <artifactId>undertow-core</artifactId>
-      <version>${version.undertow}</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
