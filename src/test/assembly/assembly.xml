@@ -23,6 +23,7 @@
                 <include>**/*.class</include>
                 <include>**/*.json</include>
                 <include>**/*.properties</include>
+                <include>**/*.xml</include>
                 <include>**/META-INF/**</include>
             </includes>
             <useDefaultExcludes>true</useDefaultExcludes>
