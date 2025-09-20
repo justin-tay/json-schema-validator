@@ -55,7 +55,7 @@ class OpenApi30Test {
                 + "  \"petType\": \"dog\",\r\n"
                 + "  \"bark\": \"woof\"\r\n"
                 + "}";
-        Set<ValidationMessage> messages = schema.validate(input, InputFormat.JSON);
+        List<ValidationMessage> messages = schema.validate(input, InputFormat.JSON);
         assertEquals(0, messages.size());
 
         String invalid = "{\r\n"

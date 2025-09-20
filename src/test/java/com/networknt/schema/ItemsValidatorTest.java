@@ -52,7 +52,7 @@ class ItemsValidatorTest {
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
         JsonSchema schema = factory.getSchema(schemaData, config);
         String inputData = "[1, \"x\"]";
-        Set<ValidationMessage> messages = schema.validate(inputData, InputFormat.JSON);
+        List<ValidationMessage> messages = schema.validate(inputData, InputFormat.JSON);
         assertFalse(messages.isEmpty());
         ValidationMessage message = messages.iterator().next();
         assertEquals("/items/type", message.getEvaluationPath().toString());
@@ -79,7 +79,7 @@ class ItemsValidatorTest {
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
         JsonSchema schema = factory.getSchema(schemaData, config);
         String inputData = "[ null, 2, 3, \"foo\" ]";
-        Set<ValidationMessage> messages = schema.validate(inputData, InputFormat.JSON);
+        List<ValidationMessage> messages = schema.validate(inputData, InputFormat.JSON);
         assertFalse(messages.isEmpty());
         ValidationMessage message = messages.iterator().next();
         assertEquals("/additionalItems/type", message.getEvaluationPath().toString());
@@ -106,7 +106,7 @@ class ItemsValidatorTest {
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
         JsonSchema schema = factory.getSchema(schemaData, config);
         String inputData = "[ null, 2, 3, \"foo\" ]";
-        Set<ValidationMessage> messages = schema.validate(inputData, InputFormat.JSON);
+        List<ValidationMessage> messages = schema.validate(inputData, InputFormat.JSON);
         assertFalse(messages.isEmpty());
         ValidationMessage message = messages.iterator().next();
         assertEquals("/additionalItems", message.getEvaluationPath().toString());
@@ -133,7 +133,7 @@ class ItemsValidatorTest {
             }
 
             @Override
-            public void onWalkEnd(WalkEvent walkEvent, Set<ValidationMessage> validationMessages) {
+            public void onWalkEnd(WalkEvent walkEvent, List<ValidationMessage> validationMessages) {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
@@ -169,7 +169,7 @@ class ItemsValidatorTest {
             }
 
             @Override
-            public void onWalkEnd(WalkEvent walkEvent, Set<ValidationMessage> validationMessages) {
+            public void onWalkEnd(WalkEvent walkEvent, List<ValidationMessage> validationMessages) {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
@@ -211,7 +211,7 @@ class ItemsValidatorTest {
             }
 
             @Override
-            public void onWalkEnd(WalkEvent walkEvent, Set<ValidationMessage> validationMessages) {
+            public void onWalkEnd(WalkEvent walkEvent, List<ValidationMessage> validationMessages) {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
@@ -261,7 +261,7 @@ class ItemsValidatorTest {
             }
 
             @Override
-            public void onWalkEnd(WalkEvent walkEvent, Set<ValidationMessage> validationMessages) {
+            public void onWalkEnd(WalkEvent walkEvent, List<ValidationMessage> validationMessages) {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
@@ -318,7 +318,7 @@ class ItemsValidatorTest {
                     }
 
                     @Override
-                    public void onWalkEnd(WalkEvent walkEvent, Set<ValidationMessage> validationMessages) {
+                    public void onWalkEnd(WalkEvent walkEvent, List<ValidationMessage> validationMessages) {
                         @SuppressWarnings("unchecked")
                         List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                                 .getCollectorContext()

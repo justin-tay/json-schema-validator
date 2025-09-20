@@ -36,7 +36,7 @@ public abstract class AbstractWalkListenerRunner implements WalkListenerRunner {
     }
 
     protected void runPostWalkListeners(List<JsonSchemaWalkListener> walkListeners, WalkEvent walkEvent,
-                                        Set<ValidationMessage> validationMessages) {
+                                        List<ValidationMessage> validationMessages) {
         if (walkListeners != null) {
             for (JsonSchemaWalkListener walkListener : walkListeners) {
                 walkListener.onWalkEnd(walkEvent, validationMessages);

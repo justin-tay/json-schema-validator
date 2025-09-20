@@ -92,7 +92,7 @@ class JsonNodesTest {
                 builder -> builder.jsonNodeReader(JsonNodeReader.builder().locationAware().build()));
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
         JsonSchema schema = factory.getSchema(schemaData, InputFormat.JSON, config);
-        Set<ValidationMessage> messages = schema.validate(inputData, InputFormat.JSON, executionContext -> {
+        List<ValidationMessage> messages = schema.validate(inputData, InputFormat.JSON, executionContext -> {
             executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
         });
         List<ValidationMessage> list = messages.stream().collect(Collectors.toList());
@@ -138,7 +138,7 @@ class JsonNodesTest {
                 builder -> builder.jsonNodeReader(JsonNodeReader.builder().locationAware().build()));
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
         JsonSchema schema = factory.getSchema(schemaData, InputFormat.YAML, config);
-        Set<ValidationMessage> messages = schema.validate(inputData, InputFormat.YAML, executionContext -> {
+        List<ValidationMessage> messages = schema.validate(inputData, InputFormat.YAML, executionContext -> {
             executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
         });
         List<ValidationMessage> list = messages.stream().collect(Collectors.toList());
