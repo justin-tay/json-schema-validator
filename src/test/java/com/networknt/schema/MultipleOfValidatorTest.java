@@ -81,7 +81,8 @@ class MultipleOfValidatorTest {
         
         // With type loose this has 3 multipleOf errors
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().typeLoose(true).build();
-        Schema typeLoose = factory.getSchema(schemaData, config);
+        factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        Schema typeLoose = factory.getSchema(schemaData);
         messages = typeLoose.validate(inputData, InputFormat.JSON);
         assertEquals(3, messages.size());
         assertEquals(3, messages.stream().filter(m -> "multipleOf".equals(m.getKeyword())).count());

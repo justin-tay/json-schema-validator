@@ -106,7 +106,7 @@ public class ExclusiveMaximumValidator extends BaseKeywordValidator {
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
-        if (!JsonNodeUtil.isNumber(node, validationContext.getConfig())) {
+        if (!JsonNodeUtil.isNumber(node, validationContext.getSchemaRegistryConfig())) {
             // maximum only applies to numbers
             return;
         }

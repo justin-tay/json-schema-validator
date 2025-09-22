@@ -48,8 +48,7 @@ class ItemsValidatorTest {
                 + "  \"items\": {\"type\": \"integer\"}"
                 + "}";
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09);
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
-        Schema schema = factory.getSchema(schemaData, config);
+        Schema schema = factory.getSchema(schemaData);
         String inputData = "[1, \"x\"]";
         List<Error> messages = schema.validate(inputData, InputFormat.JSON);
         assertFalse(messages.isEmpty());
@@ -75,8 +74,7 @@ class ItemsValidatorTest {
                 + "  \"additionalItems\": {\"type\": \"integer\"}"
                 + "}";
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09);
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
-        Schema schema = factory.getSchema(schemaData, config);
+        Schema schema = factory.getSchema(schemaData);
         String inputData = "[ null, 2, 3, \"foo\" ]";
         List<Error> messages = schema.validate(inputData, InputFormat.JSON);
         assertFalse(messages.isEmpty());
@@ -102,8 +100,7 @@ class ItemsValidatorTest {
                 + "  \"additionalItems\": false"
                 + "}";
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09);
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
-        Schema schema = factory.getSchema(schemaData, config);
+        Schema schema = factory.getSchema(schemaData);
         String inputData = "[ null, 2, 3, \"foo\" ]";
         List<Error> messages = schema.validate(inputData, InputFormat.JSON);
         assertFalse(messages.isEmpty());
@@ -124,7 +121,6 @@ class ItemsValidatorTest {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -141,7 +137,8 @@ class ItemsValidatorTest {
                 items.add(walkEvent);
             }
         }).build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         ValidationResult result = schema.walk("[\"the\",\"quick\",\"brown\"]", InputFormat.JSON, true);
         assertTrue(result.getErrors().isEmpty());
         
@@ -160,7 +157,6 @@ class ItemsValidatorTest {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -177,7 +173,8 @@ class ItemsValidatorTest {
                 items.add(walkEvent);
             }
         }).build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         ValidationResult result = schema.walk(null, true);
         assertTrue(result.getErrors().isEmpty());
         
@@ -202,7 +199,6 @@ class ItemsValidatorTest {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -219,7 +215,8 @@ class ItemsValidatorTest {
                 items.add(walkEvent);
             }
         }).build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         ValidationResult result = schema.walk(null, true);
         assertTrue(result.getErrors().isEmpty());
 
@@ -252,7 +249,6 @@ class ItemsValidatorTest {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -269,7 +265,8 @@ class ItemsValidatorTest {
                 items.add(walkEvent);
             }
         }).build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         JsonNode input = JsonMapperFactory.getInstance().readTree("[\"hello\"]");
         ValidationResult result = schema.walk(input, true);
         assertTrue(result.getErrors().isEmpty());
@@ -306,7 +303,6 @@ class ItemsValidatorTest {
                 + "    \"default\": \"additional\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
                 .applyDefaultsStrategy(new ApplyDefaultsStrategy(true, true, true))
                 .itemWalkListener(new JsonSchemaWalkListener() {
@@ -327,7 +323,8 @@ class ItemsValidatorTest {
                     }
                 })
                 .build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         JsonNode input = JsonMapperFactory.getInstance().readTree("[null, null, null, null]");
         ValidationResult result = schema.walk(input, true);
         assertTrue(result.getErrors().isEmpty());

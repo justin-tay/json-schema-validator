@@ -37,7 +37,7 @@ public class ReadOnlyValidator extends BaseKeywordValidator {
     public ReadOnlyValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, ValidationContext validationContext) {
         super(ValidatorTypeCode.READ_ONLY, schemaNode, schemaLocation, parentSchema, validationContext, evaluationPath);
 
-        this.readOnly = validationContext.getConfig().isReadOnly();
+        this.readOnly = validationContext.getSchemaRegistryConfig().isReadOnly();
         logger.debug("Loaded ReadOnlyValidator for property {} as {}", parentSchema, "read mode");
     }
 

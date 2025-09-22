@@ -41,6 +41,19 @@ import java.util.function.Consumer;
  * Configuration for validators. 
  */
 public class SchemaValidatorsConfig {
+    private static class Holder {
+        private static final SchemaValidatorsConfig INSTANCE = SchemaValidatorsConfig.builder().build();
+    }
+
+    /**
+     * Gets the default config instance.
+     * 
+     * @return the config
+     */
+    public static SchemaValidatorsConfig getInstance() {
+        return Holder.INSTANCE;
+    }
+    
     // This is just a constant for listening to all Keywords.
     public static final String ALL_KEYWORD_WALK_LISTENER_KEY = "com.networknt.AllKeywordWalkListener";
 
@@ -76,18 +89,6 @@ public class SchemaValidatorsConfig {
      */
     private Boolean formatAssertionsEnabled = null;
 
-    /**
-     * When a field is set as nullable in the OpenAPI specification, the schema
-     * validator validates that it is nullable however continues with validation
-     * against the nullable field
-     * <p>
-     * If handleNullableField is set to true && incoming field is nullable && value
-     * is field: null --> succeed If handleNullableField is set to false && incoming
-     * field is nullable && value is field: null --> it is up to the type validator
-     * using the SchemaValidator to handle it.
-     */
-    private boolean nullableKeywordEnabled = true;
-
     private final WalkListenerRunner itemWalkListenerRunner;
 
     private final List<JsonSchemaWalkListener> itemWalkListeners;
@@ -116,13 +117,6 @@ public class SchemaValidatorsConfig {
      * The message source to use for generating localised messages.
      */
     private MessageSource messageSource;
-
-    /**
-     * When set to true, support for discriminators is enabled for validations of
-     * oneOf, anyOf and allOf as described on <a href=
-     * "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md#discriminatorObject">GitHub</a>.
-     */
-    private boolean discriminatorKeywordEnabled = false;
 
     /**
      * The approach used to generate paths in reported messages, logs and errors. Default is the legacy "JSONPath-like" approach.
@@ -178,44 +172,12 @@ public class SchemaValidatorsConfig {
      */
     private Boolean writeOnly = null;
 
-    /**
-     * Constructor to create an instance.
-     * <p>
-     * This is deprecated in favor of using the builder
-     * {@link SchemaValidatorsConfig#builder()} to create an instance. Migration
-     * note: The builder has different defaults from the constructor.
-     * <pre>
-     * SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
-     *     .pathType(PathType.LEGACY)
-     *     .errorMessageKeyword("message")
-     *     .nullableKeywordEnabled(true)
-     *     .build();
-     * </pre>
-     * <ul>
-     * <li> customMessageSupported (errorMessageKeyword): change from message to null
-     * <li> pathType: changed from PathType.LEGACY to PathType.JSON_POINTER.
-     * <li> handleNullableField (nullableKeywordEnabled): changed from true to false
-     * </ul>
-     */
-    @Deprecated
-    public SchemaValidatorsConfig() {
-        this.strictness = new HashMap<>(0);
-
-        this.keywordWalkListenersMap = new HashMap<>();
-        this.propertyWalkListeners = new ArrayList<>();
-        this.itemWalkListeners = new ArrayList<>();
-        
-        this.itemWalkListenerRunner = new DefaultItemWalkListenerRunner(getArrayItemWalkListeners());
-        this.keywordWalkListenerRunner = new DefaultKeywordWalkListenerRunner(getKeywordWalkListenersMap());
-        this.propertyWalkListenerRunner = new DefaultPropertyWalkListenerRunner(getPropertyWalkListeners());
-    }
- 
     SchemaValidatorsConfig(ApplyDefaultsStrategy applyDefaultsStrategy, boolean cacheRefs,
             String errorMessageKeyword, ExecutionContextCustomizer executionContextCustomizer, boolean failFast,
-            Boolean formatAssertionsEnabled, boolean nullableKeywordEnabled,
+            Boolean formatAssertionsEnabled,
             List<JsonSchemaWalkListener> itemWalkListeners, boolean javaSemantics,
             Map<String, List<JsonSchemaWalkListener>> keywordWalkListenersMap, Locale locale, boolean losslessNarrowing,
-            MessageSource messageSource, boolean discriminatorKeywordEnabled, PathType pathType,
+            MessageSource messageSource, PathType pathType,
             boolean preloadJsonSchema, int preloadJsonSchemaRefMaxNestingDepth,
             List<JsonSchemaWalkListener> propertyWalkListeners, Boolean readOnly,
             RegularExpressionFactory regularExpressionFactory, JsonSchemaIdValidator schemaIdValidator,
@@ -227,14 +189,12 @@ public class SchemaValidatorsConfig {
         this.executionContextCustomizer = executionContextCustomizer;
         this.failFast = failFast;
         this.formatAssertionsEnabled = formatAssertionsEnabled;
-        this.nullableKeywordEnabled = nullableKeywordEnabled;
         this.itemWalkListeners = itemWalkListeners;
         this.javaSemantics = javaSemantics;
         this.keywordWalkListenersMap = keywordWalkListenersMap;
         this.locale = locale;
         this.losslessNarrowing = losslessNarrowing;
         this.messageSource = messageSource;
-        this.discriminatorKeywordEnabled = discriminatorKeywordEnabled;
         this.pathType = pathType;
         this.preloadJsonSchema = preloadJsonSchema;
         this.preloadJsonSchemaRefMaxNestingDepth = preloadJsonSchemaRefMaxNestingDepth;
@@ -449,53 +409,12 @@ public class SchemaValidatorsConfig {
         return this.failFast;
     }
 
-    /**
-     * Deprecated use {{@link #isNullableKeywordEnabled()} instead.
-     *
-     * @return true if the nullable keyword is enabled
-     */
-    @Deprecated
-    public boolean isHandleNullableField() {
-        return isNullableKeywordEnabled();
-    }
-
-    /**
-     * Gets if the nullable keyword is enabled.
-     *
-     * @return true if the nullable keyword is enabled
-     */
-    public boolean isNullableKeywordEnabled() {
-        return this.nullableKeywordEnabled;
-    }
-
     public boolean isJavaSemantics() {
         return this.javaSemantics;
     }
 
     public boolean isLosslessNarrowing() {
         return this.losslessNarrowing;
-    }
-
-    /**
-     * Indicates whether OpenAPI 3 style discriminators should be supported
-     * <p>
-     * Deprecated use {{@link #isDiscriminatorKeywordEnabled()} instead.
-     * 
-     * @return true in case discriminators are enabled
-     * @since 1.0.51
-     */
-    @Deprecated
-    public boolean isOpenAPI3StyleDiscriminators() {
-        return isDiscriminatorKeywordEnabled();
-    }
-
-    /**
-     * Gets if the discriminator keyword is enabled.
-     * 
-     * @return true if the discriminator keyword is enabled
-     */
-    public boolean isDiscriminatorKeywordEnabled() {
-        return this.discriminatorKeywordEnabled;
     }
 
     /**
@@ -634,10 +553,6 @@ public class SchemaValidatorsConfig {
         this.formatAssertionsEnabled = formatAssertionsEnabled;
     }
 
-    public void setHandleNullableField(boolean handleNullableField) {
-        this.nullableKeywordEnabled = handleNullableField;
-    }
-
     public void setJavaSemantics(boolean javaSemantics) {
         this.javaSemantics = javaSemantics;
     }
@@ -673,43 +588,6 @@ public class SchemaValidatorsConfig {
         this.messageSource = messageSource;
     }
     
-    /**
-     * When enabled, the validation of <code>anyOf</code> and <code>allOf</code> in
-     * polymorphism will respect OpenAPI 3 style discriminators as described in the
-     * <a href=
-     * "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md#discriminatorObject">OpenAPI
-     * 3.0.3 spec</a>. The presence of a discriminator configuration on the schema
-     * will lead to the following changes in the behavior:
-     * <ul>
-     * <li>for <code>oneOf</code> the spec is unfortunately very vague. Whether
-     * <code>oneOf</code> semantics should be affected by discriminators or not is
-     * not even 100% clear within the members of the OAS steering committee.
-     * Therefore <code>oneOf</code> at the moment ignores discriminators</li>
-     * <li>for <code>anyOf</code> the validation will choose one of the candidate
-     * schemas for validation based on the discriminator property value and will
-     * pass validation when this specific schema passes. This is in particular
-     * useful when the payload could match multiple candidates in the
-     * <code>anyOf</code> list and could lead to ambiguity. Example: type B has all
-     * mandatory properties of A and adds more mandatory ones. Whether the payload
-     * is an A or B is determined via the discriminator property name. A payload
-     * indicating it is an instance of B then requires passing the validation of B
-     * and passing the validation of A would not be sufficient anymore.</li>
-     * <li>for <code>allOf</code> use cases with discriminators defined on the
-     * copied-in parent type, it is possible to automatically validate against a
-     * subtype. Example: some schema specifies that there is a field of type A. A
-     * carries a discriminator field and B inherits from A. Then B is automatically
-     * a candidate for validation as well and will be chosen in case the
-     * discriminator property matches</li>
-     * </ul>
-     * 
-     * @param openAPI3StyleDiscriminators whether discriminators should be used.
-     *                                    Defaults to <code>false</code>
-     * @since 1.0.51
-     */
-    public void setOpenAPI3StyleDiscriminators(boolean openAPI3StyleDiscriminators) {
-        this.discriminatorKeywordEnabled = openAPI3StyleDiscriminators;
-    }
-
     /**
      * Set the approach used to generate paths in messages, logs and errors (default is PathType.LEGACY).
      *
@@ -796,14 +674,12 @@ public class SchemaValidatorsConfig {
         builder.executionContextCustomizer = config.executionContextCustomizer;
         builder.failFast = config.failFast;
         builder.formatAssertionsEnabled = config.formatAssertionsEnabled;
-        builder.nullableKeywordEnabled = config.nullableKeywordEnabled;
         builder.itemWalkListeners = config.itemWalkListeners;
         builder.javaSemantics = config.javaSemantics;
         builder.keywordWalkListeners = config.keywordWalkListenersMap;
         builder.locale = config.locale;
         builder.losslessNarrowing = config.losslessNarrowing;
         builder.messageSource = config.messageSource;
-        builder.discriminatorKeywordEnabled = config.discriminatorKeywordEnabled;
         builder.pathType = config.pathType;
         builder.preloadJsonSchema = config.preloadJsonSchema;
         builder.preloadJsonSchemaRefMaxNestingDepth = config.preloadJsonSchemaRefMaxNestingDepth;
@@ -827,14 +703,12 @@ public class SchemaValidatorsConfig {
         private ExecutionContextCustomizer executionContextCustomizer = null;
         private boolean failFast = false;
         private Boolean formatAssertionsEnabled = null;
-        private boolean nullableKeywordEnabled = false;
         private List<JsonSchemaWalkListener> itemWalkListeners = new ArrayList<>();
         private boolean javaSemantics = false;
         private Map<String, List<JsonSchemaWalkListener>> keywordWalkListeners = new HashMap<>();
         private Locale locale = null; // This must be null to use Locale.getDefault() as the default can be changed
         private boolean losslessNarrowing = false;
         private MessageSource messageSource = null;
-        private boolean discriminatorKeywordEnabled = false;
         private PathType pathType = PathType.JSON_POINTER;
         private boolean preloadJsonSchema = true;
         private int preloadJsonSchemaRefMaxNestingDepth = DEFAULT_PRELOAD_JSON_SCHEMA_REF_MAX_NESTING_DEPTH;
@@ -925,16 +799,6 @@ public class SchemaValidatorsConfig {
             return this;
         }
 
-        /**
-         * Sets if the nullable keyword is enabled.
-         * 
-         * @param nullableKeywordEnabled true to enable
-         * @return the builder
-         */
-        public Builder nullableKeywordEnabled(boolean nullableKeywordEnabled) {
-            this.nullableKeywordEnabled = nullableKeywordEnabled;
-            return this;
-        }
         public Builder itemWalkListeners(List<JsonSchemaWalkListener> itemWalkListeners) {
             this.itemWalkListeners = itemWalkListeners;
             return this;
@@ -978,18 +842,6 @@ public class SchemaValidatorsConfig {
             return this;
         }
         /**
-         * Sets if the discriminator keyword is enabled.
-         * <p>
-         * Defaults to false.
-         * 
-         * @param discriminatorKeywordEnabled true to enable
-         * @return the builder
-         */
-        public Builder discriminatorKeywordEnabled(boolean discriminatorKeywordEnabled) {
-            this.discriminatorKeywordEnabled = discriminatorKeywordEnabled;
-            return this;
-        }
-        /**
          * Sets the path type to use when reporting the instance location of errors.
          * <p>
          * Defaults to {@link PathType#JSON_POINTER}.
@@ -1029,6 +881,7 @@ public class SchemaValidatorsConfig {
             this.propertyWalkListeners = propertyWalkListeners;
             return this;
         }
+        @Deprecated
         public Builder readOnly(Boolean readOnly) {
             this.readOnly = readOnly;
             return this;
@@ -1070,15 +923,16 @@ public class SchemaValidatorsConfig {
             this.typeLoose = typeLoose;
             return this;
         }
+        @Deprecated
         public Builder writeOnly(Boolean writeOnly) {
             this.writeOnly = writeOnly;
             return this;
         }
         public SchemaValidatorsConfig build() {
             return new ImmutableSchemaValidatorsConfig(applyDefaultsStrategy, cacheRefs, errorMessageKeyword,
-                    executionContextCustomizer, failFast, formatAssertionsEnabled, nullableKeywordEnabled,
+                    executionContextCustomizer, failFast, formatAssertionsEnabled, 
                     itemWalkListeners, javaSemantics, keywordWalkListeners, locale, losslessNarrowing, messageSource,
-                    discriminatorKeywordEnabled, pathType, preloadJsonSchema, preloadJsonSchemaRefMaxNestingDepth,
+                    pathType, preloadJsonSchema, preloadJsonSchemaRefMaxNestingDepth,
                     propertyWalkListeners, readOnly, regularExpressionFactory, schemaIdValidator, strictness, typeLoose,
                     writeOnly);
         }
@@ -1123,17 +977,17 @@ public class SchemaValidatorsConfig {
     public static class ImmutableSchemaValidatorsConfig extends SchemaValidatorsConfig {
         public ImmutableSchemaValidatorsConfig(ApplyDefaultsStrategy applyDefaultsStrategy, boolean cacheRefs,
                 String errorMessageKeyword, ExecutionContextCustomizer executionContextCustomizer, boolean failFast,
-                Boolean formatAssertionsEnabled, boolean handleNullableField,
+                Boolean formatAssertionsEnabled, 
                 List<JsonSchemaWalkListener> itemWalkListeners, boolean javaSemantics,
                 Map<String, List<JsonSchemaWalkListener>> keywordWalkListenersMap, Locale locale,
-                boolean losslessNarrowing, MessageSource messageSource, boolean openAPI3StyleDiscriminators,
+                boolean losslessNarrowing, MessageSource messageSource,
                 PathType pathType, boolean preloadJsonSchema, int preloadJsonSchemaRefMaxNestingDepth,
                 List<JsonSchemaWalkListener> propertyWalkListeners, Boolean readOnly,
                 RegularExpressionFactory regularExpressionFactory, JsonSchemaIdValidator schemaIdValidator,
                 Map<String, Boolean> strictness, boolean typeLoose, Boolean writeOnly) {
             super(applyDefaultsStrategy, cacheRefs, errorMessageKeyword, executionContextCustomizer, failFast,
-                    formatAssertionsEnabled, handleNullableField, itemWalkListeners, javaSemantics, keywordWalkListenersMap, locale,
-                    losslessNarrowing, messageSource, openAPI3StyleDiscriminators, pathType, preloadJsonSchema,
+                    formatAssertionsEnabled, itemWalkListeners, javaSemantics, keywordWalkListenersMap, locale,
+                    losslessNarrowing, messageSource, pathType, preloadJsonSchema,
                     preloadJsonSchemaRefMaxNestingDepth, propertyWalkListeners, readOnly, regularExpressionFactory,
                     schemaIdValidator, strictness, typeLoose, writeOnly);
         }
@@ -1214,11 +1068,6 @@ public class SchemaValidatorsConfig {
         }
 
         @Override
-        public void setHandleNullableField(boolean handleNullableField) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public void setJavaSemantics(boolean javaSemantics) {
             throw new UnsupportedOperationException();
         }
@@ -1235,11 +1084,6 @@ public class SchemaValidatorsConfig {
 
         @Override
         public void setMessageSource(MessageSource messageSource) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void setOpenAPI3StyleDiscriminators(boolean openAPI3StyleDiscriminators) {
             throw new UnsupportedOperationException();
         }
 

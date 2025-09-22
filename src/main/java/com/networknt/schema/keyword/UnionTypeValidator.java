@@ -79,7 +79,7 @@ public class UnionTypeValidator extends BaseKeywordValidator implements KeywordV
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
-        JsonType nodeType = TypeFactory.getValueNodeType(node, validationContext.getConfig());
+        JsonType nodeType = TypeFactory.getValueNodeType(node, validationContext.getSchemaRegistryConfig());
 
         boolean valid = false;
 

@@ -50,7 +50,7 @@ class Issue724Test {
                 + "  \"billing_address\" : \"my_billing_address\"\n"
                 + "}\n";
 
-        Schema jsonSchema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schema, config);
+        Schema jsonSchema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schema);
         jsonSchema.walk(new ObjectMapper().readTree(data), /* shouldValidateSchema= */ false);
 
         System.out.println(stringCollector.strings);

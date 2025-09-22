@@ -79,7 +79,7 @@ public class EnumValidator extends BaseKeywordValidator implements KeywordValida
             }
 
             // check if the parent schema declares the fields as nullable
-            if (validationContext.getConfig().isNullableKeywordEnabled()) {
+            if (validationContext.isNullableKeywordEnabled()) {
                 JsonNode nullable = parentSchema.getSchemaNode().get("nullable");
                 if (nullable != null && nullable.asBoolean()) {
                     nodes.add(NullNode.getInstance());
@@ -105,7 +105,7 @@ public class EnumValidator extends BaseKeywordValidator implements KeywordValida
         } else if (node.isArray()) {
             node = processArrayNode((ArrayNode) node);
         }
-        if (!nodes.contains(node) && !( this.validationContext.getConfig().isTypeLoose() && isTypeLooseContainsInEnum(node))) {
+        if (!nodes.contains(node) && !( this.validationContext.getSchemaRegistryConfig().isTypeLoose() && isTypeLooseContainsInEnum(node))) {
             executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
                     .locale(executionContext.getExecutionConfig().getLocale())
                     .arguments(error).build());
@@ -118,7 +118,7 @@ public class EnumValidator extends BaseKeywordValidator implements KeywordValida
      * @param node JsonNode to check
      */
     private boolean isTypeLooseContainsInEnum(JsonNode node) {
-        if (TypeFactory.getValueNodeType(node, this.validationContext.getConfig()) == JsonType.STRING) {
+        if (TypeFactory.getValueNodeType(node, this.validationContext.getSchemaRegistryConfig()) == JsonType.STRING) {
             String nodeText = node.textValue();
             for (JsonNode n : nodes) {
                 String value = n.asText();

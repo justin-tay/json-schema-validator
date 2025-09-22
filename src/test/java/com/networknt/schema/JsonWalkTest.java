@@ -40,24 +40,25 @@ class JsonWalkTest {
     }
 
     private void setupSchema() {
-        final Dialect dialect = getJsonMetaSchema();
+        final Dialect dialect = getDialect();
         // Create Schema.
         SchemaValidatorsConfig.Builder schemaValidatorsConfigBuilder = SchemaValidatorsConfig.builder();
         schemaValidatorsConfigBuilder.keywordWalkListener(new AllKeywordListener());
         schemaValidatorsConfigBuilder.keywordWalkListener(ValidatorTypeCode.REF.getValue(), new RefKeywordListener());
         schemaValidatorsConfigBuilder.keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(),
                 new PropertiesKeywordListener());
-        final SchemaRegistry schemaFactory = SchemaRegistry.withDialect(dialect);
-        this.jsonSchema = schemaFactory.getSchema(getSchema(), schemaValidatorsConfigBuilder.build());
+        SchemaRegistry schemaFactory = SchemaRegistry.withDialect(dialect, builder -> builder.schemaRegistryConfig(schemaValidatorsConfigBuilder.build()));
+        this.jsonSchema = schemaFactory.getSchema(getSchema());
         // Create another Schema.
         SchemaValidatorsConfig.Builder schemaValidatorsConfig1Builder = SchemaValidatorsConfig.builder();
         schemaValidatorsConfig1Builder.keywordWalkListener(ValidatorTypeCode.REF.getValue(), new RefKeywordListener());
         schemaValidatorsConfig1Builder.keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(),
                 new PropertiesKeywordListener());
-        this.jsonSchema1 = schemaFactory.getSchema(getSchema(), schemaValidatorsConfig1Builder.build());
+        schemaFactory = SchemaRegistry.withDialect(dialect, builder -> builder.schemaRegistryConfig(schemaValidatorsConfig1Builder.build()));
+        this.jsonSchema1 = schemaFactory.getSchema(getSchema());
     }
 
-    private Dialect getJsonMetaSchema() {
+    private Dialect getDialect() {
         return Dialect.builder(
                 "https://github.com/networknt/json-schema-validator/tests/schemas/example01", Dialects.getDraft201909())
                 .keyword(new CustomKeyword()).build();

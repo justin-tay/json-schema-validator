@@ -88,8 +88,8 @@ public class MultipleOfValidator extends BaseKeywordValidator implements Keyword
             // convert to BigDecimal since double type is not accurate enough to do the
             // division and multiple
             return node.isBigDecimal() ? node.decimalValue() : BigDecimal.valueOf(node.doubleValue());
-        } else if (this.validationContext.getConfig().isTypeLoose()
-                && JsonNodeUtil.isNumber(node, this.validationContext.getConfig())) {
+        } else if (this.validationContext.getSchemaRegistryConfig().isTypeLoose()
+                && JsonNodeUtil.isNumber(node, this.validationContext.getSchemaRegistryConfig())) {
             // handling for type loose
             return new BigDecimal(node.textValue());
         }

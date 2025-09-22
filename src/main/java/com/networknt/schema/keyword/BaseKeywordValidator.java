@@ -48,9 +48,9 @@ public abstract class BaseKeywordValidator extends AbstractKeywordValidator {
         this.validationContext = validationContext;
 
         this.parentSchema = parentSchema;
-        if (keyword != null && parentSchema != null && validationContext.getConfig().getErrorMessageKeyword() != null) {
+        if (keyword != null && parentSchema != null && validationContext.getSchemaRegistryConfig().getErrorMessageKeyword() != null) {
             this.errorMessage = ErrorMessages.getErrorMessage(parentSchema,
-                    validationContext.getConfig().getErrorMessageKeyword(), keyword.getValue());
+                    validationContext.getSchemaRegistryConfig().getErrorMessageKeyword(), keyword.getValue());
         } else {
             this.errorMessage = null;
         }
@@ -182,7 +182,7 @@ public abstract class BaseKeywordValidator extends AbstractKeywordValidator {
 
     protected MessageSourceError.Builder error() {
         return MessageSourceError
-                .builder(this.validationContext.getConfig().getMessageSource(), this.errorMessage)
+                .builder(this.validationContext.getSchemaRegistryConfig().getMessageSource(), this.errorMessage)
                 .schemaNode(this.schemaNode).schemaLocation(this.schemaLocation).evaluationPath(this.evaluationPath)
                 .keyword(this.getKeyword()).messageKey(this.getKeyword());
     }

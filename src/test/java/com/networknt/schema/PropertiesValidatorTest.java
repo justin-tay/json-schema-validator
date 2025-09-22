@@ -12,13 +12,12 @@ class PropertiesValidatorTest extends BaseJsonSchemaValidatorTest {
     @Test
     void testDoesNotThrowWhenApplyingDefaultPropertiesToNonObjects() throws Exception {
         Assertions.assertDoesNotThrow(() -> {
-            SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_4);
 
             SchemaValidatorsConfig schemaValidatorsConfig = SchemaValidatorsConfig.builder()
                     .applyDefaultsStrategy(new ApplyDefaultsStrategy(true, true, true))
                     .build();
-
-            Schema schema = factory.getSchema("{\"type\":\"object\",\"properties\":{\"foo\":{\"type\":\"object\", \"properties\": {} },\"i-have-default\":{\"type\":\"string\",\"default\":\"foo\"}}}", schemaValidatorsConfig);
+            SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_4, builder -> builder.schemaRegistryConfig(schemaValidatorsConfig));
+            Schema schema = factory.getSchema("{\"type\":\"object\",\"properties\":{\"foo\":{\"type\":\"object\", \"properties\": {} },\"i-have-default\":{\"type\":\"string\",\"default\":\"foo\"}}}");
             JsonNode node = getJsonNodeFromStringContent("{\"foo\": \"bar\"}");
             ValidationResult result = schema.walk(node, true);
             Assertions.assertEquals(result.getErrors().size(), 1);

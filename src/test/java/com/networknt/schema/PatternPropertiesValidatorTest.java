@@ -56,8 +56,8 @@ class PatternPropertiesValidatorTest extends BaseJsonSchemaValidatorTest {
             SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
                     .regularExpressionFactory(JoniRegularExpressionFactory.getInstance())
                     .build();
-            SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_4);
-            Schema schema = factory.getSchema("{\"patternProperties\":6}", config);
+            SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_4, builder -> builder.schemaRegistryConfig(config));
+            Schema schema = factory.getSchema("{\"patternProperties\":6}");
 
             JsonNode node = getJsonNodeFromStringContent("");
             List<Error> errors = schema.validate(node);
@@ -80,8 +80,7 @@ class PatternPropertiesValidatorTest extends BaseJsonSchemaValidatorTest {
                 + "  }\n"
                 + "}";
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
-        Schema schema = factory.getSchema(schemaData, config);
+        Schema schema = factory.getSchema(schemaData);
         String inputData = "{\n"
                 + "  \"valid_array\": [\"array1_value\", \"array2_value\"],\n"
                 + "  \"valid_string\": \"string_value\",\n"
@@ -131,8 +130,7 @@ class PatternPropertiesValidatorTest extends BaseJsonSchemaValidatorTest {
                 + "  }\n"
                 + "}";
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
-        Schema schema = factory.getSchema(schemaData, config);
+        Schema schema = factory.getSchema(schemaData);
         String inputData = "{\n"
                 + "  \"test\": 5\n"
                 + "}";

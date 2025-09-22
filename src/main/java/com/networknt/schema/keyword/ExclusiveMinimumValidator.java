@@ -113,7 +113,7 @@ public class ExclusiveMinimumValidator extends BaseKeywordValidator {
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
-        if (!JsonNodeUtil.isNumber(node, this.validationContext.getConfig())) {
+        if (!JsonNodeUtil.isNumber(node, this.validationContext.getSchemaRegistryConfig())) {
             // minimum only applies to numbers
             return;
         }

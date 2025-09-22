@@ -48,7 +48,6 @@ class IfValidatorTest {
                 + "    \"type\": \"number\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
                     @Override
@@ -67,7 +66,8 @@ class IfValidatorTest {
                     }
                 })
                 .build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         ValidationResult result = schema.walk("\"false\"", InputFormat.JSON, true);
         assertFalse(result.getErrors().isEmpty());
 
@@ -91,7 +91,6 @@ class IfValidatorTest {
                 + "    \"type\": \"number\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
                     @Override
@@ -110,7 +109,8 @@ class IfValidatorTest {
                     }
                 })
                 .build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         ValidationResult result = schema.walk("\"hello\"", InputFormat.JSON, true);
         assertFalse(result.getErrors().isEmpty());
 
@@ -134,7 +134,6 @@ class IfValidatorTest {
                 + "    \"type\": \"number\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
                     @Override
@@ -153,7 +152,8 @@ class IfValidatorTest {
                     }
                 })
                 .build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         ValidationResult result = schema.walk(null, true);
         assertTrue(result.getErrors().isEmpty());
 
@@ -175,7 +175,6 @@ class IfValidatorTest {
                 + "    \"type\": \"number\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
                     @Override
@@ -194,7 +193,8 @@ class IfValidatorTest {
                     }
                 })
                 .build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         ValidationResult result = schema.walk("\"false\"", InputFormat.JSON, false);
         assertTrue(result.getErrors().isEmpty());
 

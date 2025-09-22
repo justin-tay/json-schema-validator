@@ -43,9 +43,9 @@ class MetaSchemaValidationTest {
             SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
             Schema schema = SchemaRegistry
                     .withDefaultDialect(Version.DRAFT_2020_12,
-                            builder -> builder.schemaMappers(schemaMappers -> schemaMappers
+                            builder -> builder.schemaRegistryConfig(config).schemaMappers(schemaMappers -> schemaMappers
                                     .mapPrefix("https://spec.openapis.org/oas/3.1", "classpath:oas/3.1")))
-                    .getSchema(SchemaLocation.of("https://spec.openapis.org/oas/3.1/schema-base/2022-10-07"), config);
+                    .getSchema(SchemaLocation.of("https://spec.openapis.org/oas/3.1/schema-base/2022-10-07"));
             List<Error> messages = schema.validate(inputData);
             assertEquals(0, messages.size());
         }

@@ -137,6 +137,6 @@ public class FormatValidator extends BaseFormatJsonValidator implements KeywordV
      * @return whether to perform strict handling
      */
     protected boolean isStrict(ExecutionContext executionContext) {
-        return this.validationContext.getConfig().isStrict(getKeyword(), Boolean.FALSE);
+        return this.validationContext.getSchemaRegistryConfig().isStrict(getKeyword(), Boolean.FALSE);
     }
 }

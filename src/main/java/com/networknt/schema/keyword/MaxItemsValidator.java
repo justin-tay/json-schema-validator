@@ -53,7 +53,7 @@ public class MaxItemsValidator extends BaseKeywordValidator implements KeywordVa
                         .locale(executionContext.getExecutionConfig().getLocale())
                         .arguments(this.max, node.size()).build());
             }
-        } else if (this.validationContext.getConfig().isTypeLoose()) {
+        } else if (this.validationContext.getSchemaRegistryConfig().isTypeLoose()) {
             if (1 > this.max) {
                 executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
                         .locale(executionContext.getExecutionConfig().getLocale())

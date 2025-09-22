@@ -31,9 +31,9 @@ class Issue936Test {
                 .schemaIdValidator(JsonSchemaIdValidator.DEFAULT)
                 .build();
         assertThrowsExactly(InvalidSchemaException.class,
-                () -> SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schema, config));
+                () -> SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schema));
         try {
-            SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schema, config);
+            SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schema);
         } catch (InvalidSchemaException e) {
             assertEquals("/$id: '0' is not a valid $id", e.getError().toString());
         }

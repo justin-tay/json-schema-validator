@@ -66,11 +66,13 @@ public class NetworkntTestSuiteTestCases {
                 for (TestCase testCase : testSource.getTestCases()) {
                     SchemaLocation testCaseFileUri = SchemaLocation
                             .of("classpath:" + toForwardSlashPath(testCase.getSpecification()));
+                    SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+                            .regularExpressionFactory(JoniRegularExpressionFactory.getInstance()).build();
                     Schema schema = SchemaRegistry
                             .withDefaultDialect(defaultVersion,
-                                    builder -> builder.schemaLoaders(schemaLoaders -> schemaLoaders.add(schemaLoader)))
-                            .getSchema(testCaseFileUri, testCase.getSchema(), SchemaValidatorsConfig.builder()
-                                    .regularExpressionFactory(JoniRegularExpressionFactory.getInstance()).build());
+                                    builder -> builder.schemaRegistryConfig(config)
+                                            .schemaLoaders(schemaLoaders -> schemaLoaders.add(schemaLoader)))
+                            .getSchema(testCaseFileUri, testCase.getSchema());
                     results.add(new NetworkntTestSuiteTestCase(schema, testCase,
                             testCase.getSource().getPath().getParent().toString().endsWith("format") ? true : null));
                 }

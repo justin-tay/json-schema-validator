@@ -72,7 +72,7 @@ public class RefValidator extends BaseKeywordValidator {
             return new JsonSchemaRef(getSupplier(() -> {
                 Schema schemaResource = validationContext.getSchemaResources().get(schemaUriFinal);
                 if (schemaResource == null) {
-                    schemaResource = validationContext.getJsonSchemaFactory().loadSchema(schemaLocation, validationContext.getConfig()); 
+                    schemaResource = validationContext.getSchemaRegistry().loadSchema(schemaLocation); 
                     if (schemaResource != null) {
                         copySchemaResources(validationContext, schemaResource);
                     }
@@ -100,7 +100,7 @@ public class RefValidator extends BaseKeywordValidator {
                     }
                     return schemaResource.fromRef(parentSchema, evaluationPath);
                 }
-            }, validationContext.getConfig().isCacheRefs()));
+            }, validationContext.getSchemaRegistryConfig().isCacheRefs()));
             
         } else if (SchemaLocation.Fragment.isAnchorFragment(refValue)) {
             String absoluteIri = resolve(parentSchema, refValue);
@@ -117,17 +117,17 @@ public class RefValidator extends BaseKeywordValidator {
                     return null;
                 }
                 return schemaResource.fromRef(parentSchema, evaluationPath);
-            }, validationContext.getConfig().isCacheRefs()));
+            }, validationContext.getSchemaRegistryConfig().isCacheRefs()));
         }
         if (refValue.equals(REF_CURRENT)) {
             return new JsonSchemaRef(
                     getSupplier(() -> parentSchema.findSchemaResourceRoot().fromRef(parentSchema, evaluationPath),
-                            validationContext.getConfig().isCacheRefs()));
+                            validationContext.getSchemaRegistryConfig().isCacheRefs()));
         }
         return new JsonSchemaRef(getSupplier(
                 () -> getJsonSchema(parentSchema, validationContext, refValue, refValueOriginal, evaluationPath)
                         .fromRef(parentSchema, evaluationPath),
-                validationContext.getConfig().isCacheRefs()));
+                validationContext.getSchemaRegistryConfig().isCacheRefs()));
     }
 
     static <T> Supplier<T> getSupplier(Supplier<T> supplier, boolean cache) {
@@ -171,7 +171,7 @@ public class RefValidator extends BaseKeywordValidator {
         // The getSubSchema potentially recurses to call back to getJsonSchema again
         Schema result = validationContext.getSchemaReferences().get(schemaReference);
         if (result == null) {
-            synchronized (validationContext.getJsonSchemaFactory()) { // acquire lock on shared factory object to prevent deadlock
+            synchronized (validationContext.getSchemaRegistry()) { // acquire lock on shared factory object to prevent deadlock
                 result = validationContext.getSchemaReferences().get(schemaReference);
                 if (result == null) {
                     result = parent.getSubSchema(fragment);
@@ -261,8 +261,8 @@ public class RefValidator extends BaseKeywordValidator {
                 break;
             }
         }
-        if (this.validationContext.getConfig().isCacheRefs() && !circularDependency
-                && depth < this.validationContext.getConfig().getPreloadJsonSchemaRefMaxNestingDepth()) {
+        if (this.validationContext.getSchemaRegistryConfig().isCacheRefs() && !circularDependency
+                && depth < this.validationContext.getSchemaRegistryConfig().getPreloadJsonSchemaRefMaxNestingDepth()) {
             jsonSchema.initializeValidators();
         }
     }

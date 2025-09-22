@@ -51,7 +51,7 @@ public class MinItemsValidator extends BaseKeywordValidator implements KeywordVa
                         .arguments(min, node.size())
                         .build());
             }
-        } else if (this.validationContext.getConfig().isTypeLoose()) {
+        } else if (this.validationContext.getSchemaRegistryConfig().isTypeLoose()) {
             if (1 < min) {
                 executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
                         .locale(executionContext.getExecutionConfig().getLocale())

@@ -44,7 +44,7 @@ public class AllOfValidator extends BaseKeywordValidator {
     public AllOfValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, ValidationContext validationContext) {
         super(ValidatorTypeCode.ALL_OF, schemaNode, schemaLocation, parentSchema, validationContext, evaluationPath);
         if (!schemaNode.isArray()) {
-            JsonType nodeType = TypeFactory.getValueNodeType(schemaNode, this.validationContext.getConfig());
+            JsonType nodeType = TypeFactory.getValueNodeType(schemaNode, this.validationContext.getSchemaRegistryConfig());
             throw new JsonSchemaException(error().instanceNode(schemaNode)
                     .instanceLocation(schemaLocation.getFragment())
                     .messageKey("type")
@@ -73,7 +73,7 @@ public class AllOfValidator extends BaseKeywordValidator {
             } else {
                 schema.walk(executionContext, node, rootNode, instanceLocation, true);
             }
-            if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()) {
+            if (this.validationContext.isDiscriminatorKeywordEnabled()) {
                 final Iterator<JsonNode> arrayElements = this.schemaNode.elements();
                 while (arrayElements.hasNext()) {
                     final ObjectNode allOfEntry = (ObjectNode) arrayElements.next();

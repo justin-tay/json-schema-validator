@@ -48,7 +48,7 @@ public class OneOfValidator extends BaseKeywordValidator {
     public OneOfValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, ValidationContext validationContext) {
         super(ValidatorTypeCode.ONE_OF, schemaNode, schemaLocation, parentSchema, validationContext, evaluationPath);
         if (!schemaNode.isArray()) {
-            JsonType nodeType = TypeFactory.getValueNodeType(schemaNode, this.validationContext.getConfig());
+            JsonType nodeType = TypeFactory.getValueNodeType(schemaNode, this.validationContext.getSchemaRegistryConfig());
             throw new JsonSchemaException(error().instanceNode(schemaNode)
                     .instanceLocation(schemaLocation.getFragment())
                     .messageKey("type")
@@ -84,7 +84,7 @@ public class OneOfValidator extends BaseKeywordValidator {
         boolean addMessages = true;
         try {
             DiscriminatorValidator discriminator = null;
-            if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()) {
+            if (this.validationContext.isDiscriminatorKeywordEnabled()) {
                 DiscriminatorContext discriminatorContext = new DiscriminatorContext();
                 executionContext.enterDiscriminatorContext(discriminatorContext, instanceLocation);
 
@@ -121,7 +121,7 @@ public class OneOfValidator extends BaseKeywordValidator {
                     break;
                 }
                 
-                if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()) {
+                if (this.validationContext.isDiscriminatorKeywordEnabled()) {
                     // The discriminator will cause all messages other than the one with the
                     // matching discriminator to be discarded. Note that the discriminator cannot
                     // affect the actual validation result.
@@ -169,7 +169,7 @@ public class OneOfValidator extends BaseKeywordValidator {
                 index++;
             }
 
-            if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()
+            if (this.validationContext.isDiscriminatorKeywordEnabled()
                     && (discriminator != null || executionContext.getCurrentDiscriminatorContext().isActive())
                     && !executionContext.getCurrentDiscriminatorContext().isDiscriminatorMatchFound()
                     && !executionContext.getCurrentDiscriminatorContext().isDiscriminatorIgnore()) {
@@ -184,7 +184,7 @@ public class OneOfValidator extends BaseKeywordValidator {
             // Restore flag
             executionContext.setFailFast(failFast);
 
-            if (this.validationContext.getConfig().isDiscriminatorKeywordEnabled()) {
+            if (this.validationContext.isDiscriminatorKeywordEnabled()) {
                 executionContext.leaveDiscriminatorContextImmediately(instanceLocation);
             }
         }

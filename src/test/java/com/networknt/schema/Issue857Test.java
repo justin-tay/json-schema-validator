@@ -49,8 +49,8 @@ class Issue857Test {
                 + "}";
 
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().failFast(true).build();
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
-        List<Error> result = factory.getSchema(schema, config).validate(input, InputFormat.JSON);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        List<Error> result = factory.getSchema(schema).validate(input, InputFormat.JSON);
         assertTrue(result.isEmpty());
     }
 }

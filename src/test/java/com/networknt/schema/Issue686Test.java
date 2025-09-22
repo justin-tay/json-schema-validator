@@ -54,8 +54,8 @@ class Issue686Test {
     }
 
     private Schema getSchema(SchemaValidatorsConfig config) {
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_2019_09);
-        return factory.getSchema("{ \"$schema\": \"https://json-schema.org/draft/2019-09/schema\", \"$id\": \"https://json-schema.org/draft/2019-09/schema\", \"type\": \"object\", \"properties\": { \"foo\": { \"type\": \"string\" } } } }", config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(config));
+        return factory.getSchema("{ \"$schema\": \"https://json-schema.org/draft/2019-09/schema\", \"$id\": \"https://json-schema.org/draft/2019-09/schema\", \"type\": \"object\", \"properties\": { \"foo\": { \"type\": \"string\" } } } }");
     }
 
     private void verify(SchemaValidatorsConfig config, String expectedMessage) throws JsonProcessingException {

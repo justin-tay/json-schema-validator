@@ -17,11 +17,11 @@ class Issue461Test {
     protected ObjectMapper mapper = JsonMapperFactory.getInstance();
 
     protected Schema getJsonSchemaFromStreamContentV7(SchemaLocation schemaUri) {
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7);
         SchemaValidatorsConfig svc = SchemaValidatorsConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new Walker())
                 .build();
-        return factory.getSchema(schemaUri, svc);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(svc));
+        return factory.getSchema(schemaUri);
     }
 
     @Test

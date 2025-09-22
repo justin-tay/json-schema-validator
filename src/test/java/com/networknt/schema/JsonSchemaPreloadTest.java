@@ -26,17 +26,17 @@ import com.networknt.schema.Specification.Version;
 class JsonSchemaPreloadTest {
     @Test
     void cacheRefsFalse() {
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_7);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().cacheRefs(false).build();
-        factory.getSchema(SchemaLocation.of("classpath:/issues/1016/schema.json"), config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));
+        factory.getSchema(SchemaLocation.of("classpath:/issues/1016/schema.json"));
     }
 
     @Test
     void preloadSchemaRefMaxNestingDepth() {
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_7);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
                 .preloadJsonSchemaRefMaxNestingDepth(20)
                 .build();
-        factory.getSchema(SchemaLocation.of("classpath:/issues/1016/schema.json"), config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));
+        factory.getSchema(SchemaLocation.of("classpath:/issues/1016/schema.json"));
     }
 }

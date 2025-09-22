@@ -14,8 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class Issue428Test {
     protected ObjectMapper mapper = new ObjectMapper();
-    protected SchemaRegistry validatorFactory = SchemaRegistry
-            .builder(SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_4)).build();
 
     private void runTestFile(String testCaseFile) throws Exception {
         final SchemaLocation testCaseFileUri = SchemaLocation.of("classpath:" + testCaseFile);
@@ -37,8 +35,10 @@ class Issue428Test {
                     // if test file do not contains typeLoose flag, use default value: true.
                     SchemaValidatorsConfig.Builder configBuilder = SchemaValidatorsConfig.builder();
                     configBuilder.typeLoose(typeLooseNode != null && typeLooseNode.asBoolean());
-                    configBuilder.discriminatorKeywordEnabled(false);
-                    Schema schema = validatorFactory.getSchema(testCaseFileUri, testCase.get("schema"), configBuilder.build());
+                    SchemaValidatorsConfig config = configBuilder.build();
+
+                    SchemaRegistry validatorFactory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_4, builder -> builder.schemaRegistryConfig(config));
+                    Schema schema = validatorFactory.getSchema(testCaseFileUri, testCase.get("schema"));
 
                     List<Error> errors = new ArrayList<Error>(schema.validate(node));
 

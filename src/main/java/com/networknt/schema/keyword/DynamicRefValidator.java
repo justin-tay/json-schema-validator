@@ -84,7 +84,7 @@ public class DynamicRefValidator extends BaseKeywordValidator {
                 refSchema = refSchema.fromRef(parentSchema, evaluationPath);
             }
             return refSchema;
-        }, validationContext.getConfig().isCacheRefs()));
+        }, validationContext.getSchemaRegistryConfig().isCacheRefs()));
     }
 
     static <T> Supplier<T> getSupplier(Supplier<T> supplier, boolean cache) {
@@ -177,8 +177,8 @@ public class DynamicRefValidator extends BaseKeywordValidator {
                 break;
             }
         }
-        if (this.validationContext.getConfig().isCacheRefs() && !circularDependency
-                && depth < this.validationContext.getConfig().getPreloadJsonSchemaRefMaxNestingDepth()) {
+        if (this.validationContext.getSchemaRegistryConfig().isCacheRefs() && !circularDependency
+                && depth < this.validationContext.getSchemaRegistryConfig().getPreloadJsonSchemaRefMaxNestingDepth()) {
             jsonSchema.initializeValidators();
         }
     }

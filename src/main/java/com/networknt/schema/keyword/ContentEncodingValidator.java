@@ -75,7 +75,7 @@ public class ContentEncodingValidator extends BaseKeywordValidator {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
         // Ignore non-strings
-        JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getConfig());
+        JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getSchemaRegistryConfig());
         if (nodeType != JsonType.STRING) {
             return;
         }

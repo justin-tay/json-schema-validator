@@ -37,7 +37,6 @@ import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
 
 class Issue467Test {
-    private static final SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7);
     private static final String schemaPath = "/schema/issue467.json";
 
     protected ObjectMapper mapper = new ObjectMapper();
@@ -59,7 +58,8 @@ class Issue467Test {
                     }
                 })
                 .build();
-        Schema schema = factory.getSchema(schemaInputStream, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaInputStream);
         JsonNode data = mapper.readTree(Issue467Test.class.getResource("/data/issue467.json"));
         ValidationResult result = schema.walk(data, true);
         assertEquals(new HashSet<>(Arrays.asList("/properties", "/properties/tags/items/0/properties")),
@@ -84,7 +84,8 @@ class Issue467Test {
                     }
                 })
                 .build();
-        Schema schema = factory.getSchema(schemaInputStream, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaInputStream);
         JsonNode data = mapper.readTree(Issue467Test.class.getResource("/data/issue467.json"));
         ValidationResult result = schema.walk(data, true);
         assertEquals(

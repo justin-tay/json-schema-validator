@@ -156,9 +156,8 @@ class CollectorContextTest {
         final Dialect dialect = getJsonMetaSchema(
                 "https://github.com/networknt/json-schema-validator/tests/schemas/example01");
         final SchemaRegistry schemaFactory = SchemaRegistry.withDialect(dialect);
-        SchemaValidatorsConfig schemaValidatorsConfig  = SchemaValidatorsConfig.builder().build();
-        this.jsonSchema = schemaFactory.getSchema(getSchemaString(), schemaValidatorsConfig);
-        this.jsonSchemaForCombine = schemaFactory.getSchema(getSchemaStringMultipleProperties(), schemaValidatorsConfig);
+        this.jsonSchema = schemaFactory.getSchema(getSchemaString());
+        this.jsonSchemaForCombine = schemaFactory.getSchema(getSchemaStringMultipleProperties());
     }
 
     private String getSchemaString() {

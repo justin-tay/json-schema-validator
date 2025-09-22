@@ -21,7 +21,7 @@ public class WriteOnlyValidator extends BaseKeywordValidator {
     public WriteOnlyValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, ValidationContext validationContext) {
         super(ValidatorTypeCode.WRITE_ONLY, schemaNode, schemaLocation, parentSchema, validationContext, evaluationPath);
 
-        this.writeOnly = validationContext.getConfig().isWriteOnly();
+        this.writeOnly = validationContext.getSchemaRegistryConfig().isWriteOnly();
         logger.debug("Loaded WriteOnlyValidator for property {} as {}", parentSchema, "write mode");
     }
 

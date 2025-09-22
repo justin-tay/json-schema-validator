@@ -55,9 +55,9 @@ class RequiredValidatorTest {
                 + "    \"name\"\r\n"
                 + "  ]\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().readOnly(true).build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         String inputData = "{\r\n"
                 + "  \"foo\":\"hello\",\r\n"
                 + "  \"bar\":\"world\"\r\n"
@@ -99,9 +99,9 @@ class RequiredValidatorTest {
                 + "    \"name\"\r\n"
                 + "  ]\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().writeOnly(true).build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         String inputData = "{\r\n"
                 + "  \"foo\":\"hello\",\r\n"
                 + "  \"bar\":\"world\"\r\n"
@@ -143,9 +143,9 @@ class RequiredValidatorTest {
                 + "    \"name\"\r\n"
                 + "  ]\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().readOnly(true).build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         String inputData = "{\r\n"
                 + "  \"amount\":10,\r\n"
                 + "  \"description\":\"world\"\r\n"
@@ -181,9 +181,9 @@ class RequiredValidatorTest {
                 + "    \"name\"\r\n"
                 + "  ]\r\n"
                 + "}";
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().writeOnly(true).build();
-        Schema schema = factory.getSchema(schemaData, config);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        Schema schema = factory.getSchema(schemaData);
         String inputData = "{\r\n"
                 + "  \"description\":\"world\",\r\n"
                 + "  \"name\":\"hello\"\r\n"

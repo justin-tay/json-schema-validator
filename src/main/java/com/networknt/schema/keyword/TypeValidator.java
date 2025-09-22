@@ -65,7 +65,7 @@ public class TypeValidator extends BaseKeywordValidator {
         }
 
         if (!equalsToSchemaType(node)) {
-            JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getConfig());
+            JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getSchemaRegistryConfig());
             executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
                     .locale(executionContext.getExecutionConfig().getLocale())
                     .arguments(nodeType.toString(), this.schemaType.toString()).build());

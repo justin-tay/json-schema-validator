@@ -30,12 +30,13 @@ class SharedConfigTest {
 
     @Test
     void shouldCallAllKeywordListenerOnWalkStart() throws Exception {
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7);
 
         AllKeywordListener allKeywordListener = new AllKeywordListener();
         SchemaValidatorsConfig schemaValidatorsConfig = SchemaValidatorsConfig.builder()
                 .keywordWalkListener(allKeywordListener)
                 .build();
+
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(schemaValidatorsConfig));
 
         SchemaLocation draft07Schema = SchemaLocation.of("resource:/draft-07/schema#");
 
@@ -46,7 +47,7 @@ class SharedConfigTest {
         firstSchema.walk(new ObjectMapper().readTree("{ \"id\": 123 }"), true);
 
         // note that only second schema takes overridden schemaValidatorsConfig
-        Schema secondSchema = factory.getSchema(draft07Schema, schemaValidatorsConfig);
+        Schema secondSchema = factory.getSchema(draft07Schema);
 
         secondSchema.walk(new ObjectMapper().readTree("{ \"id\": 123 }"), true);
         Assertions.assertTrue(allKeywordListener.wasCalled);

@@ -21,11 +21,11 @@ class Issue451Test {
     private static final String COLLECTOR_ID = "collector-451";
 
     protected Schema getJsonSchemaFromStreamContentV7(InputStream schemaContent) {
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7);
         SchemaValidatorsConfig svc = SchemaValidatorsConfig.builder()
                 .propertyWalkListener(new CountingWalker())
                 .build();
-        return factory.getSchema(schemaContent, svc);
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(svc));
+        return factory.getSchema(schemaContent);
     }
 
     protected JsonNode getJsonNodeFromStreamContent(InputStream content) throws Exception {

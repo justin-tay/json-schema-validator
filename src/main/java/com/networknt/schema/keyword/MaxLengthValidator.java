@@ -48,7 +48,7 @@ public class MaxLengthValidator extends BaseKeywordValidator implements KeywordV
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
-        JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getConfig());
+        JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getSchemaRegistryConfig());
         if (nodeType != JsonType.STRING) {
             // ignore no-string typs
             return;

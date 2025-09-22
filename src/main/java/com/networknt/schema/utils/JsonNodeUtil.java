@@ -57,16 +57,16 @@ public class JsonNodeUtil {
     }
 
     //Check to see if a JsonNode is nullable with checking the isHandleNullableField
-    public static boolean isNodeNullable(JsonNode schema, SchemaValidatorsConfig config){
+    public static boolean isNodeNullable(JsonNode schema, ValidationContext validationContext) {
         // check if the parent schema declares the fields as nullable
-        if (config.isNullableKeywordEnabled()) {
+        if (validationContext.isNullableKeywordEnabled()) {
             return isNodeNullable(schema);
         }
         return false;
     }
 
     public static boolean equalsToSchemaType(JsonNode node, JsonType schemaType, Schema parentSchema, ValidationContext validationContext) {
-        SchemaValidatorsConfig config = validationContext.getConfig();
+        SchemaValidatorsConfig config = validationContext.getSchemaRegistryConfig();
         JsonType nodeType = TypeFactory.getValueNodeType(node, config);
         // in the case that node type is not the same as schema type, try to convert node to the
         // same type of schema. In REST API, query parameters, path parameters and headers are all
@@ -84,7 +84,7 @@ public class JsonNodeUtil {
             }
 
             if (nodeType == JsonType.NULL) {
-                if (parentSchema != null && config.isNullableKeywordEnabled()) {
+                if (parentSchema != null && validationContext.isNullableKeywordEnabled()) {
                     Schema grandParentSchema = parentSchema.getParentSchema();
                     if (grandParentSchema != null && JsonNodeUtil.isNodeNullable(grandParentSchema.getSchemaNode())
                             || JsonNodeUtil.isNodeNullable(parentSchema.getSchemaNode())) {

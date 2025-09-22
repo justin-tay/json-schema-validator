@@ -95,7 +95,7 @@ public class ItemsValidator extends BaseKeywordValidator {
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
         debug(logger, executionContext, node, rootNode, instanceLocation);
 
-        if (!node.isArray() && !this.validationContext.getConfig().isTypeLoose()) {
+        if (!node.isArray() && !this.validationContext.getSchemaRegistryConfig().isTypeLoose()) {
             // ignores non-arrays
             return;
         }
@@ -235,7 +235,7 @@ public class ItemsValidator extends BaseKeywordValidator {
                 int count = Math.max(1, node.size());
                 ArrayNode arrayNode = (ArrayNode) node;
                 JsonNode defaultNode = null;
-                if (this.validationContext.getConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()) {
+                if (this.validationContext.getSchemaRegistryConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()) {
                     defaultNode = getDefaultNode(this.schema);
                 }
                 for (int i = 0; i < count; i++) {
@@ -260,7 +260,7 @@ public class ItemsValidator extends BaseKeywordValidator {
                     ArrayNode arrayNode = (ArrayNode) node;
                     JsonNode defaultNode = null;
                     JsonNode n = arrayNode.get(i);
-                    if (this.validationContext.getConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()) {
+                    if (this.validationContext.getSchemaRegistryConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()) {
                         defaultNode = getDefaultNode(this.tupleSchema.get(i));
                     }
                     if (n != null) {
@@ -287,7 +287,7 @@ public class ItemsValidator extends BaseKeywordValidator {
                         ArrayNode arrayNode = (ArrayNode) node;
                         JsonNode defaultNode = null;
                         JsonNode n = arrayNode.get(i);
-                        if (this.validationContext.getConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()) {
+                        if (this.validationContext.getSchemaRegistryConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()) {
                             defaultNode = getDefaultNode(this.additionalSchema);
                         }
                         if (n != null) {
@@ -333,13 +333,13 @@ public class ItemsValidator extends BaseKeywordValidator {
 
     private void walkSchema(ExecutionContext executionContext, Schema walkSchema, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema, String keyword) {
-        boolean executeWalk = this.validationContext.getConfig().getItemWalkListenerRunner().runPreWalkListeners(executionContext, keyword,
+        boolean executeWalk = this.validationContext.getSchemaRegistryConfig().getItemWalkListenerRunner().runPreWalkListeners(executionContext, keyword,
                 node, rootNode, instanceLocation, walkSchema, this);
         int currentErrors = executionContext.getErrors().size();
         if (executeWalk) {
             walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
         }
-        this.validationContext.getConfig().getItemWalkListenerRunner().runPostWalkListeners(executionContext, keyword, node, rootNode,
+        this.validationContext.getSchemaRegistryConfig().getItemWalkListenerRunner().runPostWalkListeners(executionContext, keyword, node, rootNode,
                 instanceLocation, walkSchema, this, executionContext.getErrors().subList(currentErrors, executionContext.getErrors().size()));
 
     }

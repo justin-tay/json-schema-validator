@@ -149,7 +149,7 @@ class UnevaluatedPropertiesValidatorTest {
         assertEquals(1, messages.size());
         List<Error> assertions = messages.stream().collect(Collectors.toList());
         assertEquals("type", assertions.get(0).getKeyword());
-        assertEquals("$.unevaluatedProperties.type", assertions.get(0).getEvaluationPath().toString());
+        assertEquals("/unevaluatedProperties/type", assertions.get(0).getEvaluationPath().toString());
     }
 
     @Test

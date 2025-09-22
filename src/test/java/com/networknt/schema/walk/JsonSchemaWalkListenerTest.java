@@ -104,7 +104,7 @@ class JsonSchemaWalkListenerTest {
                     }
                 })
                 .build();
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_7).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         String inputData = "{\r\n"
                 + "  \"tags\": [\r\n"
                 + "    {\r\n"
@@ -184,7 +184,7 @@ class JsonSchemaWalkListenerTest {
                     }
                 })
                 .build();
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_7).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         String inputData = "{\r\n"
                 + "  \"tags\": [\r\n"
                 + "    {\r\n"
@@ -269,7 +269,7 @@ class JsonSchemaWalkListenerTest {
             public void onWalkEnd(WalkEvent walkEvent, List<Error> errors) {
             }
         }).build();
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_7).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         String inputData = "{\r\n"
                 + "  \"tags\": [\r\n"
                 + "    {\r\n"
@@ -342,7 +342,7 @@ class JsonSchemaWalkListenerTest {
             public void onWalkEnd(WalkEvent walkEvent, List<Error> errors) {
             }
         }).build();
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_7).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         String inputData = "{\r\n"
                 + "  \"tags\": [\r\n"
                 + "    {\r\n"
@@ -391,8 +391,9 @@ class JsonSchemaWalkListenerTest {
                     }
                 })
                 .build();
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09)
-                .getSchema(SchemaLocation.of(DialectId.DRAFT_2019_09), config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(config))
+                .getSchema(SchemaLocation.of(DialectId.DRAFT_2019_09));
+
         String inputData = "{\r\n"
                 + "  \"$schema\": \"https://json-schema.org/draft/2019-09/schema\",\r\n"
                 + "  \"type\": \"object\",\r\n"
@@ -555,7 +556,8 @@ class JsonSchemaWalkListenerTest {
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
                 .applyDefaultsStrategy(new ApplyDefaultsStrategy(true, true, true))
                 .build();
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
+
         JsonNode inputNode = JsonMapperFactory.getInstance().readTree("{}");
         ValidationResult result = schema.walk(inputNode, true);
         assertEquals("{\"s\":\"S\",\"ref\":\"REF\"}", inputNode.toString());
@@ -612,7 +614,8 @@ class JsonSchemaWalkListenerTest {
                 })
                 .build();
 
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
+
         JsonNode inputNode = JsonMapperFactory.getInstance().readTree("{}");
         ValidationResult result = schema.walk(inputNode, true);
         assertEquals("{\"s\":\"S\",\"ref\":\"REF\"}", inputNode.toString());
@@ -669,7 +672,7 @@ class JsonSchemaWalkListenerTest {
                 })
                 .build();
         
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         JsonNode inputNode = JsonMapperFactory.getInstance().readTree("{}");
         ValidationResult result = schema.walk(inputNode, true);
         assertEquals("{\"s\":1,\"ref\":\"REF\"}", inputNode.toString());
@@ -737,7 +740,8 @@ class JsonSchemaWalkListenerTest {
                 })
                 .build();
 
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
+
         JsonNode inputNode = JsonMapperFactory.getInstance().readTree("{}");
         ValidationResult result = schema.walk(inputNode, true);
         assertFalse(result.getErrors().isEmpty());
@@ -807,7 +811,8 @@ class JsonSchemaWalkListenerTest {
                 })
                 .build();
 
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
+
         JsonNode inputNode = JsonMapperFactory.getInstance().readTree("{}");
         ValidationResult result = schema.walk(inputNode, true);
         assertEquals("{\"name\":\"John Doe\",\"email\":\"john.doe@gmail.com\"}", inputNode.toString());
@@ -858,7 +863,8 @@ class JsonSchemaWalkListenerTest {
                 .itemWalkListener(listener)
                 .propertyWalkListener(listener)
                 .build();
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
+
         ValidationResult result = schema.walk(null, true);
         @SuppressWarnings("unchecked")
         List<WalkEvent> items = (List<WalkEvent>) result.getExecutionContext().getCollectorContext().get("items");
@@ -921,7 +927,8 @@ class JsonSchemaWalkListenerTest {
                 .itemWalkListener(listener)
                 .propertyWalkListener(listener)
                 .build();
-        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData, config);
+        Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
+
         ValidationResult result = schema.walk(null, true);
         @SuppressWarnings("unchecked")
         List<WalkEvent> items = (List<WalkEvent>) result.getExecutionContext().getCollectorContext().get("items");

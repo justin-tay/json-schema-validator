@@ -58,7 +58,7 @@ public class RecursiveRefValidator extends BaseKeywordValidator {
 
     static JsonSchemaRef getRefSchema(Schema parentSchema, ValidationContext validationContext, String refValue,
             JsonNodePath evaluationPath) {
-        return new JsonSchemaRef(getSupplier(() -> getSchema(parentSchema, validationContext, refValue, evaluationPath), validationContext.getConfig().isCacheRefs()));
+        return new JsonSchemaRef(getSupplier(() -> getSchema(parentSchema, validationContext, refValue, evaluationPath), validationContext.getSchemaRegistryConfig().isCacheRefs()));
     }
 
     static <T> Supplier<T> getSupplier(Supplier<T> supplier, boolean cache) {
@@ -172,8 +172,8 @@ public class RecursiveRefValidator extends BaseKeywordValidator {
                 break;
             }
         }
-        if (this.validationContext.getConfig().isCacheRefs() && !circularDependency
-                && depth < this.validationContext.getConfig().getPreloadJsonSchemaRefMaxNestingDepth()) {
+        if (this.validationContext.getSchemaRegistryConfig().isCacheRefs() && !circularDependency
+                && depth < this.validationContext.getSchemaRegistryConfig().getPreloadJsonSchemaRefMaxNestingDepth()) {
             jsonSchema.initializeValidators();
         }
     }
