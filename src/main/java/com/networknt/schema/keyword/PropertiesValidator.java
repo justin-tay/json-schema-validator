@@ -87,7 +87,7 @@ public class PropertiesValidator extends BaseKeywordValidator {
                     entry.getValue().validate(executionContext, propertyNode, rootNode, path);
                 } else {
                     // check if walker is enabled. If it is enabled it is upto the walker implementation to decide about the validation.
-                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, this.validationContext.getSchemaRegistryConfig().getPropertyWalkListenerRunner());
+                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, executionContext.getWalkConfig().getPropertyWalkListenerRunner());
                 }
             } else {
                 if (walk) {
@@ -96,7 +96,7 @@ public class PropertiesValidator extends BaseKeywordValidator {
                     // null.
                     // The actual walk needs to be skipped as the validators assume that node is not
                     // null.
-                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, this.validationContext.getSchemaRegistryConfig().getPropertyWalkListenerRunner());
+                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, executionContext.getWalkConfig().getPropertyWalkListenerRunner());
                 }
             }
         }
@@ -112,15 +112,15 @@ public class PropertiesValidator extends BaseKeywordValidator {
 
     @Override
     public void walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean shouldValidateSchema) {
-        if (this.validationContext.getSchemaRegistryConfig().getApplyDefaultsStrategy().shouldApplyPropertyDefaults() && null != node
+        if (executionContext.getWalkConfig().getApplyDefaultsStrategy().shouldApplyPropertyDefaults() && null != node
                 && node.getNodeType() == JsonNodeType.OBJECT) {
-            applyPropertyDefaults((ObjectNode) node);
+            applyPropertyDefaults((ObjectNode) node, executionContext);
         }
         if (shouldValidateSchema) {
             validate(executionContext, node == null ? MissingNode.getInstance() : node, rootNode,
                     instanceLocation, true);
         } else {
-            WalkListenerRunner propertyWalkListenerRunner = this.validationContext.getSchemaRegistryConfig().getPropertyWalkListenerRunner();
+            WalkListenerRunner propertyWalkListenerRunner = executionContext.getWalkConfig().getPropertyWalkListenerRunner();
             for (Map.Entry<String, Schema> entry : this.schemas.entrySet()) {
                 walkSchema(executionContext, entry, node, rootNode, instanceLocation, shouldValidateSchema, propertyWalkListenerRunner);
             }
@@ -138,7 +138,7 @@ public class PropertiesValidator extends BaseKeywordValidator {
         return hasUnevaluatedPropertiesValidator;
     }
 
-    private void applyPropertyDefaults(ObjectNode node) {
+    private void applyPropertyDefaults(ObjectNode node, ExecutionContext executionContext) {
         for (Map.Entry<String, Schema> entry : this.schemas.entrySet()) {
             JsonNode propertyNode = node.get(entry.getKey());
 
@@ -146,7 +146,7 @@ public class PropertiesValidator extends BaseKeywordValidator {
             if (defaultNode == null) {
                 continue;
             }
-            boolean applyDefault = propertyNode == null || (propertyNode.isNull() && this.validationContext.getSchemaRegistryConfig()
+            boolean applyDefault = propertyNode == null || (propertyNode.isNull() && executionContext.getWalkConfig()
                     .getApplyDefaultsStrategy().shouldApplyPropertyDefaultsIfNull());
             if (applyDefault) {
                 node.set(entry.getKey(), defaultNode);

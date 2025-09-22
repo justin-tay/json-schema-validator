@@ -27,7 +27,7 @@ class Issue936Test {
     void shouldThrowInvalidSchemaException() {
         String schema = "{\r\n" + "  \"$id\": \"0\",\r\n"
                 + "  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\"\r\n" + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .schemaIdValidator(JsonSchemaIdValidator.DEFAULT)
                 .build();
         assertThrowsExactly(InvalidSchemaException.class,

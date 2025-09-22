@@ -36,7 +36,7 @@ class ConstValidatorTest {
         String schemaData = "{\r\n"
                 + "  \"const\": \"aa\"\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .messageSource(new ResourceBundleMessageSource("const-messages-override", "jsv-messages"))
                 .build();
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
@@ -50,7 +50,7 @@ class ConstValidatorTest {
         String schemaData = "{\r\n"
                 + "  \"const\": 1\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .messageSource(new ResourceBundleMessageSource("const-messages-override", "jsv-messages"))
                 .build();
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
@@ -64,7 +64,7 @@ class ConstValidatorTest {
         String schemaData = "{\r\n"
                 + "  \"const\": \"aa\"\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().build();
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         String inputData = "\"aa\"";
         List<Error> messages = schema.validate(inputData, InputFormat.JSON);

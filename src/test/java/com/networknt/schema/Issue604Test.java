@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 class Issue604Test {
     @Test
     void failure() {
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .applyDefaultsStrategy(new ApplyDefaultsStrategy(true, false, false))
                 .build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));

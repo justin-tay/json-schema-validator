@@ -40,14 +40,14 @@ class ReadOnlyValidatorTest {
 	}
 
 	private Schema getJsonSchema(Boolean write) {
-		SchemaValidatorsConfig schemaConfig = createSchemaConfig(write);
+		SchemaRegistryConfig schemaConfig = createSchemaConfig(write);
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(schemaConfig));
 		InputStream schema = getClass().getClassLoader().getResourceAsStream("schema/read-only-schema.json");
 		return factory.getSchema(schema);
 	}
 
-	private SchemaValidatorsConfig createSchemaConfig(Boolean write) {
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().readOnly(write).build();
+	private SchemaRegistryConfig createSchemaConfig(Boolean write) {
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().readOnly(write).build();
 		return config;
 	}
 

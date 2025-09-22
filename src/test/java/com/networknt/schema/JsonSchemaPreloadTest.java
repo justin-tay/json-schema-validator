@@ -26,14 +26,14 @@ import com.networknt.schema.Specification.Version;
 class JsonSchemaPreloadTest {
     @Test
     void cacheRefsFalse() {
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().cacheRefs(false).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().cacheRefs(false).build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));
         factory.getSchema(SchemaLocation.of("classpath:/issues/1016/schema.json"));
     }
 
     @Test
     void preloadSchemaRefMaxNestingDepth() {
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .preloadJsonSchemaRefMaxNestingDepth(20)
                 .build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));

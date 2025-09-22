@@ -22,7 +22,7 @@ class Issue366FailFastTest {
     ObjectMapper objectMapper = new ObjectMapper();
 
     private void setupSchema() throws IOException {
-        SchemaValidatorsConfig schemaValidatorsConfig = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig schemaValidatorsConfig = SchemaRegistryConfig.builder()
                 .failFast(true)
                 .typeLoose(false)
                 .build();

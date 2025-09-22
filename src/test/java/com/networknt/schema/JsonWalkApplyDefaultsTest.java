@@ -120,7 +120,7 @@ class JsonWalkApplyDefaultsTest {
     }
 
     private Schema createSchema(ApplyDefaultsStrategy applyDefaultsStrategy) {
-        SchemaValidatorsConfig schemaValidatorsConfig = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig schemaValidatorsConfig = SchemaRegistryConfig.builder()
                 .applyDefaultsStrategy(applyDefaultsStrategy).build();
         SchemaRegistry schemaFactory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_4,
                 builder -> builder.schemaRegistryConfig(schemaValidatorsConfig));

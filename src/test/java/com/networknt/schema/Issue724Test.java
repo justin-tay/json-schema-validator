@@ -22,7 +22,7 @@ class Issue724Test {
     @Test
     void test() throws JsonProcessingException {
         StringCollector stringCollector = new StringCollector();
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().keywordWalkListener(stringCollector).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().keywordWalkListener(stringCollector).build();
 
         String schema =
             "{\n"

@@ -121,7 +121,7 @@ class ItemsValidatorTest {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -157,7 +157,7 @@ class ItemsValidatorTest {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -199,7 +199,7 @@ class ItemsValidatorTest {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -249,7 +249,7 @@ class ItemsValidatorTest {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -303,7 +303,7 @@ class ItemsValidatorTest {
                 + "    \"default\": \"additional\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .applyDefaultsStrategy(new ApplyDefaultsStrategy(true, true, true))
                 .itemWalkListener(new JsonSchemaWalkListener() {
 

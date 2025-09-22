@@ -38,7 +38,7 @@ class OpenAPI30JsonSchemaTest {
                     JsonNode typeLooseNode = test.get("isTypeLoose");
                     // Configure the schemaValidator to set typeLoose's value based on the test file,
                     // if test file do not contains typeLoose flag, use default value: true.
-                    SchemaValidatorsConfig.Builder configBuilder = SchemaValidatorsConfig.builder();
+                    SchemaRegistryConfig.Builder configBuilder = SchemaRegistryConfig.builder();
                     configBuilder.typeLoose(typeLooseNode != null && typeLooseNode.asBoolean());
                     SchemaRegistry validatorFactory = SchemaRegistry.withDialect(Dialects.getOpenApi30(),
                             builder -> builder.schemaRegistryConfig(configBuilder.build()));

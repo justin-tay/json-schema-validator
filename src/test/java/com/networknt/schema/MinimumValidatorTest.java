@@ -172,7 +172,7 @@ class MinimumValidatorTest {
             String minimum = aTestCycle[0];
             String value = aTestCycle[1];
             String schema = format(NUMBER, minimum);
-            SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().typeLoose(true).build();
+            SchemaRegistryConfig config = SchemaRegistryConfig.builder().typeLoose(true).build();
             SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_4, builder -> builder.schemaRegistryConfig(config));
 
             // Schema and document parsed with just double
@@ -289,7 +289,7 @@ class MinimumValidatorTest {
             String minimum = aTestCycle[0];
             String value = aTestCycle[1];
             String schema = format(integer, minimum);
-            SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().typeLoose(true).build();
+            SchemaRegistryConfig config = SchemaRegistryConfig.builder().typeLoose(true).build();
             SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_4, builder -> builder.schemaRegistryConfig(config));
             Schema v = factory.getSchema(mapper.readTree(schema));
             JsonNode doc = bigIntegerMapper.readTree(value);

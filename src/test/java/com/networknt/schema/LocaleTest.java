@@ -33,7 +33,7 @@ import com.networknt.schema.i18n.Locales;
 import com.networknt.schema.serialization.JsonMapperFactory;
 
 class LocaleTest {
-    private Schema getSchema(SchemaValidatorsConfig config) {
+    private Schema getSchema(SchemaRegistryConfig config) {
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(config));
         return factory.getSchema(
                 "{ \"$schema\": \"https://json-schema.org/draft/2019-09/schema\", \"$id\": \"https://json-schema.org/draft/2019-09/schema\", \"type\": \"object\", \"properties\": { \"foo\": { \"type\": \"string\" } } } }"
@@ -50,7 +50,7 @@ class LocaleTest {
     @Test
     void executionContextLocale() throws JsonMappingException, JsonProcessingException {
         JsonNode rootNode = new ObjectMapper().readTree(" { \"foo\": 123 } ");
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().build();
         Schema jsonSchema = getSchema(config);
 
         Locale locale = Locales.findSupported("it;q=0.9,fr;q=1.0"); // fr
@@ -95,7 +95,7 @@ class LocaleTest {
             assertEquals(1, messages.size());
             assertEquals(": integer gefunden, object erwartet", messages.iterator().next().toString());
             
-            SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().locale(Locale.ENGLISH).build();
+            SchemaRegistryConfig config = SchemaRegistryConfig.builder().locale(Locale.ENGLISH).build();
             jsonSchema = SchemaRegistry.withDefaultDialect(Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config))
                     .getSchema(JsonMapperFactory.getInstance().readTree(schema));
             messages = jsonSchema.validate(input, InputFormat.JSON);

@@ -66,7 +66,7 @@ class ItemsValidator202012Test {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -105,7 +105,7 @@ class ItemsValidator202012Test {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;

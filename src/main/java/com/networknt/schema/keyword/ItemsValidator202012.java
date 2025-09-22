@@ -106,7 +106,7 @@ public class ItemsValidator202012 extends BaseKeywordValidator {
         if (node instanceof ArrayNode) {
             ArrayNode arrayNode = (ArrayNode) node;
             JsonNode defaultNode = null;
-            if (this.validationContext.getSchemaRegistryConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()
+            if (executionContext.getWalkConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()
                     && this.schema != null) {
                 defaultNode = getDefaultNode(this.schema);
             }
@@ -154,7 +154,7 @@ public class ItemsValidator202012 extends BaseKeywordValidator {
     private void walkSchema(ExecutionContext executionContext, Schema walkSchema, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         //@formatter:off
-        boolean executeWalk = this.validationContext.getSchemaRegistryConfig().getItemWalkListenerRunner().runPreWalkListeners(
+        boolean executeWalk = executionContext.getWalkConfig().getItemWalkListenerRunner().runPreWalkListeners(
             executionContext,
             ValidatorTypeCode.ITEMS.getValue(),
             node,
@@ -166,7 +166,7 @@ public class ItemsValidator202012 extends BaseKeywordValidator {
         if (executeWalk) {
             walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
         }
-        this.validationContext.getSchemaRegistryConfig().getItemWalkListenerRunner().runPostWalkListeners(
+        executionContext.getWalkConfig().getItemWalkListenerRunner().runPostWalkListeners(
             executionContext,
             ValidatorTypeCode.ITEMS.getValue(),
             node,

@@ -48,7 +48,7 @@ class IfValidatorTest {
                 + "    \"type\": \"number\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -91,7 +91,7 @@ class IfValidatorTest {
                 + "    \"type\": \"number\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -134,7 +134,7 @@ class IfValidatorTest {
                 + "    \"type\": \"number\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -175,7 +175,7 @@ class IfValidatorTest {
                 + "    \"type\": \"number\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {

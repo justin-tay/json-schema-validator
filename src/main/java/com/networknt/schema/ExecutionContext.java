@@ -18,6 +18,7 @@ package com.networknt.schema;
 
 import com.networknt.schema.annotation.JsonNodeAnnotations;
 import com.networknt.schema.result.JsonNodeResults;
+import com.networknt.schema.walk.WalkConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ public class ExecutionContext {
     private Stack<DiscriminatorContext> discriminatorContexts = null;
     private JsonNodeAnnotations annotations = null;
     private JsonNodeResults results = null;
+    private WalkConfig walkConfig = null;
     private List<Error> errors = new ArrayList<>();
     
     /**
@@ -75,6 +77,27 @@ public class ExecutionContext {
     public ExecutionContext(ExecutionConfig executionConfig, CollectorContext collectorContext) {
         this.collectorContext = collectorContext;
         this.executionConfig = executionConfig;
+    }
+
+    /**
+     * Sets the walk configuration.
+     * 
+     * @param walkConfig the walk configuration
+     */
+    public void setWalkConfig(WalkConfig walkConfig) {
+        this.walkConfig = walkConfig;
+    }
+
+    /**
+     * Gets the walk configuration.
+     * 
+     * @return the walk configuration
+     */
+    public WalkConfig getWalkConfig() {
+        if (this.walkConfig == null) {
+            this.walkConfig = WalkConfig.getInstance();
+        }
+        return this.walkConfig;
     }
 
     /**

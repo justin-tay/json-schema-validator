@@ -31,7 +31,7 @@ class Issue1091Test {
     @Test
     @Disabled // Disabled as this test takes quite long to run for ci
     void testHasAdjacentKeywordInEvaluationPath() throws Exception {
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().cacheRefs(false).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().cacheRefs(false).build();
 
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_4, builder -> builder.schemaRegistryConfig(config))
                 .getSchema(SchemaLocation.of("classpath:schema/issue1091.json"));

@@ -12,7 +12,7 @@ class Issue792 {
 
     @Test
     void test() throws JsonProcessingException {
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().typeLoose(false).failFast(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().typeLoose(false).failFast(true).build();
 
         SchemaRegistry schemaFactory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));
 

@@ -99,7 +99,7 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
             int count = this.tupleSchema.size();
             for (int i = 0; i < count; ++i) {
                 JsonNode n = node.get(i);
-                if (this.validationContext.getSchemaRegistryConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()) {
+                if (executionContext.getWalkConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()) {
                     JsonNode defaultNode = getDefaultNode(this.tupleSchema.get(i));
                     if (n != null) {
                         // Defaults only set if array index is explicitly null
@@ -159,7 +159,7 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
     private void walkSchema(ExecutionContext executionContext, Schema walkSchema, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean shouldValidateSchema) {
         //@formatter:off
-        boolean executeWalk = this.validationContext.getSchemaRegistryConfig().getItemWalkListenerRunner().runPreWalkListeners(
+        boolean executeWalk = executionContext.getWalkConfig().getItemWalkListenerRunner().runPreWalkListeners(
             executionContext,
             ValidatorTypeCode.PREFIX_ITEMS.getValue(),
             node,
@@ -171,7 +171,7 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
         if (executeWalk) {
             walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
         }
-        this.validationContext.getSchemaRegistryConfig().getItemWalkListenerRunner().runPostWalkListeners(
+        executionContext.getWalkConfig().getItemWalkListenerRunner().runPostWalkListeners(
             executionContext,
             ValidatorTypeCode.PREFIX_ITEMS.getValue(),
             node,

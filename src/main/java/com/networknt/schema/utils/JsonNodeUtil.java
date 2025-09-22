@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.Schema;
 import com.networknt.schema.JsonType;
 import com.networknt.schema.PathType;
-import com.networknt.schema.SchemaValidatorsConfig;
+import com.networknt.schema.SchemaRegistryConfig;
 import com.networknt.schema.Specification.Version;
 import com.networknt.schema.TypeFactory;
 import com.networknt.schema.ValidationContext;
@@ -66,7 +66,7 @@ public class JsonNodeUtil {
     }
 
     public static boolean equalsToSchemaType(JsonNode node, JsonType schemaType, Schema parentSchema, ValidationContext validationContext) {
-        SchemaValidatorsConfig config = validationContext.getSchemaRegistryConfig();
+        SchemaRegistryConfig config = validationContext.getSchemaRegistryConfig();
         JsonType nodeType = TypeFactory.getValueNodeType(node, config);
         // in the case that node type is not the same as schema type, try to convert node to the
         // same type of schema. In REST API, query parameters, path parameters and headers are all
@@ -131,7 +131,7 @@ public class JsonNodeUtil {
      * @param config      the SchemaValidatorsConfig to depend on
      * @return boolean to indicate if it is a number
      */
-    public static boolean isNumber(JsonNode node, SchemaValidatorsConfig config) {
+    public static boolean isNumber(JsonNode node, SchemaRegistryConfig config) {
         if (node.isNumber()) {
             return true;
         } else if (config.isTypeLoose()) {

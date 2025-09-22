@@ -55,7 +55,7 @@ class FormatValidatorTest {
         String schemaData = "{\r\n"
                 + "  \"format\":\"unknown\"\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().strict("format", true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().strict("format", true).build();
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         List<Error> messages = schema.validate("\"hello\"", InputFormat.JSON, executionContext -> {
             executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 class OverwritingCustomMessageBugTest {
   private Schema getJsonSchemaFromStreamContentV7(InputStream schemaContent) {
-      SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().pathType(PathType.LEGACY)
+      SchemaRegistryConfig config = SchemaRegistryConfig.builder().pathType(PathType.LEGACY)
               .errorMessageKeyword("message")
               .regularExpressionFactory(JDKRegularExpressionFactory.getInstance()).build();
       SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));

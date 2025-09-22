@@ -48,7 +48,7 @@ class Issue857Test {
                 + "  \"id\": \"4\"\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().failFast(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().failFast(true).build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
         List<Error> result = factory.getSchema(schema).validate(input, InputFormat.JSON);
         assertTrue(result.isEmpty());

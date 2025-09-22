@@ -40,7 +40,7 @@ import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.JsonSchemaRef;
 import com.networknt.schema.SchemaLocation;
-import com.networknt.schema.SchemaValidatorsConfig;
+import com.networknt.schema.SchemaRegistryConfig;
 import com.networknt.schema.Specification.Version;
 import com.networknt.schema.dialect.DialectId;
 import com.networknt.schema.keyword.ItemsValidator;
@@ -86,7 +86,7 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -166,7 +166,7 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
         
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .propertyWalkListener(new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -253,7 +253,7 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 @SuppressWarnings("unchecked")
@@ -326,7 +326,7 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 @SuppressWarnings("unchecked")
@@ -373,7 +373,7 @@ class JsonSchemaWalkListenerTest {
 
     @Test
     void draft201909() {
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -553,7 +553,7 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .applyDefaultsStrategy(new ApplyDefaultsStrategy(true, true, true))
                 .build();
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
@@ -587,7 +587,7 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .propertyWalkListener(new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -645,7 +645,7 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .propertyWalkListener(new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -705,7 +705,7 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
         Map<String, JsonNode> missingSchemaNode = new LinkedHashMap<>();
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -778,7 +778,7 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .propertyWalkListener(new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -859,7 +859,7 @@ class JsonSchemaWalkListenerTest {
                 items.add(walkEvent);
             }
         }; 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .itemWalkListener(listener)
                 .propertyWalkListener(listener)
                 .build();
@@ -923,7 +923,7 @@ class JsonSchemaWalkListenerTest {
                 items.add(walkEvent);
             }
         };
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .itemWalkListener(listener)
                 .propertyWalkListener(listener)
                 .build();

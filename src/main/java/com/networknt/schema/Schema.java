@@ -1029,62 +1029,6 @@ public class Schema implements Validator {
         }
     }
 
-    /**
-     * Deprecated. Initialize the CollectorContext externally and call loadCollectors when done.
-     * <p>
-     * @param executionContext ExecutionContext
-     * @param node JsonNode
-     * @return ValidationResult
-     */
-    @Deprecated
-    public ValidationResult validateAndCollect(ExecutionContext executionContext, JsonNode node) {
-        return validateAndCollect(executionContext, node, node, atRoot());
-    }
-
-    /**
-     * Deprecated. Initialize the CollectorContext externally and call loadCollectors when done.
-     * <p>
-     * This method both validates and collects the data in a CollectorContext.
-     * Unlike others this methods cleans and removes everything from collector
-     * context before returning.
-     * @param executionContext ExecutionContext
-     * @param jsonNode JsonNode
-     * @param rootNode JsonNode
-     * @param instanceLocation JsonNodePath
-     *
-     * @return ValidationResult
-     */
-    @Deprecated
-    private ValidationResult validateAndCollect(ExecutionContext executionContext, JsonNode jsonNode, JsonNode rootNode, JsonNodePath instanceLocation) {
-        // Validate.
-        validate(executionContext, jsonNode, rootNode, instanceLocation);
-
-        // Get the config.
-        SchemaValidatorsConfig config = this.validationContext.getSchemaRegistryConfig();
-
-        // When walk is called in series of nested call we don't want to load the collectors every time. Leave to the API to decide when to call collectors.
-        if (config.doLoadCollectors()) {
-            // Get the collector context.
-            CollectorContext collectorContext = executionContext.getCollectorContext();
-
-            // Load all the data from collectors into the context.
-            collectorContext.loadCollectors();
-        }
-        // Collect errors and collector context into validation result.
-        return new ValidationResult(executionContext);
-    }
-
-    /**
-     * Deprecated. Initialize the CollectorContext externally and call loadCollectors when done.
-     *
-     * @param node JsonNode
-     * @return ValidationResult
-     */
-    @Deprecated
-    public ValidationResult validateAndCollect(JsonNode node) {
-        return validateAndCollect(createExecutionContext(), node, node, atRoot());
-    }
-
     /************************ END OF VALIDATE METHODS **********************************/
 
     /*********************** START OF WALK METHODS **********************************/
@@ -1251,6 +1195,30 @@ public class Schema implements Validator {
     /**
      * Walk the JSON node.
      * 
+     * @param node     the input
+     * @param validate true to validate the input against the schema
+     * @param executionCustomizer the customizer
+     * @return the validation result
+     */
+    public ValidationResult walk(JsonNode node, boolean validate, ExecutionContextCustomizer executionCustomizer) {
+        return walk(createExecutionContext(), node, validate, executionCustomizer);
+    }
+
+    /**
+     * Walk the JSON node.
+     * 
+     * @param node     the input
+     * @param validate true to validate the input against the schema
+     * @param executionCustomizer the customizer
+     * @return the validation result
+     */
+    public ValidationResult walk(JsonNode node, boolean validate, Consumer<ExecutionContext> executionCustomizer) {
+        return walk(createExecutionContext(), node, validate, executionCustomizer);
+    }
+
+    /**
+     * Walk the JSON node.
+     * 
      * @param <T>         the result type
      * @param node     the input
      * @param validate true to validate the input against the schema
@@ -1260,7 +1228,7 @@ public class Schema implements Validator {
     public <T> T walk(JsonNode node, OutputFormat<T> outputFormat, boolean validate) {
         return walk(createExecutionContext(), node, outputFormat, validate, (ExecutionContextCustomizer) null);
     }
-
+    
     /**
      * Walk the input.
      * 
@@ -1330,19 +1298,7 @@ public class Schema implements Validator {
             executionCustomizer.customize(executionContext, this.validationContext);
         }
         // Walk through the schema.
-         walk(executionContext, node, rootNode, instanceLocation, validate);
-
-        // Get the config.
-        SchemaValidatorsConfig config = this.validationContext.getSchemaRegistryConfig();
-        // When walk is called in series of nested call we don't want to load the collectors every time. Leave to the API to decide when to call collectors.
-        /* When doLoadCollectors is removed after the deprecation period the following block should be removed */
-        if (config.doLoadCollectors()) {
-            // Get the collector context.
-            CollectorContext collectorContext = executionContext.getCollectorContext();
-
-            // Load all the data from collectors into the context.
-            collectorContext.loadCollectors();
-        }
+        walk(executionContext, node, rootNode, instanceLocation, validate);
         return format.format(this, executionContext, this.validationContext);
     }
 
@@ -1356,14 +1312,14 @@ public class Schema implements Validator {
             try {
                 // Call all the pre-walk listeners. If at least one of the pre walk listeners
                 // returns SKIP, then skip the walk.
-                if (this.validationContext.getSchemaRegistryConfig().getKeywordWalkListenerRunner().runPreWalkListeners(executionContext,
+                if (executionContext.getWalkConfig().getKeywordWalkListenerRunner().runPreWalkListeners(executionContext,
                         evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
                         this, validator)) {
                     validator.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
                 }
             } finally {
                 // Call all the post-walk listeners.
-                this.validationContext.getSchemaRegistryConfig().getKeywordWalkListenerRunner().runPostWalkListeners(executionContext,
+                executionContext.getWalkConfig().getKeywordWalkListenerRunner().runPostWalkListeners(executionContext,
                         evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
                         this, validator,
                         executionContext.getErrors().subList(currentErrors, executionContext.getErrors().size()));
@@ -1430,7 +1386,7 @@ public class Schema implements Validator {
      * @return the execution context
      */
     public ExecutionContext createExecutionContext() {
-        SchemaValidatorsConfig config = validationContext.getSchemaRegistryConfig();
+        SchemaRegistryConfig config = validationContext.getSchemaRegistryConfig();
         // Copy execution config defaults from validation config
         ExecutionConfig executionConfig = new ExecutionConfig();
         executionConfig.setLocale(config.getLocale());

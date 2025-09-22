@@ -55,7 +55,7 @@ class SchemaTest {
         String inputData = "{\r\n"
                 + "  \"name\": 1\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().preloadJsonSchema(false).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().preloadJsonSchema(false).build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12,
                 builder -> builder.schemaRegistryConfig(config)
                         .schemaLoaders(schemaLoaders -> schemaLoaders

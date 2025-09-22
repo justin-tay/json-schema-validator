@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.KeywordWalkListenerRunner;
+import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
 
@@ -32,11 +34,11 @@ class SharedConfigTest {
     void shouldCallAllKeywordListenerOnWalkStart() throws Exception {
 
         AllKeywordListener allKeywordListener = new AllKeywordListener();
-        SchemaValidatorsConfig schemaValidatorsConfig = SchemaValidatorsConfig.builder()
-                .keywordWalkListener(allKeywordListener)
-                .build();
+        KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
+                .keywordWalkListener(allKeywordListener).build();
+        WalkConfig walkConfig = WalkConfig.builder().keywordWalkListenerRunner(keywordWalkListenerRunner).build();
 
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(schemaValidatorsConfig));
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7);
 
         SchemaLocation draft07Schema = SchemaLocation.of("resource:/draft-07/schema#");
 
@@ -49,7 +51,8 @@ class SharedConfigTest {
         // note that only second schema takes overridden schemaValidatorsConfig
         Schema secondSchema = factory.getSchema(draft07Schema);
 
-        secondSchema.walk(new ObjectMapper().readTree("{ \"id\": 123 }"), true);
+        secondSchema.walk(new ObjectMapper().readTree("{ \"id\": 123 }"), true,
+                executionContext -> executionContext.setWalkConfig(walkConfig));
         Assertions.assertTrue(allKeywordListener.wasCalled);
     }
 }

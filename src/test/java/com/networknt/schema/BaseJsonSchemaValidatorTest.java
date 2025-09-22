@@ -54,7 +54,7 @@ public class BaseJsonSchemaValidatorTest {
         return getJsonSchemaFromClasspath(name, schemaVersion, null);
     }
 
-    public static Schema getJsonSchemaFromClasspath(String name, Specification.Version schemaVersion, SchemaValidatorsConfig config) {
+    public static Schema getJsonSchemaFromClasspath(String name, Specification.Version schemaVersion, SchemaRegistryConfig config) {
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(schemaVersion, builder -> builder.schemaRegistryConfig(config));
         InputStream is = Thread.currentThread().getContextClassLoader()
             .getResourceAsStream(name);

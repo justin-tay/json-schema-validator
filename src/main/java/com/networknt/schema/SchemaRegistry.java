@@ -65,7 +65,7 @@ public class SchemaRegistry {
         private SchemaLoaders.Builder schemaLoadersBuilder = null;
         private SchemaMappers.Builder schemaMappersBuilder = null;
         private boolean enableSchemaCache = true;
-        private SchemaValidatorsConfig schemaRegistryConfig = null;
+        private SchemaRegistryConfig schemaRegistryConfig = null;
 
         /**
          * Sets the json node reader to read the data.
@@ -113,7 +113,7 @@ public class SchemaRegistry {
             return this;
         }
 
-        public Builder schemaRegistryConfig(SchemaValidatorsConfig schemaRegistryConfig) {
+        public Builder schemaRegistryConfig(SchemaRegistryConfig schemaRegistryConfig) {
             this.schemaRegistryConfig = schemaRegistryConfig;
             return this;
         }
@@ -139,7 +139,7 @@ public class SchemaRegistry {
     private final ConcurrentMap<SchemaLocation, Schema> schemaCache = new ConcurrentHashMap<>();
     private final boolean enableSchemaCache;
     private final DialectRegistry dialectRegistry;
-    private final SchemaValidatorsConfig schemaRegistryConfig;
+    private final SchemaRegistryConfig schemaRegistryConfig;
     
     private static final List<SchemaLoader> DEFAULT_SCHEMA_LOADERS = SchemaLoaders.builder().build();
     private static final List<SchemaMapper> DEFAULT_SCHEMA_MAPPERS = SchemaMappers.builder().build();
@@ -151,7 +151,7 @@ public class SchemaRegistry {
             SchemaMappers.Builder schemaMappersBuilder,
             boolean enableSchemaCache,
             DialectRegistry dialectRegistry,
-            SchemaValidatorsConfig schemaRegistryConfig) {
+            SchemaRegistryConfig schemaRegistryConfig) {
         if (defaultDialectId == null || defaultDialectId.trim().isEmpty()) {
             throw new IllegalArgumentException("defaultDialectId must not be null or empty");
         }
@@ -164,7 +164,7 @@ public class SchemaRegistry {
                 schemaMappersBuilder != null ? schemaMappersBuilder.build() : DEFAULT_SCHEMA_MAPPERS);
         this.enableSchemaCache = enableSchemaCache;
         this.dialectRegistry = dialectRegistry != null ? dialectRegistry : new DefaultDialectRegistry();
-        this.schemaRegistryConfig = schemaRegistryConfig != null ? schemaRegistryConfig : SchemaValidatorsConfig.getInstance();
+        this.schemaRegistryConfig = schemaRegistryConfig != null ? schemaRegistryConfig : SchemaRegistryConfig.getInstance();
     }
 
     public SchemaLoader getSchemaLoader() {
@@ -374,7 +374,7 @@ public class SchemaRegistry {
         return new ValidationContext(dialect, this);
     }
 
-    private Dialect getDialect(final JsonNode schemaNode, SchemaValidatorsConfig config) {
+    private Dialect getDialect(final JsonNode schemaNode, SchemaRegistryConfig config) {
         final JsonNode iriNode = schemaNode.get("$schema");
         if (iriNode != null && iriNode.isTextual()) {
             return getDialect(iriNode.textValue());
@@ -591,7 +591,7 @@ public class SchemaRegistry {
      * Using this is not recommended as there is potentially no base IRI for
      * resolving references to the absolute IRI.
      * <p>
-     * Prefer {@link #getSchema(SchemaLocation, JsonNode, SchemaValidatorsConfig)}
+     * Prefer {@link #getSchema(SchemaLocation, JsonNode, SchemaRegistryConfig)}
      * instead to ensure the base IRI if no id is present.
      * 
      * @param jsonNode the node
@@ -606,7 +606,7 @@ public class SchemaRegistry {
      *
      * @return the schema registry config
      */
-    public SchemaValidatorsConfig getSchemaRegistryConfig() {
+    public SchemaRegistryConfig getSchemaRegistryConfig() {
         return this.schemaRegistryConfig;
     }
 

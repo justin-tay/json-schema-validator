@@ -17,7 +17,7 @@ import com.networknt.schema.AbsoluteIri;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.SchemaLocation;
-import com.networknt.schema.SchemaValidatorsConfig;
+import com.networknt.schema.SchemaRegistryConfig;
 import com.networknt.schema.Specification.Version;
 import com.networknt.schema.regex.JoniRegularExpressionFactory;
 import com.networknt.schema.resource.InputStreamSource;
@@ -66,7 +66,7 @@ public class NetworkntTestSuiteTestCases {
                 for (TestCase testCase : testSource.getTestCases()) {
                     SchemaLocation testCaseFileUri = SchemaLocation
                             .of("classpath:" + toForwardSlashPath(testCase.getSpecification()));
-                    SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+                    SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                             .regularExpressionFactory(JoniRegularExpressionFactory.getInstance()).build();
                     Schema schema = SchemaRegistry
                             .withDefaultDialect(defaultVersion,

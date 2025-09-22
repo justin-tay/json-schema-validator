@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import com.networknt.schema.InputFormat;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaRegistry;
-import com.networknt.schema.SchemaValidatorsConfig;
+import com.networknt.schema.SchemaRegistryConfig;
 import com.networknt.schema.Specification.Version;
 import com.networknt.schema.Error;
 
@@ -36,7 +36,7 @@ class IriReferenceFormatTest {
                 + "  \"format\": \"iri-reference\"\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().formatAssertionsEnabled(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().formatAssertionsEnabled(true).build();
         Schema schema = SchemaRegistry
                 .withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config))
                 .getSchema(schemaData);
@@ -51,7 +51,7 @@ class IriReferenceFormatTest {
                 + "  \"format\": \"iri-reference\"\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().formatAssertionsEnabled(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().formatAssertionsEnabled(true).build();
         Schema schema = SchemaRegistry
                 .withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config))
                 .getSchema(schemaData);
@@ -66,7 +66,7 @@ class IriReferenceFormatTest {
                 + "  \"format\": \"iri-reference\"\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().formatAssertionsEnabled(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().formatAssertionsEnabled(true).build();
         Schema schema = SchemaRegistry
                 .withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config))
                 .getSchema(schemaData);
@@ -81,7 +81,7 @@ class IriReferenceFormatTest {
                 + "  \"format\": \"iri-reference\"\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().formatAssertionsEnabled(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().formatAssertionsEnabled(true).build();
         Schema schema = SchemaRegistry
                 .withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config))
                 .getSchema(schemaData);
@@ -96,7 +96,7 @@ class IriReferenceFormatTest {
                 + "  \"format\": \"iri-reference\"\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().formatAssertionsEnabled(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().formatAssertionsEnabled(true).build();
         Schema schema = SchemaRegistry
                 .withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config))
                 .getSchema(schemaData);
@@ -110,7 +110,7 @@ class IriReferenceFormatTest {
                 + "  \"format\": \"iri-reference\"\r\n"
                 + "}";
 
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().formatAssertionsEnabled(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().formatAssertionsEnabled(true).build();
         Schema schema = SchemaRegistry
                 .withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config))
                 .getSchema(schemaData);

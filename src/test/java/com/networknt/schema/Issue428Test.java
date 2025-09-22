@@ -33,9 +33,9 @@ class Issue428Test {
                     JsonNode typeLooseNode = test.get("isTypeLoose");
                     // Configure the schemaValidator to set typeLoose's value based on the test file,
                     // if test file do not contains typeLoose flag, use default value: true.
-                    SchemaValidatorsConfig.Builder configBuilder = SchemaValidatorsConfig.builder();
+                    SchemaRegistryConfig.Builder configBuilder = SchemaRegistryConfig.builder();
                     configBuilder.typeLoose(typeLooseNode != null && typeLooseNode.asBoolean());
-                    SchemaValidatorsConfig config = configBuilder.build();
+                    SchemaRegistryConfig config = configBuilder.build();
 
                     SchemaRegistry validatorFactory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_4, builder -> builder.schemaRegistryConfig(config));
                     Schema schema = validatorFactory.getSchema(testCaseFileUri, testCase.get("schema"));

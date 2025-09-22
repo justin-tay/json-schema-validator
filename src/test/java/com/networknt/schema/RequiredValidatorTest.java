@@ -55,7 +55,7 @@ class RequiredValidatorTest {
                 + "    \"name\"\r\n"
                 + "  ]\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().readOnly(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().readOnly(true).build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
         Schema schema = factory.getSchema(schemaData);
         String inputData = "{\r\n"
@@ -99,7 +99,7 @@ class RequiredValidatorTest {
                 + "    \"name\"\r\n"
                 + "  ]\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().writeOnly(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().writeOnly(true).build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
         Schema schema = factory.getSchema(schemaData);
         String inputData = "{\r\n"
@@ -143,7 +143,7 @@ class RequiredValidatorTest {
                 + "    \"name\"\r\n"
                 + "  ]\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().readOnly(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().readOnly(true).build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
         Schema schema = factory.getSchema(schemaData);
         String inputData = "{\r\n"
@@ -181,7 +181,7 @@ class RequiredValidatorTest {
                 + "    \"name\"\r\n"
                 + "  ]\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().writeOnly(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().writeOnly(true).build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
         Schema schema = factory.getSchema(schemaData);
         String inputData = "{\r\n"

@@ -31,7 +31,7 @@ class DefaultJsonSchemaIdValidatorTest {
     void givenRelativeIdShouldThrowInvalidSchemaException() {
         String schema = "{\r\n" + "  \"$id\": \"0\",\r\n"
                 + "  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\"\r\n" + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .schemaIdValidator(JsonSchemaIdValidator.DEFAULT)
                 .build();
         assertThrowsExactly(InvalidSchemaException.class,
@@ -47,7 +47,7 @@ class DefaultJsonSchemaIdValidatorTest {
     void givenFragmentWithNoContextShouldNotThrowInvalidSchemaException() {
         String schema = "{\r\n" + "  \"$id\": \"#0\",\r\n"
                 + "  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\"\r\n" + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .schemaIdValidator(JsonSchemaIdValidator.DEFAULT)
                 .build();
         assertDoesNotThrow(() -> SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schema));
@@ -57,7 +57,7 @@ class DefaultJsonSchemaIdValidatorTest {
     void givenSlashWithNoContextShouldNotThrowInvalidSchemaException() {
         String schema = "{\r\n" + "  \"$id\": \"/base\",\r\n"
                 + "  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\"\r\n" + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .schemaIdValidator(JsonSchemaIdValidator.DEFAULT)
                 .build();
         assertDoesNotThrow(() -> SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schema));
@@ -65,7 +65,7 @@ class DefaultJsonSchemaIdValidatorTest {
 
     @Test
     void givenRelativeIdWithClasspathBaseShouldNotThrowInvalidSchemaException() {
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder()
                 .schemaIdValidator(JsonSchemaIdValidator.DEFAULT)
                 .build();
         assertDoesNotThrow(() -> SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config))

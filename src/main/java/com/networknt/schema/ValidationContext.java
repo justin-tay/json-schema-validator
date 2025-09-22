@@ -133,7 +133,7 @@ public class ValidationContext {
         return this.schemaRegistry;
     }
 
-    public SchemaValidatorsConfig getSchemaRegistryConfig() {
+    public SchemaRegistryConfig getSchemaRegistryConfig() {
         return this.schemaRegistry.getSchemaRegistryConfig();
     }
 

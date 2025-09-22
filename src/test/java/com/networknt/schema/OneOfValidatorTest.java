@@ -65,7 +65,7 @@ class OneOfValidatorTest {
                 + "  \"fox\" : \"test\",\r\n"
                 + "  \"world\" : \"test\"\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().pathType(PathType.LEGACY).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().pathType(PathType.LEGACY).build();
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         List<Error> messages = schema.validate(inputData, InputFormat.JSON);
         assertEquals(3, messages.size()); // even if more than 1 matches the mismatch errors are still reported
@@ -107,7 +107,7 @@ class OneOfValidatorTest {
         String inputData = "{\r\n"
                 + "  \"test\" : 1\r\n"
                 + "}";
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().pathType(PathType.LEGACY).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().pathType(PathType.LEGACY).build();
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         List<Error> messages = schema.validate(inputData, InputFormat.JSON);
         assertEquals(4, messages.size());

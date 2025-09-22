@@ -11,6 +11,8 @@ import com.networknt.schema.keyword.Keyword;
 import com.networknt.schema.keyword.KeywordValidator;
 import com.networknt.schema.keyword.ValidatorTypeCode;
 import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.KeywordWalkListenerRunner;
+import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
 
@@ -34,6 +36,10 @@ class JsonWalkTest {
 
     private static final String CUSTOM_KEYWORD = "custom-keyword";
 
+    private WalkConfig walkConfig;
+    
+    private WalkConfig walkConfig1;
+
     @BeforeEach
     void setup() {
         setupSchema();
@@ -42,20 +48,24 @@ class JsonWalkTest {
     private void setupSchema() {
         final Dialect dialect = getDialect();
         // Create Schema.
-        SchemaValidatorsConfig.Builder schemaValidatorsConfigBuilder = SchemaValidatorsConfig.builder();
-        schemaValidatorsConfigBuilder.keywordWalkListener(new AllKeywordListener());
-        schemaValidatorsConfigBuilder.keywordWalkListener(ValidatorTypeCode.REF.getValue(), new RefKeywordListener());
-        schemaValidatorsConfigBuilder.keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(),
+        KeywordWalkListenerRunner.Builder keywordWalkListenerRunnerBuilder = KeywordWalkListenerRunner.builder();
+
+        keywordWalkListenerRunnerBuilder.keywordWalkListener(new AllKeywordListener());
+        keywordWalkListenerRunnerBuilder.keywordWalkListener(ValidatorTypeCode.REF.getValue(), new RefKeywordListener());
+        keywordWalkListenerRunnerBuilder.keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(),
                 new PropertiesKeywordListener());
-        SchemaRegistry schemaFactory = SchemaRegistry.withDialect(dialect, builder -> builder.schemaRegistryConfig(schemaValidatorsConfigBuilder.build()));
+        SchemaRegistry schemaFactory = SchemaRegistry.withDialect(dialect);
         this.jsonSchema = schemaFactory.getSchema(getSchema());
+        this.walkConfig =  WalkConfig.builder().keywordWalkListenerRunner(keywordWalkListenerRunnerBuilder.build()).build();
+
         // Create another Schema.
-        SchemaValidatorsConfig.Builder schemaValidatorsConfig1Builder = SchemaValidatorsConfig.builder();
-        schemaValidatorsConfig1Builder.keywordWalkListener(ValidatorTypeCode.REF.getValue(), new RefKeywordListener());
-        schemaValidatorsConfig1Builder.keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(),
+        KeywordWalkListenerRunner.Builder keywordWalkListenerRunner1Builder = KeywordWalkListenerRunner.builder();
+        keywordWalkListenerRunner1Builder.keywordWalkListener(ValidatorTypeCode.REF.getValue(), new RefKeywordListener());
+        keywordWalkListenerRunner1Builder.keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(),
                 new PropertiesKeywordListener());
-        schemaFactory = SchemaRegistry.withDialect(dialect, builder -> builder.schemaRegistryConfig(schemaValidatorsConfig1Builder.build()));
+        schemaFactory = SchemaRegistry.withDialect(dialect);
         this.jsonSchema1 = schemaFactory.getSchema(getSchema());
+        this.walkConfig1 =  WalkConfig.builder().keywordWalkListenerRunner(keywordWalkListenerRunner1Builder.build()).build();
     }
 
     private Dialect getDialect() {
@@ -68,7 +78,8 @@ class JsonWalkTest {
     void testWalk() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         ValidationResult result = jsonSchema.walk(
-                objectMapper.readTree(getClass().getClassLoader().getResourceAsStream("data/walk-data.json")), false);
+                objectMapper.readTree(getClass().getClassLoader().getResourceAsStream("data/walk-data.json")), false,
+                executionContext -> executionContext.setWalkConfig(walkConfig));
         JsonNode collectedNode = (JsonNode) result.getCollectorContext().get(SAMPLE_WALK_COLLECTOR_TYPE);
         assertEquals(collectedNode, (objectMapper.readTree("{" +
                 "    \"PROPERTY1\": \"sample1\","
@@ -88,7 +99,8 @@ class JsonWalkTest {
         ObjectMapper objectMapper = new ObjectMapper();
         // This instance of schema contains all listeners.
         ValidationResult result = jsonSchema.walk(
-                objectMapper.readTree(getClass().getClassLoader().getResourceAsStream("data/walk-data.json")), false);
+                objectMapper.readTree(getClass().getClassLoader().getResourceAsStream("data/walk-data.json")), false,
+                executionContext -> executionContext.setWalkConfig(walkConfig));
         JsonNode collectedNode = (JsonNode) result.getCollectorContext().get(SAMPLE_WALK_COLLECTOR_TYPE);
         assertEquals(collectedNode, (objectMapper.readTree("{" +
                 "    \"PROPERTY1\": \"sample1\","
@@ -102,7 +114,9 @@ class JsonWalkTest {
                 + "     }"
                 + "}")));
         // This instance of schema contains one listener removed.
-        result = jsonSchema1.walk(objectMapper.readTree(getClass().getClassLoader().getResourceAsStream("data/walk-data.json")), false);
+        result = jsonSchema1.walk(
+                objectMapper.readTree(getClass().getClassLoader().getResourceAsStream("data/walk-data.json")), false,
+                executionContext -> executionContext.setWalkConfig(walkConfig1));
         collectedNode = (JsonNode) result.getExecutionContext().getCollectorContext().get(SAMPLE_WALK_COLLECTOR_TYPE);
         assertEquals(collectedNode, (objectMapper.readTree("{"
                 + "    \"property3\": {"

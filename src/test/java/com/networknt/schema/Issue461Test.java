@@ -17,7 +17,7 @@ class Issue461Test {
     protected ObjectMapper mapper = JsonMapperFactory.getInstance();
 
     protected Schema getJsonSchemaFromStreamContentV7(SchemaLocation schemaUri) {
-        SchemaValidatorsConfig svc = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig svc = SchemaRegistryConfig.builder()
                 .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new Walker())
                 .build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(svc));

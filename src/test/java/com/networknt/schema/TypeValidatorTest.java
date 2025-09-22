@@ -78,7 +78,7 @@ class TypeValidatorTest {
         assertEquals(1, messages.stream().filter(m -> "type".equals(m.getKeyword())).count());
 
         // With type loose this has 0 type errors as any item can also be interpreted as an array of 1 item
-        SchemaValidatorsConfig config = SchemaValidatorsConfig.builder().typeLoose(true).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().typeLoose(true).build();
         factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
         Schema typeLoose = factory.getSchema(schemaData);
         messages = typeLoose.validate(inputData, InputFormat.JSON);

@@ -21,7 +21,7 @@ class Issue451Test {
     private static final String COLLECTOR_ID = "collector-451";
 
     protected Schema getJsonSchemaFromStreamContentV7(InputStream schemaContent) {
-        SchemaValidatorsConfig svc = SchemaValidatorsConfig.builder()
+        SchemaRegistryConfig svc = SchemaRegistryConfig.builder()
                 .propertyWalkListener(new CountingWalker())
                 .build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(svc));

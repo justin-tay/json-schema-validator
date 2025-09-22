@@ -173,7 +173,7 @@ abstract class AbstractJsonSchemaTestSuite {
                 // if test file do not contains typeLoose flag, use default value: false.
                 @SuppressWarnings("deprecation") boolean typeLoose = testSpec.isTypeLoose();
 
-                SchemaValidatorsConfig.Builder configBuilder = SchemaValidatorsConfig.builder();
+                SchemaRegistryConfig.Builder configBuilder = SchemaRegistryConfig.builder();
                 configBuilder.typeLoose(typeLoose);
                 configBuilder.regularExpressionFactory(
                         TestSpec.RegexKind.JDK == testSpec.getRegex() ? JDKRegularExpressionFactory.getInstance()
@@ -204,7 +204,7 @@ abstract class AbstractJsonSchemaTestSuite {
         }
     }
 
-    private SchemaRegistry buildSchemaRegistry(Version defaultVersion, TestCase testCase, SchemaValidatorsConfig schemaRegistryConfig) {
+    private SchemaRegistry buildSchemaRegistry(Version defaultVersion, TestCase testCase, SchemaRegistryConfig schemaRegistryConfig) {
         if (testCase.isDisabled()) return null;
         SchemaLoader schemaLoader = new SchemaLoader() {
             @Override
