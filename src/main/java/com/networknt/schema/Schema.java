@@ -754,7 +754,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      * 
      * @param rootNode the root node
@@ -771,7 +771,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      *
      * @param rootNode            the root node
@@ -788,7 +788,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      * 
      * @param rootNode            the root node
@@ -806,7 +806,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      * 
      * @param <T>      the result type
@@ -825,7 +825,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      * 
      * @param <T>                 the result type
@@ -845,7 +845,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      * 
      * @param <T>                 the result type
@@ -865,7 +865,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      * 
      * @param input       the input
@@ -884,7 +884,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      *
      * @param input               the input
@@ -903,7 +903,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      * 
      * @param input               the input
@@ -922,7 +922,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      * 
      * @param <T>         the result type
@@ -942,7 +942,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      * 
      * @param <T>                 the result type
@@ -963,7 +963,7 @@ public class Schema implements Validator {
      * Note that since Draft 2019-09 by default format generates only annotations
      * and not assertions.
      * <p>
-     * Use {@link ExecutionConfig#setFormatAssertionsEnabled(Boolean)} to override
+     * Use {@link ExecutionConfig.Builder#formatAssertionsEnabled(Boolean)} to override
      * the default.
      * 
      * @param <T>                 the result type

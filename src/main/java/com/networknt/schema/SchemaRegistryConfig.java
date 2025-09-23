@@ -463,18 +463,18 @@ public class SchemaRegistryConfig {
             return self();
         }
 
-        /**
-         * Set the locale to consider when generating localised messages.
-         * <p>
-         * Note that this locale is set on a schema basis. To configure the schema on a
-         * per execution basis use
-         * {@link com.networknt.schema.ExecutionConfig#setLocale(Locale)}.
-         * <p>
-         * Defaults to use {@link Locale#getDefault()}.
-         *
-         * @param locale The locale.
-         * @return the builder
-         */
+		/**
+		 * Set the locale to consider when generating localized messages.
+		 * <p>
+		 * Note that this locale is set on a schema registry basis. To configure the
+		 * schema on a per execution basis use
+		 * {@link com.networknt.schema.ExecutionConfig.Builder#locale(Locale)}.
+		 * <p>
+		 * Defaults to use {@link Locale#getDefault()}.
+		 *
+		 * @param locale The locale.
+		 * @return the builder
+		 */
         public T locale(Locale locale) {
             this.locale = locale;
             return self();

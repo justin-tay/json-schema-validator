@@ -217,7 +217,7 @@ public class SchemaRegistry {
      * Creates a new schema registry with a default schema dialect. The schema dialect
      * will only be used if the input does not specify a $schema.
      * 
-     * @param dialect    the default dialect id used when the schema does not
+     * @param dialectId  the default dialect id used when the schema does not
      *                   specify the $schema keyword
      * @param customizer to customize the registry
      * @return the factory
@@ -288,7 +288,6 @@ public class SchemaRegistry {
      * 
      * @param schemaUri the schema location
      * @param schemaNode the schema data node
-     * @param config the config to use
      * @return the schema
      */
     protected Schema newSchema(final SchemaLocation schemaUri, final JsonNode schemaNode) {
@@ -395,7 +394,6 @@ public class SchemaRegistry {
      * Gets the dialect that is available to the registry.
      * 
      * @param dialectId the IRI of the meta-schema
-     * @param config    the schema validators config
      * @return the meta-schema
      */
     public Dialect getDialect(String dialectId) {
@@ -481,7 +479,6 @@ public class SchemaRegistry {
      * Gets the schema.
      * 
      * @param schemaUri the absolute IRI of the schema which can map to the retrieval IRI.
-     * @param config the config
      * @return the schema
      */
     public Schema getSchema(final SchemaLocation schemaUri) {
@@ -494,7 +491,6 @@ public class SchemaRegistry {
      * Loads the schema.
      * 
      * @param schemaUri the absolute IRI of the schema which can map to the retrieval IRI.
-     * @param config the config
      * @return the schema
      */
     public Schema loadSchema(final SchemaLocation schemaUri) {
@@ -591,7 +587,7 @@ public class SchemaRegistry {
      * Using this is not recommended as there is potentially no base IRI for
      * resolving references to the absolute IRI.
      * <p>
-     * Prefer {@link #getSchema(SchemaLocation, JsonNode, SchemaRegistryConfig)}
+     * Prefer {@link #getSchema(SchemaLocation, JsonNode)}
      * instead to ensure the base IRI if no id is present.
      * 
      * @param jsonNode the node
