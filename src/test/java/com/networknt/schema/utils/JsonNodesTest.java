@@ -90,7 +90,7 @@ class JsonNodesTest {
                 builder -> builder.jsonNodeReader(JsonNodeReader.builder().locationAware().build()));
         Schema schema = factory.getSchema(schemaData, InputFormat.JSON);
         List<Error> messages = schema.validate(inputData, InputFormat.JSON, executionContext -> {
-            executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
+            executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true));
         });
         List<Error> list = messages.stream().collect(Collectors.toList());
         Error format = list.get(0);
@@ -135,7 +135,7 @@ class JsonNodesTest {
                 builder -> builder.jsonNodeReader(JsonNodeReader.builder().locationAware().build()));
         Schema schema = factory.getSchema(schemaData, InputFormat.YAML);
         List<Error> messages = schema.validate(inputData, InputFormat.YAML, executionContext -> {
-            executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
+            executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true));
         });
         List<Error> list = messages.stream().collect(Collectors.toList());
         Error format = list.get(0);

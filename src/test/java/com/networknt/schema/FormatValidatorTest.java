@@ -45,7 +45,7 @@ class FormatValidatorTest {
                 + "}";
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
         List<Error> messages = schema.validate("\"hello\"", InputFormat.JSON, executionContext -> {
-            executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
+            executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true));
         });
         assertEquals(0, messages.size());
     }
@@ -58,7 +58,7 @@ class FormatValidatorTest {
         SchemaRegistryConfig config = SchemaRegistryConfig.builder().strict("format", true).build();
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         List<Error> messages = schema.validate("\"hello\"", InputFormat.JSON, executionContext -> {
-            executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
+            executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true));
         });
         assertEquals(1, messages.size());
         assertEquals("format.unknown", messages.iterator().next().getMessageKey());
@@ -100,10 +100,11 @@ class FormatValidatorTest {
                 + "  \"format\":\"unknown\"\r\n"
                 + "}";
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
-        OutputUnit outputUnit = schema.validate("\"hello\"", InputFormat.JSON, OutputFormat.HIERARCHICAL, executionContext -> {
-            executionContext.getExecutionConfig().setAnnotationCollectionEnabled(true);
-            executionContext.getExecutionConfig().setAnnotationCollectionFilter(keyword -> true);
-        });
+		OutputUnit outputUnit = schema.validate("\"hello\"", InputFormat.JSON, OutputFormat.HIERARCHICAL,
+				executionContext -> {
+					executionContext.executionConfig(executionConfig -> executionConfig
+							.annotationCollectionEnabled(true).annotationCollectionFilter(keyword -> true));
+				});
         assertEquals("unknown", outputUnit.getAnnotations().get("format"));
         assertTrue(outputUnit.isValid()); // as no assertion vocab and assertions not enabled
     }
@@ -145,7 +146,7 @@ class FormatValidatorTest {
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         Schema schema = factory.getSchema(formatSchema);
         List<Error> messages = schema.validate("\"inval!i:d^(abc]\"", InputFormat.JSON, executionConfiguration -> {
-            executionConfiguration.getExecutionConfig().setFormatAssertionsEnabled(true);
+            executionConfiguration.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true));
         });
         assertFalse(messages.isEmpty());
     }
@@ -172,7 +173,7 @@ class FormatValidatorTest {
                 + "}";
         Schema schema = factory.getSchema(formatSchema);
         List<Error> messages = schema.validate("\"inval!i:d^(abc]\"", InputFormat.JSON, executionConfiguration -> {
-            executionConfiguration.getExecutionConfig().setFormatAssertionsEnabled(true);
+            executionConfiguration.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true));
         });
         assertFalse(messages.isEmpty());
         assertEquals(": does not match the custom pattern must be test", messages.iterator().next().toString());
@@ -219,12 +220,12 @@ class FormatValidatorTest {
                 + "}";
         Schema schema = factory.getSchema(formatSchema);
         List<Error> messages = schema.validate("123451", InputFormat.JSON, executionConfiguration -> {
-            executionConfiguration.getExecutionConfig().setFormatAssertionsEnabled(true);
+            executionConfiguration.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true));
         });
         assertFalse(messages.isEmpty());
         assertEquals(": does not match the custom-number pattern ", messages.iterator().next().toString());
         messages = schema.validate("12345", InputFormat.JSON, executionConfiguration -> {
-            executionConfiguration.getExecutionConfig().setFormatAssertionsEnabled(true);
+            executionConfiguration.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true));
         });
         assertTrue(messages.isEmpty());
         
@@ -237,7 +238,7 @@ class FormatValidatorTest {
                 + "}";
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_7).getSchema(schemaData);
         List<Error> messages = schema.validate("\"hello\"", InputFormat.JSON, executionContext -> {
-            executionContext.getExecutionConfig().setFormatAssertionsEnabled(false);
+            executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(false));
         });
         assertEquals(0, messages.size());
     }

@@ -112,7 +112,7 @@ class CollectorContextTest {
     void testCollectorGetAll() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         ExecutionContext executionContext = jsonSchemaForCombine.createExecutionContext();
-        executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
+        executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true));
         jsonSchemaForCombine.validate(executionContext, objectMapper
                 .readTree("{\"property1\":\"sample1\",\"property2\":\"sample2\",\"property3\":\"sample3\" }"));
         ValidationResult validationResult = new ValidationResult(executionContext);

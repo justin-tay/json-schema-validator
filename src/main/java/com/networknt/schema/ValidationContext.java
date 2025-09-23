@@ -88,17 +88,17 @@ public class ValidationContext {
         this(dialect, schemaRegistry, new ConcurrentHashMap<>(), new ConcurrentHashMap<>(), new ConcurrentHashMap<>());
     }
 
-    public ValidationContext(Dialect dialect, SchemaRegistry jsonSchemaFactory,
+    public ValidationContext(Dialect dialect, SchemaRegistry schemaRegistry,
             ConcurrentMap<String, Schema> schemaReferences,
             ConcurrentMap<String, Schema> schemaResources, ConcurrentMap<String, Schema> dynamicAnchors) {
         if (dialect == null) {
-            throw new IllegalArgumentException("JsonMetaSchema must not be null");
+            throw new IllegalArgumentException("Dialect must not be null");
         }
-        if (jsonSchemaFactory == null) {
-            throw new IllegalArgumentException("JsonSchemaFactory must not be null");
+        if (schemaRegistry == null) {
+            throw new IllegalArgumentException("SchemaRegistry must not be null");
         }
         this.dialect = dialect;
-        this.schemaRegistry = jsonSchemaFactory;
+        this.schemaRegistry = schemaRegistry;
         this.schemaReferences = schemaReferences;
         this.schemaResources = schemaResources;
         this.dynamicAnchors = dynamicAnchors;

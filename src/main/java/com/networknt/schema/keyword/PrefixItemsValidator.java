@@ -27,9 +27,6 @@ import com.networknt.schema.ValidationContext;
 import com.networknt.schema.annotation.JsonNodeAnnotation;
 import com.networknt.schema.utils.JsonSchemaRefs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +34,6 @@ import java.util.List;
  * {@link KeywordValidator} for prefixItems.
  */
 public class PrefixItemsValidator extends BaseKeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(PrefixItemsValidator.class);
-
     private final List<Schema> tupleSchema;
     
     private Boolean hasUnevaluatedItemsValidator = null;
@@ -61,7 +56,7 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
 
     @Override
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
+        
         // ignores non-arrays
         if (node.isArray()) {
             int count = Math.min(node.size(), this.tupleSchema.size());

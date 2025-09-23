@@ -29,9 +29,6 @@ import com.networknt.schema.ValidationContext;
 import com.networknt.schema.annotation.JsonNodeAnnotation;
 import com.networknt.schema.utils.JsonSchemaRefs;
 import com.networknt.schema.walk.WalkListenerRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -45,7 +42,6 @@ import java.util.Set;
  */
 public class PropertiesValidator extends BaseKeywordValidator {
     public static final String PROPERTY = "properties";
-    private static final Logger logger = LoggerFactory.getLogger(PropertiesValidator.class);
     private final Map<String, Schema> schemas = new LinkedHashMap<>();
     
     private Boolean hasUnevaluatedPropertiesValidator;
@@ -68,7 +64,7 @@ public class PropertiesValidator extends BaseKeywordValidator {
 
     protected void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean walk) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
+        
 
         Set<String> matchedInstancePropertyNames = null;
         boolean collectAnnotations = collectAnnotations() || collectAnnotations(executionContext);

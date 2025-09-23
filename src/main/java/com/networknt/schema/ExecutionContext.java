@@ -23,17 +23,19 @@ import com.networknt.schema.walk.WalkConfig;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 /**
  * Stores the execution context for the validation run.
  */
 public class ExecutionContext {
     private ExecutionConfig executionConfig;
+    private WalkConfig walkConfig = null;
     private CollectorContext collectorContext = null;
+
     private Stack<DiscriminatorContext> discriminatorContexts = null;
     private JsonNodeAnnotations annotations = null;
     private JsonNodeResults results = null;
-    private WalkConfig walkConfig = null;
     private List<Error> errors = new ArrayList<>();
     
     /**
@@ -47,7 +49,7 @@ public class ExecutionContext {
      * Creates an execution context.
      */
     public ExecutionContext() {
-        this(new ExecutionConfig(), null);
+        this(ExecutionConfig.getInstance(), null);
     }
 
     /**
@@ -56,7 +58,7 @@ public class ExecutionContext {
      * @param collectorContext the collector context
      */
     public ExecutionContext(CollectorContext collectorContext) {
-        this(new ExecutionConfig(), collectorContext);
+        this(ExecutionConfig.getInstance(), collectorContext);
     }
 
     /**
@@ -213,5 +215,27 @@ public class ExecutionContext {
 
     public void setErrors(List<Error> errors) {
         this.errors = errors;
+    }
+
+    /**
+     * Customize the execution configuration.
+     *
+     * @param customizer the customizer
+     */
+    public void executionConfig(Consumer<ExecutionConfig.Builder> customizer) {
+    	ExecutionConfig.Builder builder = ExecutionConfig.builder(this.getExecutionConfig());
+    	customizer.accept(builder);
+    	this.executionConfig = builder.build();
+    }
+
+    /**
+     * Customize the walk configuration.
+     * 
+     * @param customizer the customizer
+     */
+    public void walkConfig(Consumer<WalkConfig.Builder> customizer) {
+    	WalkConfig.Builder builder = WalkConfig.builder(this.getWalkConfig());
+    	customizer.accept(builder);
+    	this.walkConfig = builder.build();
     }
 }

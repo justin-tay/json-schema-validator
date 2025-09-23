@@ -25,9 +25,6 @@ import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.ValidationContext;
 import com.networknt.schema.annotation.JsonNodeAnnotation;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static com.networknt.schema.keyword.VersionCode.MinV201909;
 
 import java.util.ArrayList;
@@ -39,7 +36,6 @@ import java.util.Optional;
  * {@link KeywordValidator} for contains.
  */
 public class ContainsValidator extends BaseKeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(ContainsValidator.class);
     private static final String CONTAINS_MAX = "contains.max";
     private static final String CONTAINS_MIN = "contains.min";
 
@@ -86,8 +82,6 @@ public class ContainsValidator extends BaseKeywordValidator {
 
     @Override
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
-
         // ignores non-arrays
         int actual = 0, i = 0;
         List<Integer> indexes = new ArrayList<>(); // for the annotation

@@ -24,186 +24,284 @@ import java.util.function.Predicate;
  * Configuration per execution.
  */
 public class ExecutionConfig {
-    /**
-     * The locale to use for formatting messages.
-     */
-    private Locale locale = Locale.ROOT;
+	private static class Holder {
+		private static final ExecutionConfig INSTANCE = ExecutionConfig.builder().build();
+	}
 
-    /**
-     * Determines if annotation collection is enabled.
-     * <p>
-     * This does not affect annotation collection required for evaluating keywords
-     * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
-     */
-    private boolean annotationCollectionEnabled = false;
+	public static ExecutionConfig getInstance() {
+		return Holder.INSTANCE;
+	}
 
-    /**
-     * If annotation collection is enabled, determine which annotations to collect.
-     * <p>
-     * This does not affect annotation collection required for evaluating keywords
-     * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
-     */
-    private Predicate<String> annotationCollectionFilter = keyword -> false;
+	/**
+	 * The locale to use for formatting messages.
+	 */
+	private final Locale locale;
 
-    /**
-     * Since Draft 2019-09 format assertions are not enabled by default.
-     */
-    private Boolean formatAssertionsEnabled = null;
+	/**
+	 * Determines if annotation collection is enabled.
+	 * <p>
+	 * This does not affect annotation collection required for evaluating keywords
+	 * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
+	 */
+	private final boolean annotationCollectionEnabled;
 
-    /**
-     * Determine if the validation execution can fail fast.
-     */
-    private boolean failFast = false;
+	/**
+	 * If annotation collection is enabled, determine which annotations to collect.
+	 * <p>
+	 * This does not affect annotation collection required for evaluating keywords
+	 * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
+	 */
+	private final Predicate<String> annotationCollectionFilter;
 
-    /**
-     * Determine if debugging features such that logging are switched on.
-     * <p>
-     * This is turned off by default. This is present because the library attempts
-     * to log debug logs at each validation node and the logger evaluation on
-     * whether the logger is turned on is impacting performance.
-     */
-    private boolean debugEnabled = false;
+	/**
+	 * Since Draft 2019-09 format assertions are not enabled by default.
+	 */
+	private final Boolean formatAssertionsEnabled;
 
-    /**
-     * Gets the locale to use for formatting messages.
-     * 
-     * @return the locale
-     */
-    public Locale getLocale() {
-        return locale;
-    }
+	/**
+	 * Determine if the validation execution can fail fast.
+	 */
+	private final boolean failFast;
 
-    /**
-     * Sets the locale to use for formatting messages.
-     * 
-     * @param locale the locale
-     */
-    public void setLocale(Locale locale) {
-        this.locale = Objects.requireNonNull(locale, "Locale must not be null");
-    }
+	/**
+	 * When set to true assumes that schema is used to validate incoming data from
+	 * an API.
+	 */
+	private final Boolean readOnly;
 
-    /**
-     * Gets the format assertion enabled flag.
-     * <p>
-     * This defaults to null meaning that it will follow the defaults of the
-     * specification.
-     * <p>
-     * Since draft 2019-09 this will default to false unless enabled by using the
-     * $vocabulary keyword.
-     * 
-     * @return the format assertions enabled flag
-     */
-    public Boolean getFormatAssertionsEnabled() {
-        return formatAssertionsEnabled;
-    }
+	/**
+	 * When set to true assumes that schema is used to validate outgoing data from
+	 * an API.
+	 */
+	private final Boolean writeOnly;
 
-    /**
-     * Sets the format assertion enabled flag.
-     * 
-     * @param formatAssertionsEnabled the format assertions enabled flag
-     */
-    public void setFormatAssertionsEnabled(Boolean formatAssertionsEnabled) {
-        this.formatAssertionsEnabled = formatAssertionsEnabled;
-    }
+	protected ExecutionConfig(Locale locale, boolean annotationCollectionEnabled,
+			Predicate<String> annotationCollectionFilter, Boolean formatAssertionsEnabled, boolean failFast,
+			Boolean readOnly, Boolean writeOnly) {
+		super();
+		this.locale = locale;
+		this.annotationCollectionEnabled = annotationCollectionEnabled;
+		this.annotationCollectionFilter = annotationCollectionFilter;
+		this.formatAssertionsEnabled = formatAssertionsEnabled;
+		this.failFast = failFast;
+		this.readOnly = readOnly;
+		this.writeOnly = writeOnly;
+	}
 
-    /**
-     * Return if fast fail is enabled.
-     * 
-     * @return if fast fail is enabled
-     */
-    public boolean isFailFast() {
-        return failFast;
-    }
+	/**
+	 * Gets the locale to use for formatting messages.
+	 * 
+	 * @return the locale
+	 */
+	public Locale getLocale() {
+		return locale;
+	}
 
-    /**
-     * Sets whether fast fail is enabled.
-     * 
-     * @param failFast true to fast fail
-     */
-    public void setFailFast(boolean failFast) {
-        this.failFast = failFast;
-    }
+	/**
+	 * Gets the format assertion enabled flag.
+	 * <p>
+	 * This defaults to null meaning that it will follow the defaults of the
+	 * specification.
+	 * <p>
+	 * Since draft 2019-09 this will default to false unless enabled by using the
+	 * $vocabulary keyword.
+	 * 
+	 * @return the format assertions enabled flag
+	 */
+	public Boolean getFormatAssertionsEnabled() {
+		return formatAssertionsEnabled;
+	}
 
-    /**
-     * Return if annotation collection is enabled.
-     * <p>
-     * This does not affect annotation collection required for evaluating keywords
-     * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
-     * <p>
-     * The annotations to collect can be customized using the annotation collection
-     * predicate.
-     * 
-     * @return if annotation collection is enabled
-     */
-    public boolean isAnnotationCollectionEnabled() {
-        return annotationCollectionEnabled;
-    }
+	/**
+	 * Return if fast fail is enabled.
+	 * 
+	 * @return if fast fail is enabled
+	 */
+	public boolean isFailFast() {
+		return failFast;
+	}
 
-    /**
-     * Sets whether the annotation collection is enabled.
-     * <p>
-     * This does not affect annotation collection required for evaluating keywords
-     * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
-     * <p>
-     * The annotations to collect can be customized using the annotation collection
-     * predicate.
-     * 
-     * @param annotationCollectionEnabled true to enable annotation collection
-     */
-    public void setAnnotationCollectionEnabled(boolean annotationCollectionEnabled) {
-        this.annotationCollectionEnabled = annotationCollectionEnabled;
-    }
+	/**
+	 * Return if annotation collection is enabled.
+	 * <p>
+	 * This does not affect annotation collection required for evaluating keywords
+	 * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
+	 * <p>
+	 * The annotations to collect can be customized using the annotation collection
+	 * predicate.
+	 * 
+	 * @return if annotation collection is enabled
+	 */
+	public boolean isAnnotationCollectionEnabled() {
+		return annotationCollectionEnabled;
+	}
 
-    /**
-     * Gets the predicate to determine if annotation collection is allowed for a
-     * particular keyword. This only has an effect if annotation collection is
-     * enabled.
-     * <p>
-     * The default value is to not collect any annotation keywords if annotation
-     * collection is enabled.
-     * <p>
-     * This does not affect annotation collection required for evaluating keywords
-     * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
-     * 
-     * @return the predicate to determine if annotation collection is allowed for
-     *         the keyword
-     */
-    public Predicate<String> getAnnotationCollectionFilter() {
-        return annotationCollectionFilter;
-    }
+	/**
+	 * Gets the predicate to determine if annotation collection is allowed for a
+	 * particular keyword. This only has an effect if annotation collection is
+	 * enabled.
+	 * <p>
+	 * The default value is to not collect any annotation keywords if annotation
+	 * collection is enabled.
+	 * <p>
+	 * This does not affect annotation collection required for evaluating keywords
+	 * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
+	 * 
+	 * @return the predicate to determine if annotation collection is allowed for
+	 *         the keyword
+	 */
+	public Predicate<String> getAnnotationCollectionFilter() {
+		return annotationCollectionFilter;
+	}
 
-    /**
-     * Predicate to determine if annotation collection is allowed for a particular
-     * keyword. This only has an effect if annotation collection is enabled.
-     * <p>
-     * The default value is to not collect any annotation keywords if annotation
-     * collection is enabled.
-     * <p>
-     * This does not affect annotation collection required for evaluating keywords
-     * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
-     *
-     * @param annotationCollectionFilter the predicate accepting the keyword
-     */
-    public void setAnnotationCollectionFilter(Predicate<String> annotationCollectionFilter) {
-        this.annotationCollectionFilter = Objects.requireNonNull(annotationCollectionFilter,
-                "annotationCollectionFilter must not be null");
-    }
+	/**
+	 * Returns the value of the read only flag.
+	 *
+	 * @return the value of read only flag or null if not set
+	 */
+	public Boolean getReadOnly() {
+		return this.readOnly;
+	}
 
-    /**
-     * Gets if debugging features such as logging is switched on.
-     *
-     * @return true if debug is enabled
-     */
-    public boolean isDebugEnabled() {
-        return debugEnabled;
-    }
+	/**
+	 * Returns the value of the write only flag.
+	 *
+	 * @return the value of the write only flag or null if not set
+	 */
+	public Boolean getWriteOnly() {
+		return this.writeOnly;
+	}
 
-    /**
-     * Sets if debugging features such as logging is switched on.
-     *
-     * @param debugEnabled true to enable debug
-     */
-    public void setDebugEnabled(boolean debugEnabled) {
-        this.debugEnabled = debugEnabled;
-    }
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static Builder builder(ExecutionConfig config) {
+		Builder copy = new Builder();
+		copy.locale = config.locale;
+		copy.annotationCollectionEnabled = config.annotationCollectionEnabled;
+		copy.annotationCollectionFilter = config.annotationCollectionFilter;
+		copy.formatAssertionsEnabled = config.formatAssertionsEnabled;
+		copy.failFast = config.failFast;
+		copy.readOnly = config.readOnly;
+		copy.writeOnly = config.writeOnly;
+		return copy;
+	}
+
+	/**
+	 * Builder for {@link ExecutionConfig}.
+	 */
+	public static class Builder extends BuilderSupport<Builder> {
+
+		@Override
+		protected Builder self() {
+			return this;
+		}
+	}
+
+	/**
+	 * Builder for {@link ExecutionConfig}.
+	 */
+	public static abstract class BuilderSupport<T> {
+		protected Locale locale = Locale.ROOT;
+		protected boolean annotationCollectionEnabled = false;
+		protected Predicate<String> annotationCollectionFilter = keyword -> false;
+		protected Boolean formatAssertionsEnabled = null;
+		protected boolean failFast = false;
+		protected Boolean readOnly = null;
+		protected Boolean writeOnly = null;
+
+		protected abstract T self();
+
+		/**
+		 * Sets the locale to use for formatting messages.
+		 * 
+		 * @param locale the locale
+		 * @return the builder
+		 */
+		public T locale(Locale locale) {
+			this.locale = locale;
+			return self();
+		}
+
+		/**
+		 * Sets whether the annotation collection is enabled.
+		 * <p>
+		 * This does not affect annotation collection required for evaluating keywords
+		 * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
+		 * <p>
+		 * The annotations to collect can be customized using the annotation collection
+		 * predicate.
+		 * 
+		 * @param annotationCollectionEnabled true to enable annotation collection
+		 * @return the builder
+		 */
+		public T annotationCollectionEnabled(boolean annotationCollectionEnabled) {
+			this.annotationCollectionEnabled = annotationCollectionEnabled;
+			return self();
+		}
+
+		/**
+		 * Predicate to determine if annotation collection is allowed for a particular
+		 * keyword. This only has an effect if annotation collection is enabled.
+		 * <p>
+		 * The default value is to not collect any annotation keywords if annotation
+		 * collection is enabled.
+		 * <p>
+		 * This does not affect annotation collection required for evaluating keywords
+		 * such as unevaluatedItems or unevaluatedProperties and only affects reporting.
+		 *
+		 * @param annotationCollectionFilter the predicate accepting the keyword
+		 * @return the builder
+		 */
+		public T annotationCollectionFilter(Predicate<String> annotationCollectionFilter) {
+			this.annotationCollectionFilter = annotationCollectionFilter;
+			return self();
+		}
+
+		/**
+		 * Sets the format assertion enabled flag.
+		 * 
+		 * @param formatAssertionsEnabled the format assertions enabled flag
+		 * @return the builder
+		 */
+		public T formatAssertionsEnabled(Boolean formatAssertionsEnabled) {
+			this.formatAssertionsEnabled = formatAssertionsEnabled;
+			return self();
+		}
+
+		/**
+		 * Sets whether fast fail is enabled.
+		 * 
+		 * @param failFast true to fast fail
+		 * @return the builder
+		 */
+		public T failFast(boolean failFast) {
+			this.failFast = failFast;
+			return self();
+		}
+
+		public T readOnly(Boolean readOnly) {
+			this.readOnly = readOnly;
+			return self();
+		}
+
+		public T writeOnly(Boolean writeOnly) {
+			this.writeOnly = writeOnly;
+			return self();
+		}
+
+		/**
+		 * Builds the {@link ExecutionConfig}.
+		 */
+		public ExecutionConfig build() {
+			Locale locale = this.locale;
+			if (locale == null) {
+				locale = Locale.getDefault();
+			}
+			Objects.requireNonNull(annotationCollectionFilter, "annotationCollectionFilter must not be null");
+			return new ExecutionConfig(locale, annotationCollectionEnabled, annotationCollectionFilter,
+					formatAssertionsEnabled, failFast, readOnly, writeOnly);
+		}
+	}
 }

@@ -1388,11 +1388,10 @@ public class Schema implements Validator {
     public ExecutionContext createExecutionContext() {
         SchemaRegistryConfig config = validationContext.getSchemaRegistryConfig();
         // Copy execution config defaults from validation config
-        ExecutionConfig executionConfig = new ExecutionConfig();
-        executionConfig.setLocale(config.getLocale());
-        executionConfig.setFormatAssertionsEnabled(config.getFormatAssertionsEnabled());
-        executionConfig.setFailFast(config.isFailFast());
-
+		ExecutionConfig executionConfig = ExecutionConfig.builder()
+				.locale(config.getLocale())
+				.formatAssertionsEnabled(config.getFormatAssertionsEnabled())
+				.failFast(config.isFailFast()).build();
         ExecutionContext executionContext = new ExecutionContext(executionConfig);
         if(config.getExecutionContextCustomizer() != null) {
             config.getExecutionContextCustomizer().customize(executionContext, validationContext);

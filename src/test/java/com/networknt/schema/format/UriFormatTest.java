@@ -37,7 +37,7 @@ class UriFormatTest {
         
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
         List<Error> messages = schema.validate("\"https://test.com/assets/product.pdf\"",
-                InputFormat.JSON, executionContext -> executionContext.getExecutionConfig().setFormatAssertionsEnabled(true));
+                InputFormat.JSON, executionContext -> executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertTrue(messages.isEmpty());
     }
 
@@ -48,7 +48,7 @@ class UriFormatTest {
                 + "}";
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
         List<Error> messages = schema.validate("\"https://test.com/assets/product.pdf?filter[test]=1\"",
-                InputFormat.JSON, executionContext -> executionContext.getExecutionConfig().setFormatAssertionsEnabled(true));
+                InputFormat.JSON, executionContext -> executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertFalse(messages.isEmpty());
     }
 
@@ -60,7 +60,7 @@ class UriFormatTest {
 
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
         List<Error> messages = schema.validate("\"https://test.com/assets/product.pdf?filter%5Btest%5D=1\"",
-                InputFormat.JSON, executionContext -> executionContext.getExecutionConfig().setFormatAssertionsEnabled(true));
+                InputFormat.JSON, executionContext -> executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertTrue(messages.isEmpty());
     }
 
@@ -72,7 +72,7 @@ class UriFormatTest {
 
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
         List<Error> messages = schema.validate("\"https://test.com/assets/produktdatenblätter.pdf\"",
-                InputFormat.JSON, executionContext -> executionContext.getExecutionConfig().setFormatAssertionsEnabled(true));
+                InputFormat.JSON, executionContext -> executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertFalse(messages.isEmpty());
     }
 
@@ -82,7 +82,7 @@ class UriFormatTest {
                 + "  \"format\": \"uri\"\r\n"
                 + "}";
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
-        List<Error> messages = schema.validate("\"http://\"", InputFormat.JSON, executionContext -> executionContext.getExecutionConfig().setFormatAssertionsEnabled(true));
+        List<Error> messages = schema.validate("\"http://\"", InputFormat.JSON, executionContext -> executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertTrue(messages.isEmpty());
     }
 
@@ -93,7 +93,7 @@ class UriFormatTest {
                 + "}";
 
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
-        List<Error> messages = schema.validate("\"//\"", InputFormat.JSON, executionContext -> executionContext.getExecutionConfig().setFormatAssertionsEnabled(true));
+        List<Error> messages = schema.validate("\"//\"", InputFormat.JSON, executionContext -> executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertTrue(messages.isEmpty());
     }
 
@@ -103,7 +103,7 @@ class UriFormatTest {
                 + "  \"format\": \"uri\"\r\n"
                 + "}";
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
-        List<Error> messages = schema.validate("\"about:\"", InputFormat.JSON, executionContext -> executionContext.getExecutionConfig().setFormatAssertionsEnabled(true));
+        List<Error> messages = schema.validate("\"about:\"", InputFormat.JSON, executionContext -> executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertTrue(messages.isEmpty());
     }
 }

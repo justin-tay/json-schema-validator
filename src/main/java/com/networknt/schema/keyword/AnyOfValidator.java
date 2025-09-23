@@ -28,16 +28,12 @@ import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.TypeFactory;
 import com.networknt.schema.ValidationContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
 
 /**
  * {@link KeywordValidator} for anyOf.
  */
 public class AnyOfValidator extends BaseKeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(AnyOfValidator.class);
     private static final String DISCRIMINATOR_REMARK = "and the discriminator-selected candidate schema didn't pass validation";
 
     private final List<Schema> schemas;
@@ -70,8 +66,6 @@ public class AnyOfValidator extends BaseKeywordValidator {
 
     protected void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean walk) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
-
         if (this.validationContext.isDiscriminatorKeywordEnabled()) {
             executionContext.enterDiscriminatorContext(new DiscriminatorContext(), instanceLocation);
         }

@@ -23,15 +23,10 @@ import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.ValidationContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * {@link KeywordValidator} for minItems.
  */
 public class MinItemsValidator extends BaseKeywordValidator implements KeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(MinItemsValidator.class);
-
     private int min = 0;
 
     public MinItemsValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, ValidationContext validationContext) {
@@ -42,7 +37,7 @@ public class MinItemsValidator extends BaseKeywordValidator implements KeywordVa
     }
 
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
+        
 
         if (node.isArray()) {
             if (node.size() < min) {

@@ -30,15 +30,10 @@ import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.TypeFactory;
 import com.networknt.schema.ValidationContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * {@link KeywordValidator} for allOf.
  */
 public class AllOfValidator extends BaseKeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(AllOfValidator.class);
-
     private final List<Schema> schemas;
 
     public AllOfValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, ValidationContext validationContext) {
@@ -65,8 +60,6 @@ public class AllOfValidator extends BaseKeywordValidator {
     }
 
     protected void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation, boolean walk) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
-
         for (Schema schema : this.schemas) {
             if (!walk) {
                 schema.validate(executionContext, node, rootNode, instanceLocation);

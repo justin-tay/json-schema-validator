@@ -19,9 +19,6 @@ package com.networknt.schema.keyword;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.networknt.schema.DiscriminatorContext;
@@ -39,8 +36,6 @@ import com.networknt.schema.ValidationContext;
  * {@link KeywordValidator} for oneOf.
  */
 public class OneOfValidator extends BaseKeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(OneOfValidator.class);
-
     private final List<Schema> schemas;
 
     private Boolean canShortCircuit = null;
@@ -71,7 +66,7 @@ public class OneOfValidator extends BaseKeywordValidator {
 
     protected void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation, boolean walk) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
+        
         int numberOfValidSchema = 0;
         int index = 0;
         List<String> indexes = null;

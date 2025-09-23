@@ -25,15 +25,10 @@ import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.TypeFactory;
 import com.networknt.schema.ValidationContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * {@link KeywordValidator} for maxLength.
  */
 public class MaxLengthValidator extends BaseKeywordValidator implements KeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(MaxLengthValidator.class);
-
     private final int maxLength;
 
     public MaxLengthValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, ValidationContext validationContext) {
@@ -46,7 +41,7 @@ public class MaxLengthValidator extends BaseKeywordValidator implements KeywordV
     }
 
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
+        
 
         JsonType nodeType = TypeFactory.getValueNodeType(node, this.validationContext.getSchemaRegistryConfig());
         if (nodeType != JsonType.STRING) {

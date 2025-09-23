@@ -27,16 +27,12 @@ import com.networknt.schema.ValidationContext;
 import com.networknt.schema.annotation.JsonNodeAnnotation;
 import com.networknt.schema.utils.JsonSchemaRefs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
 
 /**
  * {@link KeywordValidator} for items V4 to V2019-09.
  */
 public class ItemsValidator extends BaseKeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(ItemsValidator.class);
     private static final String PROPERTY_ADDITIONAL_ITEMS = "additionalItems";
 
     private final Schema schema;
@@ -93,7 +89,7 @@ public class ItemsValidator extends BaseKeywordValidator {
 
     @Override
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
+        
 
         if (!node.isArray() && !this.validationContext.getSchemaRegistryConfig().isTypeLoose()) {
             // ignores non-arrays

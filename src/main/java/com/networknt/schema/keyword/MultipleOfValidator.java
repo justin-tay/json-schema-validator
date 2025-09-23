@@ -24,17 +24,12 @@ import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.ValidationContext;
 import com.networknt.schema.utils.JsonNodeUtil;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 
 /**
  * {@link KeywordValidator} for multipleOf.
  */
 public class MultipleOfValidator extends BaseKeywordValidator implements KeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(MultipleOfValidator.class);
-
     private final BigDecimal divisor;
 
     public MultipleOfValidator(SchemaLocation schemaLocation, JsonNodePath evaluationPath, JsonNode schemaNode,
@@ -45,7 +40,7 @@ public class MultipleOfValidator extends BaseKeywordValidator implements Keyword
 
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
+        
         if (this.divisor != null) {
             BigDecimal dividend = getDividend(node);
             if (dividend != null) {

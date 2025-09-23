@@ -25,8 +25,6 @@ import com.networknt.schema.MessageSourceError;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.ValidationContext;
 
-import org.slf4j.Logger;
-
 import java.util.Collection;
 import java.util.Map;
 
@@ -84,29 +82,6 @@ public abstract class BaseKeywordValidator extends AbstractKeywordValidator {
         this.errorMessage = errorMessage;
 
         this.evaluationParentSchema = evaluationParentSchema;
-    }
-
-    protected static boolean equals(double n1, double n2) {
-        return Math.abs(n1 - n2) < 1e-12;
-    }
-
-    public static void debug(Logger logger, ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
-            JsonNodePath instanceLocation) {
-        //logger.debug("validate( {}, {}, {})", node, rootNode, instanceLocation);
-        // The below is equivalent to the above but as there are more than 2 arguments
-        // the var-arg method is used and an array needs to be allocated even if debug
-        // is not enabled
-        if (executionContext.getExecutionConfig().isDebugEnabled() && logger.isDebugEnabled()) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("validate( ");
-            builder.append(node.toString());
-            builder.append(", ");
-            builder.append(rootNode.toString());
-            builder.append(", ");
-            builder.append(instanceLocation.toString());
-            builder.append(")");
-            logger.debug(builder.toString());
-        }
     }
 
     /**

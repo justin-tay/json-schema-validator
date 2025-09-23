@@ -28,9 +28,6 @@ import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.TypeFactory;
 import com.networknt.schema.ValidationContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,8 +37,6 @@ import java.util.Set;
  * {@link KeywordValidator} for enum.
  */
 public class EnumValidator extends BaseKeywordValidator implements KeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(EnumValidator.class);
-
     private final Set<JsonNode> nodes;
     private final String error;
 
@@ -98,8 +93,6 @@ public class EnumValidator extends BaseKeywordValidator implements KeywordValida
     }
 
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
-
         if (node.isNumber()) {
             node = processNumberNode(node);
         } else if (node.isArray()) {

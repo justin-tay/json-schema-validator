@@ -125,7 +125,7 @@ class IriReferenceFormatTest {
                 + "}";
 
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
-        List<Error> messages = schema.validate("\"about:\"", InputFormat.JSON, executionContext -> executionContext.getExecutionConfig().setFormatAssertionsEnabled(true));
+        List<Error> messages = schema.validate("\"about:\"", InputFormat.JSON, executionContext -> executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertTrue(messages.isEmpty());
     }
 

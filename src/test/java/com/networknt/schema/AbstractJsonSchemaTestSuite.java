@@ -56,9 +56,19 @@ abstract class AbstractJsonSchemaTestSuite {
 
     private static void executeTest(Schema schema, TestSpec testSpec) {
         List<Error> errors = schema.validate(testSpec.getData(), OutputFormat.DEFAULT, (executionContext, validationContext) -> {
-            if (testSpec.getTestCase().getSource().getPath().getParent().toString().endsWith("format")) {
-                executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
-            }
+        	executionContext.executionConfig(executionConfig -> {
+        		if (testSpec.getConfig() != null) {
+                	if (testSpec.getConfig().containsKey("readOnly")) {
+                		executionConfig.readOnly((Boolean) testSpec.getConfig().get("readOnly"));
+                    }
+                    if (testSpec.getConfig().containsKey("writeOnly")) {
+                    	executionConfig.writeOnly((Boolean) testSpec.getConfig().get("writeOnly"));
+                    }
+        		}
+                if (testSpec.getTestCase().getSource().getPath().getParent().toString().endsWith("format")) {
+                	executionConfig.formatAssertionsEnabled(true);
+                }
+        	});
         });
 
         if (testSpec.isValid()) {
@@ -185,15 +195,9 @@ abstract class AbstractJsonSchemaTestSuite {
                         configBuilder.errorMessageKeyword(
                                 (Boolean) testSpec.getConfig().get("isCustomMessageSupported") ? "message" : null);
                     }
-                    if (testSpec.getConfig().containsKey("readOnly")) {
-                        configBuilder.readOnly((Boolean) testSpec.getConfig().get("readOnly"));
-                    }
-                    if (testSpec.getConfig().containsKey("writeOnly")) {
-                        configBuilder.writeOnly((Boolean) testSpec.getConfig().get("writeOnly"));
-                    }
                 }
-                SchemaRegistry validatorFactory = buildSchemaRegistry(defaultVersion, testCase, configBuilder.build());
-                return buildTest(validatorFactory, testSpec);
+                SchemaRegistry schemaRegistry = buildSchemaRegistry(defaultVersion, testCase, configBuilder.build());
+                return buildTest(schemaRegistry, testSpec);
             }));
         } catch (JsonSchemaException e) {
             String msg = e.getMessage();

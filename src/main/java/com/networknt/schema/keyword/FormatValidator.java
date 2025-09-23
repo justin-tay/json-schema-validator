@@ -58,7 +58,7 @@ public class FormatValidator extends BaseFormatJsonValidator implements KeywordV
     }
     
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
+        
         /*
          * Annotations must be collected even if the format is unknown according to the specification.
          */

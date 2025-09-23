@@ -27,15 +27,10 @@ import com.networknt.schema.ValidationContext;
 import com.networknt.schema.annotation.JsonNodeAnnotation;
 import com.networknt.schema.utils.JsonSchemaRefs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * {@link KeywordValidator} for items from V2012-12.
  */
 public class ItemsValidator202012 extends BaseKeywordValidator {
-    private static final Logger logger = LoggerFactory.getLogger(ItemsValidator202012.class);
-
     private final Schema schema;
     private final int prefixCount;
     private final boolean additionalItems;
@@ -68,7 +63,7 @@ public class ItemsValidator202012 extends BaseKeywordValidator {
     @Override
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             JsonNodePath instanceLocation) {
-        debug(logger, executionContext, node, rootNode, instanceLocation);
+        
 
         // ignores non-arrays
         if (node.isArray()) {

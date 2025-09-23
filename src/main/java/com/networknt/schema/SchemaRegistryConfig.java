@@ -48,6 +48,11 @@ public class SchemaRegistryConfig {
     public static final int DEFAULT_PRELOAD_JSON_SCHEMA_REF_MAX_NESTING_DEPTH = 40;
 
     /**
+     * The execution context customizer that runs by default for all schemas.
+     */
+    private final ExecutionContextCustomizer executionContextCustomizer;
+
+    /**
      * Controls if schemas loaded from refs will be cached and reused for subsequent runs.
      */
     private final boolean cacheRefs;
@@ -57,8 +62,6 @@ public class SchemaRegistryConfig {
      * else default messages are used
      */
     private final String errorMessageKeyword;
-
-    private final ExecutionContextCustomizer executionContextCustomizer;
 
     /**
      * When set to true, validator process is stop immediately when a very first
@@ -108,19 +111,14 @@ public class SchemaRegistryConfig {
     private final int preloadJsonSchemaRefMaxNestingDepth;
 
     /**
-     * When set to true assumes that schema is used to validate incoming data from an API.
-     */
-    private Boolean readOnly = null;
-
-    /**
      * Used to create {@link com.networknt.schema.regex.RegularExpression}.
      */
-    private RegularExpressionFactory regularExpressionFactory = JDKRegularExpressionFactory.getInstance();
+    private final RegularExpressionFactory regularExpressionFactory;
 
     /**
      * Used to validate the acceptable $id values.
      */
-    private JsonSchemaIdValidator schemaIdValidator = JsonSchemaIdValidator.DEFAULT;
+    private final JsonSchemaIdValidator schemaIdValidator;
     
     /**
      * Contains a mapping of how strict a keyword's validators should be.
@@ -137,21 +135,15 @@ public class SchemaRegistryConfig {
      */
     private boolean typeLoose;
 
-    /**
-     * When set to true assumes that schema is used to validate outgoing data from an API.
-     */
-    private Boolean writeOnly = null;
-
-    SchemaRegistryConfig(boolean cacheRefs,
+    protected SchemaRegistryConfig(boolean cacheRefs,
             String errorMessageKeyword, ExecutionContextCustomizer executionContextCustomizer, boolean failFast,
             Boolean formatAssertionsEnabled,
             boolean javaSemantics,
             Locale locale, boolean losslessNarrowing,
             MessageSource messageSource, PathType pathType,
             boolean preloadJsonSchema, int preloadJsonSchemaRefMaxNestingDepth,
-            Boolean readOnly,
             RegularExpressionFactory regularExpressionFactory, JsonSchemaIdValidator schemaIdValidator,
-            Map<String, Boolean> strictness, boolean typeLoose, Boolean writeOnly) {
+            Map<String, Boolean> strictness, boolean typeLoose) {
         super();
         this.cacheRefs = cacheRefs;
         this.errorMessageKeyword = errorMessageKeyword;
@@ -165,12 +157,10 @@ public class SchemaRegistryConfig {
         this.pathType = pathType;
         this.preloadJsonSchema = preloadJsonSchema;
         this.preloadJsonSchemaRefMaxNestingDepth = preloadJsonSchemaRefMaxNestingDepth;
-        this.readOnly = readOnly;
         this.regularExpressionFactory = regularExpressionFactory;
         this.schemaIdValidator = schemaIdValidator;
         this.strictness = strictness;
         this.typeLoose = typeLoose;
-        this.writeOnly = writeOnly;
     }
 
     public ExecutionContextCustomizer getExecutionContextCustomizer() {
@@ -295,14 +285,6 @@ public class SchemaRegistryConfig {
         return preloadJsonSchema;
     }
 
-    public boolean isReadOnly() {
-        return null != this.readOnly && this.readOnly;
-    }
-
-    public Boolean getReadOnly() {
-        return this.readOnly;
-    }
-
     /**
      * Answers whether a keyword's validators may relax their analysis. The
      * default is to perform strict checking. One must explicitly allow a
@@ -329,26 +311,33 @@ public class SchemaRegistryConfig {
         return this.strictness.getOrDefault(Objects.requireNonNull(keyword, "keyword cannot be null"), defaultValue);
     }
 
-    /**
-     *
-     * @return true if type loose is used.
-     */
+	/**
+	 * Returns whether types are interpreted in a loose manner.
+	 * <p>
+	 * If set to true, a single value can be interpreted as a size 1 array. Strings
+	 * may also be interpreted as number, integer or boolean.
+	 *
+	 * @return true if type are interpreted in a loose manner
+	 */
     public boolean isTypeLoose() {
         return this.typeLoose;
     }
 
-    public boolean isWriteOnly() {
-        return null != this.writeOnly && this.writeOnly;
-    }
-
-    public Boolean getWriteOnly() {
-        return this.writeOnly;
-    }
-
+    /**
+     * Creates a builder.
+     * 
+     * @return the builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Copies values from a configuration to a new builder. 
+     *
+     * @param config the configuration
+     * @return the builder
+     */
     public static Builder builder(SchemaRegistryConfig config) {
         Builder builder = new Builder();
         builder.cacheRefs = config.cacheRefs;
@@ -363,37 +352,45 @@ public class SchemaRegistryConfig {
         builder.pathType = config.pathType;
         builder.preloadJsonSchema = config.preloadJsonSchema;
         builder.preloadJsonSchemaRefMaxNestingDepth = config.preloadJsonSchemaRefMaxNestingDepth;
-        builder.readOnly = config.readOnly;
         builder.regularExpressionFactory = config.regularExpressionFactory;
         builder.schemaIdValidator = config.schemaIdValidator;
         builder.strictness = config.strictness;
         builder.typeLoose = config.typeLoose;
-        builder.writeOnly = config.writeOnly;
         return builder;
     }
 
     /**
      * Builder for {@link SchemaRegistryConfig}.
      */
-    public static class Builder {
-        private boolean cacheRefs = true;
-        private String errorMessageKeyword = null;
-        private ExecutionContextCustomizer executionContextCustomizer = null;
-        private boolean failFast = false;
-        private Boolean formatAssertionsEnabled = null;
-        private boolean javaSemantics = false;
-        private Locale locale = null; // This must be null to use Locale.getDefault() as the default can be changed
-        private boolean losslessNarrowing = false;
-        private MessageSource messageSource = null;
-        private PathType pathType = PathType.JSON_POINTER;
-        private boolean preloadJsonSchema = true;
-        private int preloadJsonSchemaRefMaxNestingDepth = DEFAULT_PRELOAD_JSON_SCHEMA_REF_MAX_NESTING_DEPTH;
-        private Boolean readOnly = null;
-        private RegularExpressionFactory regularExpressionFactory = JDKRegularExpressionFactory.getInstance();
-        private JsonSchemaIdValidator schemaIdValidator = JsonSchemaIdValidator.DEFAULT;
-        private Map<String, Boolean> strictness = new HashMap<>(0);
-        private boolean typeLoose = false;
-        private Boolean writeOnly = null;
+    public static class Builder extends BuilderSupport<Builder> {
+		@Override
+		protected Builder self() {
+			return this;
+		}
+    }
+
+    /**
+     * Builder for {@link SchemaRegistryConfig}.
+     */
+    public static abstract class BuilderSupport<T> {
+        protected boolean cacheRefs = true;
+        protected String errorMessageKeyword = null;
+        protected ExecutionContextCustomizer executionContextCustomizer = null;
+        protected boolean failFast = false;
+        protected Boolean formatAssertionsEnabled = null;
+        protected boolean javaSemantics = false;
+        protected Locale locale = null; // This must be null to use Locale.getDefault() as the default can be changed
+        protected boolean losslessNarrowing = false;
+        protected MessageSource messageSource = null;
+        protected PathType pathType = PathType.JSON_POINTER;
+        protected boolean preloadJsonSchema = true;
+        protected int preloadJsonSchemaRefMaxNestingDepth = DEFAULT_PRELOAD_JSON_SCHEMA_REF_MAX_NESTING_DEPTH;
+        protected RegularExpressionFactory regularExpressionFactory = JDKRegularExpressionFactory.getInstance();
+        protected JsonSchemaIdValidator schemaIdValidator = JsonSchemaIdValidator.DEFAULT;
+        protected Map<String, Boolean> strictness = new HashMap<>(0);
+        protected boolean typeLoose = false;
+
+        protected abstract T self();
 
         /**
          * Sets if schemas loaded from refs will be cached and reused for subsequent runs.
@@ -403,9 +400,9 @@ public class SchemaRegistryConfig {
          * @param cacheRefs true to cache
          * @return the builder
          */
-        public Builder cacheRefs(boolean cacheRefs) {
+        public T cacheRefs(boolean cacheRefs) {
             this.cacheRefs = cacheRefs;
-            return this;
+            return self();
         }
         /**
          * Sets the error message keyword for setting custom messages in the schema.
@@ -415,9 +412,9 @@ public class SchemaRegistryConfig {
          * @param errorMessageKeyword to use for custom messages in the schema
          * @return the builder
          */
-        public Builder errorMessageKeyword(String errorMessageKeyword) {
+        public T errorMessageKeyword(String errorMessageKeyword) {
             this.errorMessageKeyword = errorMessageKeyword;
-            return this;
+            return self();
         }
         /**
          * Sets the execution context customizer that is run before each run.
@@ -425,9 +422,9 @@ public class SchemaRegistryConfig {
          * @param executionContextCustomizer the customizer
          * @return the builder
          */
-        public Builder executionContextCustomizer(ExecutionContextCustomizer executionContextCustomizer) {
+        public T executionContextCustomizer(ExecutionContextCustomizer executionContextCustomizer) {
             this.executionContextCustomizer = executionContextCustomizer;
-            return this;
+            return self();
         }
 
         /**
@@ -440,9 +437,9 @@ public class SchemaRegistryConfig {
          * @param failFast true to enable
          * @return the builder
          */
-        public Builder failFast(boolean failFast) {
+        public T failFast(boolean failFast) {
             this.failFast = failFast;
-            return this;
+            return self();
         }
 
         /**
@@ -456,14 +453,14 @@ public class SchemaRegistryConfig {
          * @param formatAssertionsEnabled true to enable
          * @return the builder
          */
-        public Builder formatAssertionsEnabled(Boolean formatAssertionsEnabled) {
+        public T formatAssertionsEnabled(Boolean formatAssertionsEnabled) {
             this.formatAssertionsEnabled = formatAssertionsEnabled;
-            return this;
+            return self();
         }
 
-        public Builder javaSemantics(boolean javaSemantics) {
+        public T javaSemantics(boolean javaSemantics) {
             this.javaSemantics = javaSemantics;
-            return this;
+            return self();
         }
 
         /**
@@ -478,14 +475,14 @@ public class SchemaRegistryConfig {
          * @param locale The locale.
          * @return the builder
          */
-        public Builder locale(Locale locale) {
+        public T locale(Locale locale) {
             this.locale = locale;
-            return this;
+            return self();
         }
 
-        public Builder losslessNarrowing(boolean losslessNarrowing) {
+        public T losslessNarrowing(boolean losslessNarrowing) {
             this.losslessNarrowing = losslessNarrowing;
-            return this;
+            return self();
         }
         /**
          * Sets the message source to use for generating localised messages.
@@ -493,9 +490,9 @@ public class SchemaRegistryConfig {
          * @param messageSource the message source
          * @return the builder
          */
-        public Builder messageSource(MessageSource messageSource) {
+        public T messageSource(MessageSource messageSource) {
             this.messageSource = messageSource;
-            return this;
+            return self();
         }
         /**
          * Sets the path type to use when reporting the instance location of errors.
@@ -505,9 +502,9 @@ public class SchemaRegistryConfig {
          * @param pathType the path type
          * @return the path type
          */
-        public Builder pathType(PathType pathType) {
+        public T pathType(PathType pathType) {
             this.pathType = pathType;
-            return this;
+            return self();
         }
         /**
          * Sets if the schema should be preloaded.
@@ -517,9 +514,9 @@ public class SchemaRegistryConfig {
          * @param preloadJsonSchema true to preload
          * @return the builder
          */
-        public Builder preloadJsonSchema(boolean preloadJsonSchema) {
+        public T preloadJsonSchema(boolean preloadJsonSchema) {
             this.preloadJsonSchema = preloadJsonSchema;
-            return this;
+            return self();
         }
         /**
          * Sets the max depth of the evaluation path to preload when preloading refs.
@@ -529,15 +526,9 @@ public class SchemaRegistryConfig {
          * @param preloadJsonSchemaRefMaxNestingDepth to preload
          * @return the builder
          */
-        public Builder preloadJsonSchemaRefMaxNestingDepth(int preloadJsonSchemaRefMaxNestingDepth) {
+        public T preloadJsonSchemaRefMaxNestingDepth(int preloadJsonSchemaRefMaxNestingDepth) {
             this.preloadJsonSchemaRefMaxNestingDepth = preloadJsonSchemaRefMaxNestingDepth;
-            return this;
-        }
-
-        @Deprecated
-        public Builder readOnly(Boolean readOnly) {
-            this.readOnly = readOnly;
-            return this;
+            return self();
         }
         /**
          * Sets the regular expression factory.
@@ -552,9 +543,9 @@ public class SchemaRegistryConfig {
          * @param regularExpressionFactory the factory
          * @return the builder
          */
-        public Builder regularExpressionFactory(RegularExpressionFactory regularExpressionFactory) {
+        public T regularExpressionFactory(RegularExpressionFactory regularExpressionFactory) {
             this.regularExpressionFactory = regularExpressionFactory;
-            return this;
+            return self();
         }
         /**
          * Sets the schema id validator to use.
@@ -564,43 +555,30 @@ public class SchemaRegistryConfig {
          * @param schemaIdValidator the builder
          * @return the builder
          */
-        public Builder schemaIdValidator(JsonSchemaIdValidator schemaIdValidator) {
+        public T schemaIdValidator(JsonSchemaIdValidator schemaIdValidator) {
             this.schemaIdValidator = schemaIdValidator;
-            return this;
+            return self();
         }
-        public Builder strict(Map<String, Boolean> strict) {
+        public T strict(Map<String, Boolean> strict) {
             this.strictness = strict;
-            return this;
+            return self();
         }
-        public Builder typeLoose(boolean typeLoose) {
+        public T strict(String keyword, boolean strict) {
+            this.strictness.put(Objects.requireNonNull(keyword, "keyword cannot be null"), strict);
+            return self();
+        }
+        public T typeLoose(boolean typeLoose) {
             this.typeLoose = typeLoose;
-            return this;
-        }
-        @Deprecated
-        public Builder writeOnly(Boolean writeOnly) {
-            this.writeOnly = writeOnly;
-            return this;
+            return self();
         }
         public SchemaRegistryConfig build() {
             return new SchemaRegistryConfig(cacheRefs, errorMessageKeyword,
                     executionContextCustomizer, failFast, formatAssertionsEnabled, 
                     javaSemantics, locale, losslessNarrowing, messageSource,
                     pathType, preloadJsonSchema, preloadJsonSchemaRefMaxNestingDepth,
-                    readOnly, regularExpressionFactory, schemaIdValidator, strictness, typeLoose,
-                    writeOnly);
+                    regularExpressionFactory, schemaIdValidator, strictness, typeLoose
+                    );
         }
-        public Builder strict(String keyword, boolean strict) {
-            this.strictness.put(Objects.requireNonNull(keyword, "keyword cannot be null"), strict);
-            return this;
-        }
-    }
 
-    /**
-     * Use {@code isReadOnly} or {@code isWriteOnly}
-     * @return true if schema is used to write data
-     */
-    @Deprecated
-    public boolean isWriteMode() {
-        return null == this.writeOnly || this.writeOnly;
     }
 }

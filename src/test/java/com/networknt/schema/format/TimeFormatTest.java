@@ -60,7 +60,7 @@ class TimeFormatTest {
 
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
         List<Error> messages = schema.validate(inputData, InputFormat.JSON,
-                executionContext -> executionContext.getExecutionConfig().setFormatAssertionsEnabled(true));
+                executionContext -> executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertTrue(messages.isEmpty());
     }
 
@@ -89,7 +89,7 @@ class TimeFormatTest {
 
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
         List<Error> messages = schema.validate(inputData, InputFormat.JSON,
-                executionContext -> executionContext.getExecutionConfig().setFormatAssertionsEnabled(true));
+                executionContext -> executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertFalse(messages.isEmpty());
     }
 }
