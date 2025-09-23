@@ -34,11 +34,11 @@ import com.networknt.schema.keyword.KeywordValidator;
  * A {@link WalkListenerRunner} for walking keywords.
  */
 public class KeywordWalkListenerRunner extends AbstractWalkListenerRunner {
-    private final List<JsonSchemaWalkListener> allKeywordWalkListeners;
-    private final Map<String, List<JsonSchemaWalkListener>> keywordWalkListenersMap;
+    private final List<WalkListener> allKeywordWalkListeners;
+    private final Map<String, List<WalkListener>> keywordWalkListenersMap;
 
-    public KeywordWalkListenerRunner(List<JsonSchemaWalkListener> allKeywordWalkListeners,
-            Map<String, List<JsonSchemaWalkListener>> keywordWalkListenersMap) {
+    public KeywordWalkListenerRunner(List<WalkListener> allKeywordWalkListeners,
+            Map<String, List<WalkListener>> keywordWalkListenersMap) {
         this.allKeywordWalkListeners = allKeywordWalkListeners;
         this.keywordWalkListenersMap = keywordWalkListenersMap;
     }
@@ -50,7 +50,7 @@ public class KeywordWalkListenerRunner extends AbstractWalkListenerRunner {
         WalkEvent keywordWalkEvent = constructWalkEvent(executionContext, keyword, instanceNode, rootNode,
                 instanceLocation, schema, validator);
         // Run Listeners that are setup only for this keyword.
-        List<JsonSchemaWalkListener> currentKeywordListeners = keywordWalkListenersMap.get(keyword);
+        List<WalkListener> currentKeywordListeners = keywordWalkListenersMap.get(keyword);
         continueRunningListenersAndWalk = runPreWalkListeners(currentKeywordListeners, keywordWalkEvent);
         if (continueRunningListenersAndWalk) {
             // Run Listeners that are setup for all keywords.
@@ -66,7 +66,7 @@ public class KeywordWalkListenerRunner extends AbstractWalkListenerRunner {
         WalkEvent keywordWalkEvent = constructWalkEvent(executionContext, keyword, instanceNode, rootNode,
                 instanceLocation, schema, validator);
         // Run Listeners that are setup only for this keyword.
-        List<JsonSchemaWalkListener> currentKeywordListeners = keywordWalkListenersMap.get(keyword);
+        List<WalkListener> currentKeywordListeners = keywordWalkListenersMap.get(keyword);
         runPostWalkListeners(currentKeywordListeners, keywordWalkEvent, errors);
         // Run Listeners that are setup for all keywords.
         runPostWalkListeners(allKeywordWalkListeners, keywordWalkEvent, errors);
@@ -77,24 +77,24 @@ public class KeywordWalkListenerRunner extends AbstractWalkListenerRunner {
     }
 
     public static class Builder {
-        private Map<String, List<JsonSchemaWalkListener>> keywordWalkListeners = new HashMap<>();
-        private List<JsonSchemaWalkListener> allKeywordWalkListeners = new ArrayList<>();
+        private Map<String, List<WalkListener>> keywordWalkListeners = new HashMap<>();
+        private List<WalkListener> allKeywordWalkListeners = new ArrayList<>();
 
-        public Builder keywordWalkListener(String keyword, JsonSchemaWalkListener keywordWalkListener) {
+        public Builder keywordWalkListener(String keyword, WalkListener keywordWalkListener) {
             this.keywordWalkListeners.computeIfAbsent(keyword, key -> new ArrayList<>()).add(keywordWalkListener);
             return this;
         }
 
-        public Builder keywordWalkListener(Keyword keyword, JsonSchemaWalkListener keywordWalkListener) {
+        public Builder keywordWalkListener(Keyword keyword, WalkListener keywordWalkListener) {
             return keywordWalkListener(keyword.getValue(), keywordWalkListener);
         }
 
-        public Builder keywordWalkListener(JsonSchemaWalkListener keywordWalkListener) {
+        public Builder keywordWalkListener(WalkListener keywordWalkListener) {
             allKeywordWalkListeners.add(keywordWalkListener);
             return this;
         }
 
-        public Builder keywordWalkListeners(Consumer<Map<String, List<JsonSchemaWalkListener>>> keywordWalkListeners) {
+        public Builder keywordWalkListeners(Consumer<Map<String, List<WalkListener>>> keywordWalkListeners) {
             keywordWalkListeners.accept(this.keywordWalkListeners);
             return this;
         }

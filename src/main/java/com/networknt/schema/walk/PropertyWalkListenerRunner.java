@@ -32,9 +32,9 @@ import java.util.function.Consumer;
  */
 public class PropertyWalkListenerRunner extends AbstractWalkListenerRunner {
 
-    private final List<JsonSchemaWalkListener> propertyWalkListeners;
+    private final List<WalkListener> propertyWalkListeners;
 
-    public PropertyWalkListenerRunner(List<JsonSchemaWalkListener> propertyWalkListeners) {
+    public PropertyWalkListenerRunner(List<WalkListener> propertyWalkListeners) {
         this.propertyWalkListeners = propertyWalkListeners;
     }
 
@@ -60,14 +60,14 @@ public class PropertyWalkListenerRunner extends AbstractWalkListenerRunner {
     }
 
     public static class Builder {
-        private List<JsonSchemaWalkListener> propertyWalkListeners = new ArrayList<>();
+        private List<WalkListener> propertyWalkListeners = new ArrayList<>();
 
-        public Builder propertyWalkListener(JsonSchemaWalkListener propertyWalkListener) {
+        public Builder propertyWalkListener(WalkListener propertyWalkListener) {
             this.propertyWalkListeners.add(propertyWalkListener);
             return this;
         }
 
-        public Builder propertyWalkListeners(Consumer<List<JsonSchemaWalkListener>> propertyWalkListeners) {
+        public Builder propertyWalkListeners(Consumer<List<WalkListener>> propertyWalkListeners) {
             propertyWalkListeners.accept(this.propertyWalkListeners);
             return this;
         }

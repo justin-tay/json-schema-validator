@@ -13,7 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.Specification.Version;
-import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.WalkListener;
 import com.networknt.schema.walk.KeywordWalkListenerRunner;
 import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
@@ -61,7 +61,7 @@ class Issue724Test {
         assertLinesMatch(Arrays.asList("my_credit_card", "my_billing_address"), stringCollector.strings);
     }
 
-    static class StringCollector implements JsonSchemaWalkListener {
+    static class StringCollector implements WalkListener {
         final List<String> strings = new ArrayList<>();
 
         @Override

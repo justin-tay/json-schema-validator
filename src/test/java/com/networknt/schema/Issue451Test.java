@@ -2,7 +2,7 @@ package com.networknt.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.WalkListener;
 import com.networknt.schema.walk.PropertyWalkListenerRunner;
 import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
@@ -70,7 +70,7 @@ class Issue451Test {
     }
 
 
-    private static class CountingWalker implements JsonSchemaWalkListener {
+    private static class CountingWalker implements WalkListener {
         @Override
         public WalkFlow onWalkStart(WalkEvent walkEvent) {
             SchemaLocation path = walkEvent.getSchema().getSchemaLocation();
@@ -88,7 +88,7 @@ class Issue451Test {
             Map<String, Integer> collector = (Map<String, Integer>) executionContext.getCollectorContext().get(COLLECTOR_ID);
             if(collector == null) {
                 collector = new HashMap<>();
-                executionContext.getCollectorContext().add(COLLECTOR_ID, collector);
+                executionContext.getCollectorContext().put(COLLECTOR_ID, collector);
             }
 
             return collector;

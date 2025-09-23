@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import com.networknt.schema.Specification.Version;
 import com.networknt.schema.keyword.ValidatorTypeCode;
-import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.WalkListener;
 import com.networknt.schema.walk.KeywordWalkListenerRunner;
 import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
@@ -51,7 +51,7 @@ class IfValidatorTest {
                 + "  }\r\n"
                 + "}";
         KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
-                .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
+                .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         return WalkFlow.CONTINUE;
@@ -62,7 +62,7 @@ class IfValidatorTest {
                         @SuppressWarnings("unchecked")
                         List<WalkEvent> types = (List<WalkEvent>) walkEvent.getExecutionContext()
                                 .getCollectorContext()
-                                .getCollectorMap()
+                                .getData()
                                 .computeIfAbsent("types", key -> new ArrayList<JsonNodePath>());
                         types.add(walkEvent);
                     }
@@ -96,7 +96,7 @@ class IfValidatorTest {
                 + "  }\r\n"
                 + "}";
         KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
-                .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
+                .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         return WalkFlow.CONTINUE;
@@ -107,7 +107,7 @@ class IfValidatorTest {
                         @SuppressWarnings("unchecked")
                         List<WalkEvent> types = (List<WalkEvent>) walkEvent.getExecutionContext()
                                 .getCollectorContext()
-                                .getCollectorMap()
+                                .getData()
                                 .computeIfAbsent("types", key -> new ArrayList<JsonNodePath>());
                         types.add(walkEvent);
                     }
@@ -142,7 +142,7 @@ class IfValidatorTest {
                 + "  }\r\n"
                 + "}";
         KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
-                .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
+                .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         return WalkFlow.CONTINUE;
@@ -153,7 +153,7 @@ class IfValidatorTest {
                         @SuppressWarnings("unchecked")
                         List<WalkEvent> types = (List<WalkEvent>) walkEvent.getExecutionContext()
                                 .getCollectorContext()
-                                .getCollectorMap()
+                                .getData()
                                 .computeIfAbsent("types", key -> new ArrayList<JsonNodePath>());
                         types.add(walkEvent);
                     }
@@ -186,7 +186,7 @@ class IfValidatorTest {
                 + "  }\r\n"
                 + "}";
         KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
-                .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new JsonSchemaWalkListener() {
+                .keywordWalkListener(ValidatorTypeCode.TYPE.getValue(), new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         return WalkFlow.CONTINUE;
@@ -197,7 +197,7 @@ class IfValidatorTest {
                         @SuppressWarnings("unchecked")
                         List<WalkEvent> types = (List<WalkEvent>) walkEvent.getExecutionContext()
                                 .getCollectorContext()
-                                .getCollectorMap()
+                                .getData()
                                 .computeIfAbsent("types", key -> new ArrayList<JsonNodePath>());
                         types.add(walkEvent);
                     }

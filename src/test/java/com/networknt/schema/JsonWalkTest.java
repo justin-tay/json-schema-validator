@@ -10,7 +10,7 @@ import com.networknt.schema.keyword.AbstractKeywordValidator;
 import com.networknt.schema.keyword.Keyword;
 import com.networknt.schema.keyword.KeywordValidator;
 import com.networknt.schema.keyword.ValidatorTypeCode;
-import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.WalkListener;
 import com.networknt.schema.walk.KeywordWalkListenerRunner;
 import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
@@ -197,7 +197,7 @@ class JsonWalkTest {
         }
     }
 
-    private static class AllKeywordListener implements JsonSchemaWalkListener {
+    private static class AllKeywordListener implements WalkListener {
         @Override
         public WalkFlow onWalkStart(WalkEvent keywordWalkEvent) {
             ObjectMapper mapper = new ObjectMapper();
@@ -205,7 +205,7 @@ class JsonWalkTest {
             JsonNode schemaNode = keywordWalkEvent.getSchema().getSchemaNode();
             CollectorContext collectorContext = keywordWalkEvent.getExecutionContext().getCollectorContext();
             if (collectorContext.get(SAMPLE_WALK_COLLECTOR_TYPE) == null) {
-                collectorContext.add(SAMPLE_WALK_COLLECTOR_TYPE, mapper.createObjectNode());
+                collectorContext.put(SAMPLE_WALK_COLLECTOR_TYPE, mapper.createObjectNode());
             }
             if (keyWordName.equals(CUSTOM_KEYWORD) && schemaNode.get(CUSTOM_KEYWORD).isArray()) {
                 ObjectNode objectNode = (ObjectNode) collectorContext.get(SAMPLE_WALK_COLLECTOR_TYPE);
@@ -221,14 +221,14 @@ class JsonWalkTest {
         }
     }
 
-    private static class RefKeywordListener implements JsonSchemaWalkListener {
+    private static class RefKeywordListener implements WalkListener {
 
         @Override
         public WalkFlow onWalkStart(WalkEvent keywordWalkEvent) {
             ObjectMapper mapper = new ObjectMapper();
             CollectorContext collectorContext = keywordWalkEvent.getExecutionContext().getCollectorContext();
             if (collectorContext.get(SAMPLE_WALK_COLLECTOR_TYPE) == null) {
-                collectorContext.add(SAMPLE_WALK_COLLECTOR_TYPE, mapper.createObjectNode());
+                collectorContext.put(SAMPLE_WALK_COLLECTOR_TYPE, mapper.createObjectNode());
             }
             ObjectNode objectNode = (ObjectNode) collectorContext.get(SAMPLE_WALK_COLLECTOR_TYPE);
             objectNode.set(keywordWalkEvent.getSchema().getSchemaNode().get("title").textValue().toLowerCase(),
@@ -242,7 +242,7 @@ class JsonWalkTest {
         }
     }
 
-    private static class PropertiesKeywordListener implements JsonSchemaWalkListener {
+    private static class PropertiesKeywordListener implements WalkListener {
 
         @Override
         public WalkFlow onWalkStart(WalkEvent keywordWalkEvent) {

@@ -55,7 +55,7 @@ import com.networknt.schema.ValidationResult;
 /**
  * JsonSchemaWalkListenerTest.
  */
-class JsonSchemaWalkListenerTest {
+class WalkListenerTest {
 
     @Test
     void keywordListener() {
@@ -86,13 +86,13 @@ class JsonSchemaWalkListenerTest {
                 + "}";
 
         KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
-                .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new JsonSchemaWalkListener() {
+                .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         @SuppressWarnings("unchecked")
                         List<WalkEvent> propertyKeywords = (List<WalkEvent>) walkEvent.getExecutionContext()
                                 .getCollectorContext()
-                                .getCollectorMap()
+                                .getData()
                                 .computeIfAbsent("propertyKeywords", key -> new ArrayList<>());
                         propertyKeywords.add(walkEvent);
                         return WalkFlow.CONTINUE;
@@ -169,13 +169,13 @@ class JsonSchemaWalkListenerTest {
                 + "}";
         
         PropertyWalkListenerRunner propertyWalkListenerRunner = PropertyWalkListenerRunner.builder()
-                .propertyWalkListener(new JsonSchemaWalkListener() {
+                .propertyWalkListener(new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         @SuppressWarnings("unchecked")
                         List<WalkEvent> properties = (List<WalkEvent>) walkEvent.getExecutionContext()
                                 .getCollectorContext()
-                                .getCollectorMap()
+                                .getData()
                                 .computeIfAbsent("properties", key -> new ArrayList<>());
                         properties.add(walkEvent);
                         return WalkFlow.CONTINUE;
@@ -258,13 +258,13 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
 
-        ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder().itemWalkListener(new WalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
-                        .getCollectorMap()
+                        .getData()
                         .computeIfAbsent("items", key -> new ArrayList<>());
                 items.add(walkEvent);
                 return WalkFlow.CONTINUE;
@@ -335,13 +335,13 @@ class JsonSchemaWalkListenerTest {
                 + "  }\r\n"
                 + "}";
 
-        ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder().itemWalkListener(new WalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
-                        .getCollectorMap()
+                        .getData()
                         .computeIfAbsent("items", key -> new ArrayList<>());
                 items.add(walkEvent);
                 return WalkFlow.CONTINUE;
@@ -386,13 +386,13 @@ class JsonSchemaWalkListenerTest {
     @Test
     void draft201909() {
     	KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
-                .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new JsonSchemaWalkListener() {
+                .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         @SuppressWarnings("unchecked")
                         List<WalkEvent> propertyKeywords = (List<WalkEvent>) walkEvent.getExecutionContext()
                                 .getCollectorContext()
-                                .getCollectorMap()
+                                .getData()
                                 .computeIfAbsent("propertyKeywords", key -> new ArrayList<>());
                         propertyKeywords.add(walkEvent);
                         return WalkFlow.CONTINUE;
@@ -427,8 +427,7 @@ class JsonSchemaWalkListenerTest {
         ValidationResult result = schema.walk(inputData, InputFormat.JSON, true, executionContext -> executionContext.setWalkConfig(walkConfig));
         assertTrue(result.getErrors().isEmpty());
 
-        @SuppressWarnings("unchecked")
-        List<WalkEvent> propertyKeywords = (List<WalkEvent>) result.getExecutionContext().getCollectorContext().getCollectorMap().get("propertyKeywords");
+        List<WalkEvent> propertyKeywords = result.getExecutionContext().getCollectorContext().get("propertyKeywords");
         
         assertEquals(28, propertyKeywords.size());
 
@@ -601,7 +600,7 @@ class JsonSchemaWalkListenerTest {
                 + "}";
 
         PropertyWalkListenerRunner propertyWalkListenerRunner = PropertyWalkListenerRunner.builder()
-                .propertyWalkListener(new JsonSchemaWalkListener() {
+                .propertyWalkListener(new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         if (walkEvent.getInstanceNode() == null || walkEvent.getInstanceNode().isMissingNode()
@@ -661,7 +660,7 @@ class JsonSchemaWalkListenerTest {
                 + "}";
 
         PropertyWalkListenerRunner propertyWalkListenerRunner = PropertyWalkListenerRunner.builder()
-                .propertyWalkListener(new JsonSchemaWalkListener() {
+                .propertyWalkListener(new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         if (walkEvent.getInstanceNode() == null || walkEvent.getInstanceNode().isMissingNode()
@@ -724,7 +723,7 @@ class JsonSchemaWalkListenerTest {
                 + "}";
         Map<String, JsonNode> missingSchemaNode = new LinkedHashMap<>();
         KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
-                .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new JsonSchemaWalkListener() {
+                .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         JsonNode requiredNode = walkEvent.getSchema().getSchemaNode().get("required");
@@ -799,7 +798,7 @@ class JsonSchemaWalkListenerTest {
                 + "}";
 
         PropertyWalkListenerRunner propertyWalkListenerRunner = PropertyWalkListenerRunner.builder()
-                .propertyWalkListener(new JsonSchemaWalkListener() {
+                .propertyWalkListener(new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         if (walkEvent.getInstanceNode() == null || walkEvent.getInstanceNode().isMissingNode()
@@ -865,7 +864,7 @@ class JsonSchemaWalkListenerTest {
                 + "            }\r\n"
                 + "          }\r\n"
                 + "        }";
-        JsonSchemaWalkListener listener = new JsonSchemaWalkListener() {
+        WalkListener listener = new WalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -876,7 +875,7 @@ class JsonSchemaWalkListenerTest {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
-                        .getCollectorMap()
+                        .getData()
                         .computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
                 items.add(walkEvent);
             }
@@ -931,7 +930,7 @@ class JsonSchemaWalkListenerTest {
                 + "            }\r\n"
                 + "          }\r\n"
                 + "        }";
-        JsonSchemaWalkListener listener = new JsonSchemaWalkListener() {
+        WalkListener listener = new WalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -942,7 +941,7 @@ class JsonSchemaWalkListenerTest {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
-                        .getCollectorMap()
+                        .getData()
                         .computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
                 items.add(walkEvent);
             }
@@ -956,7 +955,6 @@ class JsonSchemaWalkListenerTest {
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12).getSchema(schemaData);
 
         ValidationResult result = schema.walk(null, true, executionContext -> executionContext.setWalkConfig(walkConfig));
-        @SuppressWarnings("unchecked")
         List<WalkEvent> items = result.getExecutionContext().getCollectorContext().get("items");
         assertEquals(4, items.size());
         assertEquals("/name", items.get(0).getInstanceLocation().toString());

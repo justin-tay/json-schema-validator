@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.WalkListener;
 import com.networknt.schema.walk.KeywordWalkListenerRunner;
 import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
@@ -16,7 +16,7 @@ import com.networknt.schema.walk.WalkFlow;
  * Issue 918.
  */
 class SharedConfigTest {
-    private static class AllKeywordListener implements JsonSchemaWalkListener {
+    private static class AllKeywordListener implements WalkListener {
         boolean wasCalled = false;
 
         @Override

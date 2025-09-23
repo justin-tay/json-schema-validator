@@ -10,7 +10,7 @@ import com.networknt.schema.Specification.Version;
 import com.networknt.schema.keyword.PrefixItemsValidator;
 import com.networknt.schema.serialization.JsonMapperFactory;
 import com.networknt.schema.walk.ItemWalkListenerRunner;
-import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.WalkListener;
 import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
@@ -132,7 +132,7 @@ class PrefixItemsValidatorTest extends AbstractJsonSchemaTestSuite {
                 + "    }\n"
                 + "  ]\n"
                 + "}";
-        ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder().itemWalkListener(new WalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -143,7 +143,7 @@ class PrefixItemsValidatorTest extends AbstractJsonSchemaTestSuite {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
-                        .getCollectorMap()
+                        .getData()
                         .computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
                 items.add(walkEvent);
             }
@@ -190,7 +190,7 @@ class PrefixItemsValidatorTest extends AbstractJsonSchemaTestSuite {
                 + "}";
         
         ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder()
-                .itemWalkListener(new JsonSchemaWalkListener() {
+                .itemWalkListener(new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         return WalkFlow.CONTINUE;
@@ -200,7 +200,7 @@ class PrefixItemsValidatorTest extends AbstractJsonSchemaTestSuite {
                     public void onWalkEnd(WalkEvent walkEvent, List<Error> errors) {
                         @SuppressWarnings("unchecked")
                         List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext().getCollectorContext()
-                                .getCollectorMap().computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
+                                .getData().computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
                         items.add(walkEvent);
                     }
                 }).build();

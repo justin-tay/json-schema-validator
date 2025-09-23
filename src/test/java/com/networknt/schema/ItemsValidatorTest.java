@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.Specification.Version;
 import com.networknt.schema.serialization.JsonMapperFactory;
 import com.networknt.schema.walk.ItemWalkListenerRunner;
-import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.WalkListener;
 import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
@@ -124,7 +124,7 @@ class ItemsValidatorTest {
                 + "  }\r\n"
                 + "}";
         ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder()
-				.itemWalkListener(new JsonSchemaWalkListener() {
+				.itemWalkListener(new WalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -135,7 +135,7 @@ class ItemsValidatorTest {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
-                        .getCollectorMap()
+                        .getData()
                         .computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
                 items.add(walkEvent);
             }
@@ -162,7 +162,7 @@ class ItemsValidatorTest {
                 + "  }\r\n"
                 + "}";
         ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder()
-				.itemWalkListener(new JsonSchemaWalkListener() {
+				.itemWalkListener(new WalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -173,7 +173,7 @@ class ItemsValidatorTest {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
-                        .getCollectorMap()
+                        .getData()
                         .computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
                 items.add(walkEvent);
             }
@@ -206,7 +206,7 @@ class ItemsValidatorTest {
                 + "  }\r\n"
                 + "}";
         ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder()
-				.itemWalkListener(new JsonSchemaWalkListener() {
+				.itemWalkListener(new WalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -217,7 +217,7 @@ class ItemsValidatorTest {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
-                        .getCollectorMap()
+                        .getData()
                         .computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
                 items.add(walkEvent);
             }
@@ -258,7 +258,7 @@ class ItemsValidatorTest {
                 + "  }\r\n"
                 + "}";
         ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder()
-				.itemWalkListener(new JsonSchemaWalkListener() {
+				.itemWalkListener(new WalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -269,7 +269,7 @@ class ItemsValidatorTest {
                 @SuppressWarnings("unchecked")
                 List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext()
                         .getCollectorContext()
-                        .getCollectorMap()
+                        .getData()
                         .computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
                 items.add(walkEvent);
             }
@@ -316,7 +316,7 @@ class ItemsValidatorTest {
                 + "}";
         
 		ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder()
-				.itemWalkListener(new JsonSchemaWalkListener() {
+				.itemWalkListener(new WalkListener() {
 					@Override
 					public WalkFlow onWalkStart(WalkEvent walkEvent) {
 						return WalkFlow.CONTINUE;
@@ -326,7 +326,7 @@ class ItemsValidatorTest {
 					public void onWalkEnd(WalkEvent walkEvent, List<Error> errors) {
 						@SuppressWarnings("unchecked")
 						List<WalkEvent> items = (List<WalkEvent>) walkEvent.getExecutionContext().getCollectorContext()
-								.getCollectorMap().computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
+								.getData().computeIfAbsent("items", key -> new ArrayList<JsonNodePath>());
 						items.add(walkEvent);
 					}
 				}).build();

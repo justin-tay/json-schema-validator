@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.keyword.ValidatorTypeCode;
 import com.networknt.schema.serialization.JsonMapperFactory;
-import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.WalkListener;
 import com.networknt.schema.walk.KeywordWalkListenerRunner;
 import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
@@ -41,7 +41,7 @@ class Issue461Test {
     /**
      * Example NOP walker
      */
-    private static class Walker implements JsonSchemaWalkListener {
+    private static class Walker implements WalkListener {
         @Override
         public WalkFlow onWalkStart(final WalkEvent walkEvent) {
             return WalkFlow.CONTINUE;

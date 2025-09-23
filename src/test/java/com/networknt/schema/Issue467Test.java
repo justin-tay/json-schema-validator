@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.keyword.ValidatorTypeCode;
-import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.WalkListener;
 import com.networknt.schema.walk.KeywordWalkListenerRunner;
 import com.networknt.schema.walk.PropertyWalkListenerRunner;
 import com.networknt.schema.walk.WalkConfig;
@@ -49,7 +49,7 @@ class Issue467Test {
         InputStream schemaInputStream = Issue467Test.class.getResourceAsStream(schemaPath);
         final Set<JsonNodePath> properties = new LinkedHashSet<>();
         KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
-                .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new JsonSchemaWalkListener() {
+                .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         properties.add(walkEvent.getSchema().getEvaluationPath().append(walkEvent.getKeyword()));
@@ -78,7 +78,7 @@ class Issue467Test {
         InputStream schemaInputStream = Issue467Test.class.getResourceAsStream(schemaPath);
         final Set<JsonNodePath> properties = new LinkedHashSet<>();
         PropertyWalkListenerRunner propertyWalkListenerRunner = PropertyWalkListenerRunner.builder()
-                .propertyWalkListener(new JsonSchemaWalkListener() {
+                .propertyWalkListener(new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
                         properties.add(walkEvent.getSchema().getEvaluationPath());
