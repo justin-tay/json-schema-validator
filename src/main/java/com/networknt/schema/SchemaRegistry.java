@@ -292,7 +292,7 @@ public class SchemaRegistry {
     protected Schema newSchema(final SchemaLocation schemaUri, final JsonNode schemaNode) {
         final SchemaContext schemaContext = createSchemaContext(schemaNode);
         Schema jsonSchema = doCreate(schemaContext, getSchemaLocation(schemaUri),
-                new NodePath(schemaContext.getSchemaRegistryConfig().getPathType()), schemaNode, null, false);
+                schemaContext.getSchemaRegistryConfig().getNodePathFactory().get(), schemaNode, null, false);
         preload(jsonSchema);
         return jsonSchema;
     }
@@ -527,7 +527,7 @@ public class SchemaRegistry {
             }
 
             final Dialect dialect = getDialectOrDefault(schemaNode);
-            NodePath evaluationPath = new NodePath(getSchemaRegistryConfig().getPathType());
+            NodePath evaluationPath = getSchemaRegistryConfig().getNodePathFactory().get();
             if (schemaUri.getFragment() == null
                     || schemaUri.getFragment().getNameCount() == 0) {
                 // Schema without fragment

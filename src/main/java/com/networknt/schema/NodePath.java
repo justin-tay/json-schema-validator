@@ -20,8 +20,7 @@ import java.util.Objects;
 /**
  * Represents a path to a JSON node.
  */
-public class NodePath implements Comparable<NodePath> {
-    private final PathType type;
+public abstract class NodePath implements Comparable<NodePath> {
     private final NodePath parent;
 
     private final String pathSegment;
@@ -30,23 +29,20 @@ public class NodePath implements Comparable<NodePath> {
     private volatile String value = null; // computed lazily
     private int hash = 0; // computed lazily
 
-    public NodePath(PathType type) {
-        this.type = type;
+    public NodePath() {
         this.parent = null;
         this.pathSegment = null;
         this.pathSegmentIndex = -1;
     }
 
-    private NodePath(NodePath parent, String pathSegment) {
+    protected NodePath(NodePath parent, String pathSegment) {
         this.parent = parent;
-        this.type = parent.type;
         this.pathSegment = pathSegment;
         this.pathSegmentIndex = -1;
     }
 
-    private NodePath(NodePath parent, int pathSegmentIndex) {
+    protected NodePath(NodePath parent, int pathSegmentIndex) {
         this.parent = parent;
-        this.type = parent.type;
         this.pathSegment = null;
         this.pathSegmentIndex = pathSegmentIndex;
     }
@@ -66,9 +62,7 @@ public class NodePath implements Comparable<NodePath> {
      * @param token the child token
      * @return the path
      */
-    public NodePath append(String token) {
-        return new NodePath(this, token);
-    }
+    public abstract NodePath append(String token);
 
     /**
      * Append the index to the path.
@@ -76,18 +70,14 @@ public class NodePath implements Comparable<NodePath> {
      * @param index the index
      * @return the path
      */
-    public NodePath append(int index) {
-        return new NodePath(this, index);
-    }
+    public abstract NodePath append(int index);
 
     /**
      * Gets the {@link PathType}.
      * 
      * @return the path type
      */
-    public PathType getPathType() {
-        return this.type;
-    }
+    public abstract PathType getPathType();
 
     /**
      * Gets the name element given an index.
@@ -202,11 +192,11 @@ public class NodePath implements Comparable<NodePath> {
     @Override
     public String toString() {
         if (this.value == null) {
-            String parentValue = this.parent == null ? type.getRoot() : this.parent.toString();
+            String parentValue = this.parent == null ? getPathType().getRoot() : this.parent.toString();
             if (pathSegmentIndex != -1) {
-                this.value = this.type.append(parentValue, pathSegmentIndex);
+                this.value = this.getPathType().append(parentValue, pathSegmentIndex);
             } else if (pathSegment != null) {
-                this.value = this.type.append(parentValue, pathSegment);
+                this.value = this.getPathType().append(parentValue, pathSegment);
             } else {
                 this.value = parentValue;
             }
@@ -218,7 +208,7 @@ public class NodePath implements Comparable<NodePath> {
     public int hashCode() {
         int h = hash;
         if (h == 0) {
-            h = Objects.hash(parent, pathSegment, pathSegmentIndex, type);
+            h = Objects.hash(parent, pathSegment, pathSegmentIndex, getPathType());
             hash = h;
         }
         return h;
@@ -234,7 +224,7 @@ public class NodePath implements Comparable<NodePath> {
             return false;
         NodePath other = (NodePath) obj;
         return Objects.equals(pathSegment, other.pathSegment) && pathSegmentIndex == other.pathSegmentIndex
-                && type == other.type && Objects.equals(parent, other.parent);
+                && getPathType() == other.getPathType() && Objects.equals(parent, other.parent);
     }
 
     @Override

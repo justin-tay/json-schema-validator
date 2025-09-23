@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import com.networknt.schema.Specification.Version;
 import com.networknt.schema.dialect.Dialects;
+import com.networknt.schema.path.LegacyPath;
 
 /**
  * OneOfValidatorTest.
@@ -65,7 +66,7 @@ class OneOfValidatorTest {
                 + "  \"fox\" : \"test\",\r\n"
                 + "  \"world\" : \"test\"\r\n"
                 + "}";
-        SchemaRegistryConfig config = SchemaRegistryConfig.builder().pathType(PathType.LEGACY).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().nodePathFactory(LegacyPath::getRoot).build();
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         List<Error> messages = schema.validate(inputData, InputFormat.JSON);
         assertEquals(3, messages.size()); // even if more than 1 matches the mismatch errors are still reported
@@ -107,7 +108,7 @@ class OneOfValidatorTest {
         String inputData = "{\r\n"
                 + "  \"test\" : 1\r\n"
                 + "}";
-        SchemaRegistryConfig config = SchemaRegistryConfig.builder().pathType(PathType.LEGACY).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().nodePathFactory(LegacyPath::getRoot).build();
         Schema schema = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config)).getSchema(schemaData);
         List<Error> messages = schema.validate(inputData, InputFormat.JSON);
         assertEquals(4, messages.size());

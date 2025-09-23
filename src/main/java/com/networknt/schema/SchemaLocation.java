@@ -20,6 +20,9 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+import com.networknt.schema.path.JsonPointer;
+import com.networknt.schema.path.UriReferencePath;
+
 /**
  * The schema location is the canonical IRI of the schema object plus a JSON
  * Pointer fragment indicating the subschema that produced a result. In contrast
@@ -27,8 +30,8 @@ import java.util.Objects;
  * applicators such as $ref or $dynamicRef.
  */
 public class SchemaLocation {
-    private static final NodePath JSON_POINTER = new NodePath(PathType.JSON_POINTER);
-    private static final NodePath ANCHOR = new NodePath(PathType.URI_REFERENCE);
+    private static final NodePath JSON_POINTER = JsonPointer.getRoot();
+    private static final NodePath ANCHOR = UriReferencePath.getRoot();
 
     /**
      * Represents a relative schema location to the current document.

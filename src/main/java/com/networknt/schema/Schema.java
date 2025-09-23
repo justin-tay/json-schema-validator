@@ -120,26 +120,6 @@ public class Schema implements Validator {
         final SchemaLocation schemaLocation = SchemaLocation.of(node.textValue());
         return schemaContext.getSchemaRegistry().getSchema(schemaLocation);
     }
-    public static class JsonNodePathLegacy {
-        private static final NodePath INSTANCE = new NodePath(PathType.LEGACY);
-        public static NodePath getInstance() {
-            return INSTANCE;
-        }
-    }
-
-    public static class JsonNodePathJsonPointer {
-        private static final NodePath INSTANCE = new NodePath(PathType.JSON_POINTER);
-        public static NodePath getInstance() {
-            return INSTANCE;
-        }
-    }
-
-    public static class JsonNodePathJsonPath {
-        private static final NodePath INSTANCE = new NodePath(PathType.JSON_PATH);
-        public static NodePath getInstance() {
-            return INSTANCE;
-        }
-    }
 
     public void validate(ExecutionContext executionContext, JsonNode node) {
         validate(executionContext, node, node, atRoot());
@@ -151,14 +131,7 @@ public class Schema implements Validator {
      * @return The path.
      */
     protected NodePath atRoot() {
-        if (this.schemaContext.getSchemaRegistryConfig().getPathType().equals(PathType.JSON_POINTER)) {
-            return JsonNodePathJsonPointer.getInstance();
-        } else if (this.schemaContext.getSchemaRegistryConfig().getPathType().equals(PathType.LEGACY)) {
-            return JsonNodePathLegacy.getInstance();
-        } else if (this.schemaContext.getSchemaRegistryConfig().getPathType().equals(PathType.JSON_PATH)) {
-            return JsonNodePathJsonPath.getInstance();
-        }
-        return new NodePath(this.schemaContext.getSchemaRegistryConfig().getPathType());
+        return this.schemaContext.getSchemaRegistryConfig().getNodePathFactory().get();
     }    
 
     static Schema from(SchemaContext schemaContext, SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parent, boolean suppressSubSchemaRetrieval) {

@@ -108,19 +108,20 @@ public class HierarchicalOutputUnitFormatter {
         return root;
     }
 
-    public static OutputUnit format(Schema jsonSchema, List<Error> errors,
+    public static OutputUnit format(Schema schema, List<Error> errors,
             ExecutionContext executionContext, SchemaContext schemaContext,
             Function<Error, Object> errorMapper) {
         OutputUnit root = new OutputUnit();
         root.setValid(errors.isEmpty());
-        
-        root.setInstanceLocation(schemaContext.getSchemaRegistryConfig().getPathType().getRoot());
-        root.setEvaluationPath(schemaContext.getSchemaRegistryConfig().getPathType().getRoot());
-        root.setSchemaLocation(jsonSchema.getSchemaLocation().toString());
+        NodePath rootNodePath = schemaContext.getSchemaRegistryConfig().getNodePathFactory().get();
+        String rootPath = rootNodePath.getPathType().getRoot();
+        root.setInstanceLocation(rootPath);
+        root.setEvaluationPath(rootPath);
+        root.setSchemaLocation(schema.getSchemaLocation().toString());
 
         OutputUnitData data = OutputUnitData.from(errors, executionContext, errorMapper);
         
-        return format(root, data, new NodePath(schemaContext.getSchemaRegistryConfig().getPathType()));
+        return format(root, data, rootNodePath);
     }
     
     /**

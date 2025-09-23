@@ -15,6 +15,39 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class Issue687Test {
 
+    public static class BasicNodePath extends NodePath {
+        private PathType pathType;
+        public BasicNodePath(PathType pathType) {
+            this.pathType = pathType;
+        }
+
+        public BasicNodePath(BasicNodePath path, String token) {
+            super(path, token);
+            this.pathType = path.getPathType();
+        }
+
+        public BasicNodePath(BasicNodePath path, int token) {
+            super(path, token);
+            this.pathType = path.getPathType();
+        }
+
+        @Override
+        public NodePath append(String token) {
+            return new BasicNodePath(this, token);
+        }
+
+        @Override
+        public NodePath append(int index) {
+            return new BasicNodePath(this, index);
+        }
+
+        @Override
+        public PathType getPathType() {
+            return this.pathType;
+        }
+        
+    }
+
     @Test
     void testRoot() {
         assertEquals("$", PathType.LEGACY.getRoot());
@@ -80,7 +113,7 @@ class Issue687Test {
     @ParameterizedTest
     @MethodSource("errors")
     void testError(PathType pathType, String schemaPath, String content, String[] expectedMessagePaths) throws JsonProcessingException {
-        SchemaRegistryConfig config = SchemaRegistryConfig.builder().pathType(pathType).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().nodePathFactory(() -> new BasicNodePath(pathType)).build();
         SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(config));
         Schema schema = factory.getSchema(Issue687Test.class.getResourceAsStream(schemaPath));
         List<Error> messages = schema.validate(new ObjectMapper().readTree(content));
@@ -113,7 +146,7 @@ class Issue687Test {
     @MethodSource("specialCharacterTests")
     void testSpecialCharacters(PathType pathType, String propertyName, String expectedPath) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        SchemaRegistryConfig schemaValidatorsConfig = SchemaRegistryConfig.builder().pathType(pathType).build();
+        SchemaRegistryConfig schemaValidatorsConfig = SchemaRegistryConfig.builder().nodePathFactory(() -> new BasicNodePath(pathType)).build();
         Schema schema = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_2019_09, builder -> builder.schemaRegistryConfig(schemaValidatorsConfig))
                 .getSchema(mapper.readTree("{\n" +
                         "    \"$schema\": \"https://json-schema.org/draft/2019-09/schema\",\n" +

@@ -32,6 +32,7 @@ import com.networknt.schema.PathType;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaRegistryConfig;
 import com.networknt.schema.dialect.Dialects;
+import com.networknt.schema.path.JsonPath;
 import com.networknt.schema.Error;
 
 /**
@@ -70,7 +71,7 @@ class OpenApi30Test {
      */
     @Test
     void jsonPointerWithNumberInFragment() {
-        SchemaRegistryConfig config = SchemaRegistryConfig.builder().pathType(PathType.JSON_PATH).build();
+        SchemaRegistryConfig config = SchemaRegistryConfig.builder().nodePathFactory(JsonPath::getRoot).build();
         SchemaRegistry factory = SchemaRegistry.withDialect(Dialects.getOpenApi30(), builder -> builder.schemaRegistryConfig(config));
         Schema schema = factory.getSchema(SchemaLocation.of(
                 "classpath:schema/oas/3.0/petstore.yaml#/paths/~1pet/post/responses/200/content/application~1json/schema")

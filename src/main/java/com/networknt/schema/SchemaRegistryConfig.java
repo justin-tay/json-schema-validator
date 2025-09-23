@@ -18,6 +18,7 @@ package com.networknt.schema;
 
 import com.networknt.schema.i18n.DefaultMessageSource;
 import com.networknt.schema.i18n.MessageSource;
+import com.networknt.schema.path.JsonPointer;
 import com.networknt.schema.regex.ECMAScriptRegularExpressionFactory;
 import com.networknt.schema.regex.JDKRegularExpressionFactory;
 import com.networknt.schema.regex.RegularExpressionFactory;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * Configuration for SchemaRegistry that applies to all the schemas its
@@ -98,7 +100,7 @@ public class SchemaRegistryConfig {
     /**
      * The approach used to generate paths in reported messages, logs and errors. Default is the legacy "JSONPath-like" approach.
      */
-    private final PathType pathType;
+    private final Supplier<NodePath> nodePathFactory;
 
     /**
      * Controls if the schema will automatically be preloaded.
@@ -140,7 +142,7 @@ public class SchemaRegistryConfig {
             Boolean formatAssertionsEnabled,
             boolean javaSemantics,
             Locale locale, boolean losslessNarrowing,
-            MessageSource messageSource, PathType pathType,
+            MessageSource messageSource, Supplier<NodePath> nodePathFactory,
             boolean preloadSchema, int preloadSchemaRefMaxNestingDepth,
             RegularExpressionFactory regularExpressionFactory, SchemaIdValidator schemaIdValidator,
             Map<String, Boolean> strictness, boolean typeLoose) {
@@ -154,7 +156,7 @@ public class SchemaRegistryConfig {
         this.locale = locale;
         this.losslessNarrowing = losslessNarrowing;
         this.messageSource = messageSource;
-        this.pathType = pathType;
+        this.nodePathFactory = nodePathFactory;
         this.preloadSchema = preloadSchema;
         this.preloadSchemaRefMaxNestingDepth = preloadSchemaRefMaxNestingDepth;
         this.regularExpressionFactory = regularExpressionFactory;
@@ -216,8 +218,8 @@ public class SchemaRegistryConfig {
      *
      * @return The path generation approach.
      */
-    public PathType getPathType() {
-        return this.pathType;
+    public Supplier<NodePath> getNodePathFactory() {
+        return this.nodePathFactory;
     }
 
     /**
@@ -349,7 +351,7 @@ public class SchemaRegistryConfig {
         builder.locale = config.locale;
         builder.losslessNarrowing = config.losslessNarrowing;
         builder.messageSource = config.messageSource;
-        builder.pathType = config.pathType;
+        builder.nodePathFactory = config.nodePathFactory;
         builder.preloadSchema = config.preloadSchema;
         builder.preloadSchemaRefMaxNestingDepth = config.preloadSchemaRefMaxNestingDepth;
         builder.regularExpressionFactory = config.regularExpressionFactory;
@@ -382,7 +384,7 @@ public class SchemaRegistryConfig {
         protected Locale locale = null; // This must be null to use Locale.getDefault() as the default can be changed
         protected boolean losslessNarrowing = false;
         protected MessageSource messageSource = null;
-        protected PathType pathType = PathType.JSON_POINTER;
+        protected Supplier<NodePath> nodePathFactory = JsonPointer::getRoot;
         protected boolean preloadSchema = true;
         protected int preloadSchemaRefMaxNestingDepth = DEFAULT_PRELOAD_SCHEMA_REF_MAX_NESTING_DEPTH;
         protected RegularExpressionFactory regularExpressionFactory = JDKRegularExpressionFactory.getInstance();
@@ -497,13 +499,13 @@ public class SchemaRegistryConfig {
         /**
          * Sets the path type to use when reporting the instance location of errors.
          * <p>
-         * Defaults to {@link PathType#JSON_POINTER}.
+         * Defaults to {@link JsonPointer#getRoot()}.
          *
-         * @param pathType the path type
-         * @return the path type
+         * @param nodePathFactory the node path factory
+         * @return the node path factory
          */
-        public T pathType(PathType pathType) {
-            this.pathType = pathType;
+        public T nodePathFactory(Supplier<NodePath> nodePathFactory) {
+            this.nodePathFactory = nodePathFactory;
             return self();
         }
         /**
@@ -575,7 +577,7 @@ public class SchemaRegistryConfig {
             return new SchemaRegistryConfig(cacheRefs, errorMessageKeyword,
                     executionContextCustomizer, failFast, formatAssertionsEnabled, 
                     javaSemantics, locale, losslessNarrowing, messageSource,
-                    pathType, preloadSchema, preloadSchemaRefMaxNestingDepth,
+                    nodePathFactory, preloadSchema, preloadSchemaRefMaxNestingDepth,
                     regularExpressionFactory, schemaIdValidator, strictness, typeLoose
                     );
         }

@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import com.networknt.schema.annotation.JsonNodeAnnotation;
 import com.networknt.schema.annotation.JsonNodeAnnotations;
+import com.networknt.schema.path.JsonPointer;
 
 /**
  * JsonNodeAnnotationsTest.
@@ -30,7 +31,7 @@ class JsonNodeAnnotationsTest {
     void put() {
         JsonNodeAnnotations annotations = new JsonNodeAnnotations();
         JsonNodeAnnotation annotation = new JsonNodeAnnotation("unevaluatedProperties",
-                new NodePath(PathType.JSON_POINTER), SchemaLocation.of(""), new NodePath(PathType.JSON_POINTER),
+                JsonPointer.getRoot(), SchemaLocation.of(""), JsonPointer.getRoot(),
                 "test");
         annotations.put(annotation);
         assertTrue(annotations.asMap().get(annotation.getInstanceLocation()).contains(annotation));

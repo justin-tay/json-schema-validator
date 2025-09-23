@@ -24,18 +24,21 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
+import com.networknt.schema.path.JsonPath;
+import com.networknt.schema.path.JsonPointer;
+
 class NodePathTest {
 
     @Test
     void getNameCount() {
-        NodePath root = new NodePath(PathType.JSON_POINTER);
+        NodePath root = JsonPointer.getRoot();
         NodePath path = root.append("hello").append("world");
         assertEquals(2, path.getNameCount());
     }
 
     @Test
     void getName() {
-        NodePath root = new NodePath(PathType.JSON_POINTER);
+        NodePath root = JsonPointer.getRoot();
         NodePath path = root.append("hello").append("world");
         assertEquals("hello", path.getName(0));
         assertEquals("world", path.getName(1));
@@ -45,7 +48,7 @@ class NodePathTest {
 
     @Test
     void compareTo() {
-        NodePath root = new NodePath(PathType.JSON_POINTER);
+        NodePath root = JsonPointer.getRoot();
         NodePath a = root.append("a");
         NodePath aa = a.append("a");
 
@@ -79,7 +82,7 @@ class NodePathTest {
 
     @Test
     void equalsEquals() {
-        NodePath root = new NodePath(PathType.JSON_POINTER);
+        NodePath root = JsonPointer.getRoot();
         NodePath a1 = root.append("a");
         NodePath a2 = root.append("a");
         assertEquals(a1, a2);
@@ -87,7 +90,7 @@ class NodePathTest {
 
     @Test
     void hashCodeEquals() {
-        NodePath root = new NodePath(PathType.JSON_POINTER);
+        NodePath root = JsonPointer.getRoot();
         NodePath a1 = root.append("a");
         NodePath a2 = root.append("a");
         assertEquals(a1.hashCode(), a2.hashCode());
@@ -95,13 +98,13 @@ class NodePathTest {
 
     @Test
     void getPathType() {
-        NodePath root = new NodePath(PathType.JSON_POINTER);
+        NodePath root = JsonPointer.getRoot();
         assertEquals(PathType.JSON_POINTER, root.getPathType());
     }
 
     @Test
     void getElement() {
-        NodePath root = new NodePath(PathType.JSON_PATH);
+        NodePath root = JsonPath.getRoot();
         NodePath path = root.append("hello").append(1).append("world");
         assertEquals("hello", path.getElement(0));
         assertEquals(Integer.valueOf(1), path.getElement(1));
@@ -113,7 +116,7 @@ class NodePathTest {
     
     @Test
     void startsWith() {
-        NodePath root = new NodePath(PathType.JSON_PATH);
+        NodePath root = JsonPath.getRoot();
         NodePath path = root.append("items");
         NodePath other = root.append("unevaluatedItems");
         assertTrue(path.startsWith(other.getParent()));
