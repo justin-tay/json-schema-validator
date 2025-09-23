@@ -109,7 +109,6 @@ class CollectorContextTest {
         Assertions.assertEquals(contextValue3.get(0), "actual_value_added_to_context3");
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     void testCollectorGetAll() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -119,25 +118,21 @@ class CollectorContextTest {
                 .readTree("{\"property1\":\"sample1\",\"property2\":\"sample2\",\"property3\":\"sample3\" }"));
         ValidationResult validationResult = new ValidationResult(executionContext);
         CollectorContext collectorContext = validationResult.getCollectorContext();
-        Assertions.assertEquals(((List<String>) collectorContext.get(SAMPLE_COLLECTOR)).size(), 1);
-        Assertions.assertEquals(((List<String>) collectorContext.get(SAMPLE_COLLECTOR_OTHER)).size(), 3);
+        Assertions.assertEquals(collectorContext.get(SAMPLE_COLLECTOR, List.class).size(), 1);
+        Assertions.assertEquals(collectorContext.get(SAMPLE_COLLECTOR_OTHER, List.class).size(), 3);
     }
-    
+
     private Dialect getJsonMetaSchema(String uri) throws Exception {
         Dialect jsonMetaSchema = Dialect.builder(uri, Dialects.getDraft201909())
                 .keyword(new CustomKeyword()).keyword(new CustomKeyword1()).format(new Format() {
-
-                    @SuppressWarnings("unchecked")
-                    @Override
-                    public boolean matches(ExecutionContext executionContext, String value) {
-                        CollectorContext collectorContext = executionContext.getCollectorContext();
-                        if (collectorContext.get(SAMPLE_COLLECTOR) == null) {
-                            collectorContext.put(SAMPLE_COLLECTOR, new ArrayList<String>());
-                        }
-                        List<String> returnList = (List<String>) collectorContext.get(SAMPLE_COLLECTOR);
-                        returnList.add(value);
-                        return true;
-                    }
+					@Override
+					public boolean matches(ExecutionContext executionContext, String value) {
+						CollectorContext collectorContext = executionContext.getCollectorContext();
+						List<String> returnList = collectorContext.computeIfAbsent(SAMPLE_COLLECTOR,
+								(key) -> new ArrayList<String>());
+						returnList.add(value);
+						return true;
+					}
 
                     @Override
                     public String getName() {
@@ -345,31 +340,6 @@ class CollectorContextTest {
 		}
     }
 
-    /*
-    private class CustomCollector extends AbstractCollector<List<String>> {
-
-        List<String> returnList = new ArrayList<String>();
-
-        private Map<String, String> referenceMap = null;
-
-        public CustomCollector() {
-            referenceMap = getDatasourceMap();
-        }
-
-        @Override
-        public List<String> collect() {
-            return returnList;
-        }
-
-        @Override
-        public void combine(Object object) {
-            synchronized (returnList) {
-                returnList.add(referenceMap.get((String) object));
-            }
-        }
-    }
-    */
-
     /**
      * Our own custom keyword. In this case we don't use this keyword. It is just
      * for demonstration purpose.
@@ -474,7 +444,7 @@ class CollectorContextTest {
         public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, JsonNodePath instanceLocation) {
             // Get an instance of collector context.
             CollectorContext collectorContext = executionContext.getCollectorContext();
-            AtomicInteger count = (AtomicInteger) collectorContext.getData().computeIfAbsent("collect",
+            AtomicInteger count = collectorContext.computeIfAbsent("collect",
                     (key) -> new AtomicInteger(0));
             count.incrementAndGet();
         }

@@ -78,6 +78,19 @@ public class CollectorContext {
     }
 
     /**
+     * Gets the data associated with a given key.
+     * 
+     * @param <T> the return type
+     * @param key the key
+     * @param clazz the class of the result
+     * @return the value
+     */
+    @SuppressWarnings("unchecked")
+	public <T> T get(Object key, Class<T> clazz) {
+        return (T) this.data.get(key);
+    }
+
+    /**
      * Computes the value if absent.
      *
      * @param <T>
