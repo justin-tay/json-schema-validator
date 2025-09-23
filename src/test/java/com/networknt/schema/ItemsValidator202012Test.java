@@ -26,7 +26,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.networknt.schema.Specification.Version;
+import com.networknt.schema.walk.ItemWalkListenerRunner;
 import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
 
@@ -66,7 +68,7 @@ class ItemsValidator202012Test {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistryConfig config = SchemaRegistryConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -82,9 +84,12 @@ class ItemsValidator202012Test {
                 items.add(walkEvent);
             }
         }).build();
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        WalkConfig walkConfig = WalkConfig.builder()
+                .itemWalkListenerRunner(itemWalkListenerRunner)
+                .build();
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         Schema schema = factory.getSchema(schemaData);
-        ValidationResult result = schema.walk(null, true);
+        ValidationResult result = schema.walk(null, true, executionContext -> executionContext.setWalkConfig(walkConfig));
         assertTrue(result.getErrors().isEmpty());
         
         @SuppressWarnings("unchecked")
@@ -105,7 +110,7 @@ class ItemsValidator202012Test {
                 + "    \"type\": \"string\"\r\n"
                 + "  }\r\n"
                 + "}";
-        SchemaRegistryConfig config = SchemaRegistryConfig.builder().itemWalkListener(new JsonSchemaWalkListener() {
+        ItemWalkListenerRunner itemWalkListenerRunner = ItemWalkListenerRunner.builder().itemWalkListener(new JsonSchemaWalkListener() {
             @Override
             public WalkFlow onWalkStart(WalkEvent walkEvent) {
                 return WalkFlow.CONTINUE;
@@ -121,9 +126,12 @@ class ItemsValidator202012Test {
                 items.add(walkEvent);
             }
         }).build();
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12, builder -> builder.schemaRegistryConfig(config));
+        WalkConfig walkConfig = WalkConfig.builder()
+                .itemWalkListenerRunner(itemWalkListenerRunner)
+                .build();
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Version.DRAFT_2020_12);
         Schema schema = factory.getSchema(schemaData);
-        ValidationResult result = schema.walk(null, true);
+        ValidationResult result = schema.walk(null, true, executionContext -> executionContext.setWalkConfig(walkConfig));
         assertTrue(result.getErrors().isEmpty());
         
         @SuppressWarnings("unchecked")

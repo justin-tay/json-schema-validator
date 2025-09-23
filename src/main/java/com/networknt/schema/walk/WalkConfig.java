@@ -44,7 +44,8 @@ public class WalkConfig {
         @Override
         public boolean runPreWalkListeners(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
                 JsonNode rootNode, JsonNodePath instanceLocation, Schema schema, KeywordValidator validator) {
-            return false;
+            // Always walk
+        	return true;
         }
 
         @Override

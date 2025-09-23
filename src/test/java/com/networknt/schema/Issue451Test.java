@@ -3,6 +3,8 @@ package com.networknt.schema;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.PropertyWalkListenerRunner;
+import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
 import org.junit.jupiter.api.Assertions;
@@ -19,12 +21,10 @@ import java.util.Map;
 class Issue451Test {
 
     private static final String COLLECTOR_ID = "collector-451";
-
+        
     protected Schema getJsonSchemaFromStreamContentV7(InputStream schemaContent) {
-        SchemaRegistryConfig svc = SchemaRegistryConfig.builder()
-                .propertyWalkListener(new CountingWalker())
-                .build();
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(svc));
+
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7);
         return factory.getSchema(schemaContent);
     }
 
@@ -58,7 +58,9 @@ class Issue451Test {
         InputStream schemaInputStream = getClass().getResourceAsStream(schemaPath);
         Schema schema = getJsonSchemaFromStreamContentV7(schemaInputStream);
 
-        CollectorContext collectorContext = schema.walk(data, shouldValidate).getCollectorContext();
+    	WalkConfig walkConfig = WalkConfig.builder().propertyWalkListenerRunner(
+    			PropertyWalkListenerRunner.builder().propertyWalkListener(new CountingWalker()).build()).build();
+        CollectorContext collectorContext = schema.walk(data, shouldValidate, executionContext -> executionContext.setWalkConfig(walkConfig)).getCollectorContext();
 
         Map<String, Integer> collector = (Map<String, Integer>) collectorContext.get(COLLECTOR_ID);
         Assertions.assertEquals(2,

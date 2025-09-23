@@ -28,12 +28,12 @@ public class CollectorContext {
     /**
      * Map for holding the name and {@link Collector} or a simple Object.
      */
-    private final Map<String, Object> collectorMap;
+    private final Map<Object, Object> collectorMap;
 
     /**
      * Map for holding the name and {@link Collector} class collect method output.
      */
-    private final Map<String, Object> collectorLoadMap;
+    private final Map<Object, Object> collectorLoadMap;
 
     /**
      * Default constructor will use an unsynchronized HashMap to store data. This is
@@ -53,21 +53,9 @@ public class CollectorContext {
      * @param collectorMap the collector map
      * @param collectorLoadMap the collector load map
      */
-    public CollectorContext(Map<String, Object> collectorMap, Map<String, Object> collectorLoadMap) {
+    public CollectorContext(Map<Object, Object> collectorMap, Map<Object, Object> collectorLoadMap) {
         this.collectorMap = collectorMap;
         this.collectorLoadMap = collectorLoadMap;
-    }
-
-    /**
-     * Adds a collector with give name. Preserving this method for backward
-     * compatibility.
-     *
-     * @param <E>       element
-     * @param name      String
-     * @param collector Collector
-     */
-    public <E> void add(String name, Collector<E> collector) {
-        this.collectorMap.put(name, collector);
     }
 
     /**
@@ -75,10 +63,10 @@ public class CollectorContext {
      *
      * @param <E>    element
      * @param object Object
-     * @param name   String
+     * @param key   String
      */
-    public <E> void add(String name, Object object) {
-        this.collectorMap.put(name, object);
+    public <E> void add(Object key, Object object) {
+        this.collectorMap.put(key, object);
     }
 
     /**
@@ -92,15 +80,16 @@ public class CollectorContext {
      * the {@link #loadCollectors} method is called this method will
      * return the actual data collected by collector.
      *
-     * @param name String
+     * @param key String
      * @return Object
      */
-    public Object get(String name) {
-        Object object = this.collectorMap.get(name);
-        if (object instanceof Collector<?> && (this.collectorLoadMap.get(name) != null)) {
-            return this.collectorLoadMap.get(name);
+    @SuppressWarnings("unchecked")
+	public <T> T get(Object key) {
+        Object object = this.collectorMap.get(key);
+        if (object instanceof Collector<?> && (this.collectorLoadMap.get(key) != null)) {
+            return (T) this.collectorLoadMap.get(key);
         }
-        return this.collectorMap.get(name);
+        return (T) this.collectorMap.get(key);
     }
 
     /**
@@ -108,7 +97,7 @@ public class CollectorContext {
      * 
      * @return the collector map
      */
-    public Map<String, Object> getCollectorMap() {
+    public Map<Object, Object> getCollectorMap() {
         return this.collectorMap;
     }
 
@@ -116,8 +105,8 @@ public class CollectorContext {
      * Returns all the collected data. Please look into {@link #get(String)} method for more details.
      * @return Map
      */
-    public Map<String, Object> getAll() {
-        Map<String, Object> mergedMap = new HashMap<>();
+    public Map<Object, Object> getAll() {
+        Map<Object, Object> mergedMap = new HashMap<>();
         mergedMap.putAll(this.collectorMap);
         mergedMap.putAll(this.collectorLoadMap);
         return mergedMap;
@@ -129,7 +118,7 @@ public class CollectorContext {
      * @param name String
      * @param data Object
      */
-    public void combineWithCollector(String name, Object data) {
+    public void combineWithCollector(Object name, Object data) {
         Object object = this.collectorMap.get(name);
         if (object instanceof Collector<?>) {
             Collector<?> collector = (Collector<?>) object;
@@ -141,8 +130,8 @@ public class CollectorContext {
      * Loads data from all collectors.
      */
     public void loadCollectors() {
-        Set<Entry<String, Object>> entrySet = this.collectorMap.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
+        Set<Entry<Object, Object>> entrySet = this.collectorMap.entrySet();
+        for (Entry<Object, Object> entry : entrySet) {
             if (entry.getValue() instanceof Collector<?>) {
                 Collector<?> collector = (Collector<?>) entry.getValue();
                 this.collectorLoadMap.put(entry.getKey(), collector.collect());

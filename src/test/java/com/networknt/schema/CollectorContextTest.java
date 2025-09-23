@@ -401,8 +401,8 @@ class CollectorContextTest {
 
     @Test
     void constructorWithMap() {
-        ConcurrentHashMap<String, Object> collectorMap = new ConcurrentHashMap<>();
-        ConcurrentHashMap<String, Object> collectorLoadMap = new ConcurrentHashMap<>();
+        ConcurrentHashMap<Object, Object> collectorMap = new ConcurrentHashMap<>();
+        ConcurrentHashMap<Object, Object> collectorLoadMap = new ConcurrentHashMap<>();
         CollectorContext context = new CollectorContext(collectorMap, collectorLoadMap);
         assertSame(collectorMap, context.getCollectorMap());
     }
@@ -493,8 +493,7 @@ class CollectorContextTest {
         if (instance[0] != null) {
             throw instance[0];
         }
-        collectorContext.loadCollectors();
-        AtomicInteger result = (AtomicInteger) collectorContext.get("collect");
+        AtomicInteger result = collectorContext.get("collect");
         assertEquals(50, result.get());
     }
 
@@ -511,8 +510,7 @@ class CollectorContextTest {
                 executionContext.setCollectorContext(collectorContext);
             });
         }
-        collectorContext.loadCollectors();
-        AtomicInteger result = (AtomicInteger) collectorContext.get("collect");
+        AtomicInteger result = collectorContext.get("collect");
         assertEquals(50, result.get());
     }
 
@@ -529,8 +527,7 @@ class CollectorContextTest {
                 executionContext.setCollectorContext(collectorContext);
             });
         }
-        collectorContext.loadCollectors();
-        AtomicInteger result = (AtomicInteger) collectorContext.get("collect");
+        AtomicInteger result = collectorContext.get("collect");
         assertEquals(50, result.get());
     }
 
@@ -547,8 +544,7 @@ class CollectorContextTest {
                 executionContext.setCollectorContext(collectorContext);
             });
         }
-        collectorContext.loadCollectors();
-        AtomicInteger result = (AtomicInteger) collectorContext.get("collect");
+        AtomicInteger result = collectorContext.get("collect");
         assertEquals(50, result.get());
     }
 

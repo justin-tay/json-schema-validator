@@ -27,6 +27,7 @@ import com.networknt.schema.Error;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.JsonNodePath;
 import com.networknt.schema.Schema;
+import com.networknt.schema.keyword.Keyword;
 import com.networknt.schema.keyword.KeywordValidator;
 
 /**
@@ -82,6 +83,10 @@ public class KeywordWalkListenerRunner extends AbstractWalkListenerRunner {
         public Builder keywordWalkListener(String keyword, JsonSchemaWalkListener keywordWalkListener) {
             this.keywordWalkListeners.computeIfAbsent(keyword, key -> new ArrayList<>()).add(keywordWalkListener);
             return this;
+        }
+
+        public Builder keywordWalkListener(Keyword keyword, JsonSchemaWalkListener keywordWalkListener) {
+            return keywordWalkListener(keyword.getValue(), keywordWalkListener);
         }
 
         public Builder keywordWalkListener(JsonSchemaWalkListener keywordWalkListener) {

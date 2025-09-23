@@ -33,6 +33,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.keyword.ValidatorTypeCode;
 import com.networknt.schema.walk.JsonSchemaWalkListener;
+import com.networknt.schema.walk.KeywordWalkListenerRunner;
+import com.networknt.schema.walk.PropertyWalkListenerRunner;
+import com.networknt.schema.walk.WalkConfig;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
 
@@ -45,7 +48,7 @@ class Issue467Test {
     void shouldWalkKeywordWithValidation() throws URISyntaxException, IOException {
         InputStream schemaInputStream = Issue467Test.class.getResourceAsStream(schemaPath);
         final Set<JsonNodePath> properties = new LinkedHashSet<>();
-        final SchemaRegistryConfig config = SchemaRegistryConfig.builder()
+        KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
                 .keywordWalkListener(ValidatorTypeCode.PROPERTIES.getValue(), new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -58,10 +61,13 @@ class Issue467Test {
                     }
                 })
                 .build();
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));
+        WalkConfig walkConfig = WalkConfig.builder()
+                .keywordWalkListenerRunner(keywordWalkListenerRunner)
+                .build();
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7);
         Schema schema = factory.getSchema(schemaInputStream);
         JsonNode data = mapper.readTree(Issue467Test.class.getResource("/data/issue467.json"));
-        ValidationResult result = schema.walk(data, true);
+        ValidationResult result = schema.walk(data, true, executionContext -> executionContext.setWalkConfig(walkConfig));
         assertEquals(new HashSet<>(Arrays.asList("/properties", "/properties/tags/items/0/properties")),
                 properties.stream().map(Object::toString).collect(Collectors.toSet()));
         assertEquals(1, result.getErrors().size());
@@ -71,7 +77,7 @@ class Issue467Test {
     void shouldWalkPropertiesWithValidation() throws URISyntaxException, IOException {
         InputStream schemaInputStream = Issue467Test.class.getResourceAsStream(schemaPath);
         final Set<JsonNodePath> properties = new LinkedHashSet<>();
-        final SchemaRegistryConfig config = SchemaRegistryConfig.builder()
+        PropertyWalkListenerRunner propertyWalkListenerRunner = PropertyWalkListenerRunner.builder()
                 .propertyWalkListener(new JsonSchemaWalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
@@ -84,10 +90,13 @@ class Issue467Test {
                     }
                 })
                 .build();
-        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7, builder -> builder.schemaRegistryConfig(config));
+        WalkConfig walkConfig = WalkConfig.builder()
+                .propertyWalkListenerRunner(propertyWalkListenerRunner)
+                .build();
+        SchemaRegistry factory = SchemaRegistry.withDefaultDialect(Specification.Version.DRAFT_7);
         Schema schema = factory.getSchema(schemaInputStream);
         JsonNode data = mapper.readTree(Issue467Test.class.getResource("/data/issue467.json"));
-        ValidationResult result = schema.walk(data, true);
+        ValidationResult result = schema.walk(data, true, executionContext -> executionContext.setWalkConfig(walkConfig));
         assertEquals(
                 new HashSet<>(Arrays.asList("/properties/tags", "/properties/tags/items/0/properties/category", "/properties/tags/items/0/properties/value")),
                 properties.stream().map(Object::toString).collect(Collectors.toSet()));
