@@ -22,7 +22,7 @@ import com.networknt.schema.NodePath;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaContext;
-import com.networknt.schema.annotation.JsonNodeAnnotation;
+import com.networknt.schema.annotation.Annotation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,21 +57,21 @@ public class UnevaluatedPropertiesValidator extends BaseKeywordValidator {
 
         
         // Get all the valid adjacent annotations
-        Predicate<JsonNodeAnnotation> validEvaluationPathFilter = a -> executionContext.getResults().isValid(instanceLocation, a.getEvaluationPath());
+        Predicate<Annotation> validEvaluationPathFilter = a -> executionContext.getResults().isValid(instanceLocation, a.getEvaluationPath());
 
-        Predicate<JsonNodeAnnotation> adjacentEvaluationPathFilter = a -> a.getEvaluationPath()
+        Predicate<Annotation> adjacentEvaluationPathFilter = a -> a.getEvaluationPath()
                 .startsWith(this.evaluationPath.getParent());
 
-        List<JsonNodeAnnotation> instanceLocationAnnotations = executionContext.getAnnotations().asMap()
+        List<Annotation> instanceLocationAnnotations = executionContext.getAnnotations().asMap()
                 .getOrDefault(instanceLocation, Collections.emptyList());
 
         Set<String> evaluatedProperties = new LinkedHashSet<>(); // The properties that unevaluatedProperties schema
         Set<String> existingEvaluatedProperties = new LinkedHashSet<>();
         // Get all the "properties" for the instanceLocation
-        List<JsonNodeAnnotation> properties = instanceLocationAnnotations.stream()
+        List<Annotation> properties = instanceLocationAnnotations.stream()
                 .filter(a -> "properties".equals(a.getKeyword())).filter(adjacentEvaluationPathFilter)
                 .filter(validEvaluationPathFilter).collect(Collectors.toList());
-        for (JsonNodeAnnotation annotation : properties) {
+        for (Annotation annotation : properties) {
             if (annotation.getValue() instanceof Set) {
                 Set<String> p = annotation.getValue();
                 existingEvaluatedProperties.addAll(p);
@@ -79,10 +79,10 @@ public class UnevaluatedPropertiesValidator extends BaseKeywordValidator {
         }
 
         // Get all the "patternProperties" for the instanceLocation
-        List<JsonNodeAnnotation> patternProperties = instanceLocationAnnotations.stream()
+        List<Annotation> patternProperties = instanceLocationAnnotations.stream()
                 .filter(a -> "patternProperties".equals(a.getKeyword())).filter(adjacentEvaluationPathFilter)
                 .filter(validEvaluationPathFilter).collect(Collectors.toList());
-        for (JsonNodeAnnotation annotation : patternProperties) {
+        for (Annotation annotation : patternProperties) {
             if (annotation.getValue() instanceof Set) {
                 Set<String> p = annotation.getValue();
                 existingEvaluatedProperties.addAll(p);
@@ -90,10 +90,10 @@ public class UnevaluatedPropertiesValidator extends BaseKeywordValidator {
         }
 
         // Get all the "patternProperties" for the instanceLocation
-        List<JsonNodeAnnotation> additionalProperties = instanceLocationAnnotations.stream()
+        List<Annotation> additionalProperties = instanceLocationAnnotations.stream()
                 .filter(a -> "additionalProperties".equals(a.getKeyword())).filter(adjacentEvaluationPathFilter)
                 .filter(validEvaluationPathFilter).collect(Collectors.toList());
-        for (JsonNodeAnnotation annotation : additionalProperties) {
+        for (Annotation annotation : additionalProperties) {
             if (annotation.getValue() instanceof Set) {
                 Set<String> p = annotation.getValue();
                 existingEvaluatedProperties.addAll(p);
@@ -101,10 +101,10 @@ public class UnevaluatedPropertiesValidator extends BaseKeywordValidator {
         }
 
         // Get all the "unevaluatedProperties" for the instanceLocation
-        List<JsonNodeAnnotation> unevaluatedProperties = instanceLocationAnnotations.stream()
+        List<Annotation> unevaluatedProperties = instanceLocationAnnotations.stream()
                 .filter(a -> "unevaluatedProperties".equals(a.getKeyword())).filter(adjacentEvaluationPathFilter)
                 .filter(validEvaluationPathFilter).collect(Collectors.toList());
-        for (JsonNodeAnnotation annotation : unevaluatedProperties) {
+        for (Annotation annotation : unevaluatedProperties) {
             if (annotation.getValue() instanceof Set) {
                 Set<String> p = annotation.getValue();
                 existingEvaluatedProperties.addAll(p);
@@ -135,7 +135,7 @@ public class UnevaluatedPropertiesValidator extends BaseKeywordValidator {
             executionContext.setFailFast(failFast); // restore flag
         }
         executionContext.getAnnotations()
-                .put(JsonNodeAnnotation.builder().instanceLocation(instanceLocation).evaluationPath(this.evaluationPath)
+                .put(Annotation.builder().instanceLocation(instanceLocation).evaluationPath(this.evaluationPath)
                         .schemaLocation(this.schemaLocation).keyword(getKeyword()).value(evaluatedProperties).build());
 
         return;
