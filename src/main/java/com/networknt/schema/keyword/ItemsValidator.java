@@ -163,7 +163,13 @@ public class ItemsValidator extends BaseKeywordValidator {
         } else if (this.tupleSchema != null) {
             if (i < this.tupleSchema.size()) {
                 // validate against tuple schema
-                this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
+                executionContext.getEvaluationPath().push(i);
+                try {
+                    this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
+                } finally {
+                    executionContext.getEvaluationPath().pop();
+                }
+                
             } else {
                 if ((this.additionalItems != null && this.additionalItems) || this.additionalSchema != null) {
                     isAdditionalItem = true;
@@ -265,11 +271,21 @@ public class ItemsValidator extends BaseKeywordValidator {
                             n = defaultNode;
                         }
                     }
-                    walkSchema(executionContext, this.tupleSchema.get(i), n, rootNode, instanceLocation.append(i),
-                            shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    executionContext.getEvaluationPath().push(i);
+                    try {
+                        walkSchema(executionContext, this.tupleSchema.get(i), n, rootNode, instanceLocation.append(i),
+                                shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    } finally {
+                        executionContext.getEvaluationPath().pop();
+                    }
                 } else {
-                    walkSchema(executionContext, this.tupleSchema.get(i), null, rootNode, instanceLocation.append(i),
-                            shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    executionContext.getEvaluationPath().push(i);
+                    try {
+                        walkSchema(executionContext, this.tupleSchema.get(i), null, rootNode,
+                                instanceLocation.append(i), shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    } finally {
+                        executionContext.getEvaluationPath().pop();
+                    }
                 }
             }
             if (this.additionalSchema != null) {

@@ -73,6 +73,7 @@ public class AnyOfValidator extends BaseKeywordValidator {
         // Save flag as nested schema evaluation shouldn't trigger fail fast
         boolean failFast = executionContext.isFailFast();
         try {
+            int schemaIndex = 0;
             executionContext.setFailFast(false);
             for (Schema schema : this.schemas) {
                 subSchemaErrors.clear(); // Reuse and clear for each run
@@ -90,11 +91,17 @@ public class AnyOfValidator extends BaseKeywordValidator {
                         continue;
                     }
                 }
-                if (!walk) {
-                    schema.validate(executionContext, node, rootNode, instanceLocation);
-                } else {
-                    schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                executionContext.getEvaluationPath().push(schemaIndex);
+                try {
+                    if (!walk) {
+                        schema.validate(executionContext, node, rootNode, instanceLocation);
+                    } else {
+                        schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                    }
+                } finally {
+                    executionContext.getEvaluationPath().pop();
                 }
+                schemaIndex++;
 
                 // check if any validation errors have occurred
                 if (subSchemaErrors.isEmpty()) {
@@ -202,7 +209,14 @@ public class AnyOfValidator extends BaseKeywordValidator {
             return;
         }
         for (Schema schema : this.schemas) {
-            schema.walk(executionContext, node, rootNode, instanceLocation, false);
+            int schemaIndex = 0;
+            executionContext.getEvaluationPath().push(schemaIndex);
+            try {
+                schema.walk(executionContext, node, rootNode, instanceLocation, false);
+            } finally {
+                executionContext.getEvaluationPath().pop();
+            }
+            schemaIndex++;
         }
     }
 

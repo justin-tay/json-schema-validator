@@ -75,15 +75,22 @@ public class OneOfValidator extends BaseKeywordValidator {
         executionContext.setErrors(subSchemaErrors);
         // Save flag as nested schema evaluation shouldn't trigger fail fast
         boolean failFast = executionContext.isFailFast();
+        int schemaIndex = 0;
         try {
             executionContext.setFailFast(false);
             for (Schema schema : this.schemas) {
                 subSchemaErrors.clear();
-                if (!walk) {
-                    schema.validate(executionContext, node, rootNode, instanceLocation);
-                } else {
-                    schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                executionContext.getEvaluationPath().push(schemaIndex);
+                try {
+                    if (!walk) {
+                        schema.validate(executionContext, node, rootNode, instanceLocation);
+                    } else {
+                        schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                    }
+                } finally {
+                    executionContext.getEvaluationPath().pop();
                 }
+                schemaIndex++;
 
                 // check if any validation errors have occurred
                 if (subSchemaErrors.isEmpty()) { // No new errors
@@ -233,8 +240,15 @@ public class OneOfValidator extends BaseKeywordValidator {
         if (shouldValidateSchema && node != null) {
             validate(executionContext, node, rootNode, instanceLocation, true);
         } else {
+            int schemaIndex = 0;
             for (Schema schema : this.schemas) {
-                schema.walk(executionContext, node, rootNode, instanceLocation, false);
+                executionContext.getEvaluationPath().push(schemaIndex);
+                try {
+                    schema.walk(executionContext, node, rootNode, instanceLocation, false);
+                } finally {
+                    executionContext.getEvaluationPath().pop();
+                }
+                schemaIndex++;
             }
         }
     }

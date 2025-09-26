@@ -62,7 +62,12 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
             int count = Math.min(node.size(), this.tupleSchema.size());
             for (int i = 0; i < count; ++i) {
                 NodePath path = instanceLocation.append(i);
-                this.tupleSchema.get(i).validate(executionContext, node.get(i), rootNode, path);
+                executionContext.getEvaluationPath().push(i);
+                try {
+                    this.tupleSchema.get(i).validate(executionContext, node.get(i), rootNode, path);
+                } finally {
+                    executionContext.getEvaluationPath().pop();
+                }
             }
 
             // Add annotation
@@ -147,11 +152,11 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
 
     private void doWalk(ExecutionContext executionContext, int i,
             JsonNode node, JsonNode rootNode, NodePath instanceLocation, boolean shouldValidateSchema) {
-        walkSchema(executionContext, this.tupleSchema.get(i), node, rootNode, instanceLocation.append(i),
+        walkSchema(executionContext, i, this.tupleSchema.get(i), node, rootNode, instanceLocation.append(i),
                 shouldValidateSchema);
     }
 
-    private void walkSchema(ExecutionContext executionContext, Schema walkSchema, JsonNode node, JsonNode rootNode,
+    private void walkSchema(ExecutionContext executionContext, int schemaIndex, Schema walkSchema, JsonNode node, JsonNode rootNode,
             NodePath instanceLocation, boolean shouldValidateSchema) {
         //@formatter:off
         boolean executeWalk = executionContext.getWalkConfig().getItemWalkListenerRunner().runPreWalkListeners(
@@ -164,7 +169,12 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
         );
         int currentErrors = executionContext.getErrors().size();
         if (executeWalk) {
-            walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+            executionContext.getEvaluationPath().push(schemaIndex);
+            try {
+                walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+            } finally {
+                executionContext.getEvaluationPath().pop();
+            }
         }
         executionContext.getWalkConfig().getItemWalkListenerRunner().runPostWalkListeners(
             executionContext,

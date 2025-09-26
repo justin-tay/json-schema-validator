@@ -696,14 +696,24 @@ public class Schema implements Validator {
 
     @Override
     public void validate(ExecutionContext executionContext, JsonNode jsonNode, JsonNode rootNode, NodePath instanceLocation) {
-        int currentErrors = executionContext.getErrors().size();
-        for (KeywordValidator v : getValidators()) {
-            v.validate(executionContext, jsonNode, rootNode, instanceLocation);
-        }
-        if (executionContext.getErrors().size() > currentErrors) {
-            // Failed with assertion set result and drop all annotations from this schema
-            // and all subschemas
-            executionContext.getResults().setResult(instanceLocation, getSchemaLocation(), getEvaluationPath(), false);
+        executionContext.evaluationSchema.push(this);
+        try {
+            int currentErrors = executionContext.getErrors().size();
+            for (KeywordValidator v : getValidators()) {
+                executionContext.evaluationPath.push(v.getKeyword());
+                try {
+                    v.validate(executionContext, jsonNode, rootNode, instanceLocation);
+                } finally {
+                    executionContext.evaluationPath.pop();
+                }
+            }
+            if (executionContext.getErrors().size() > currentErrors) {
+                // Failed with assertion set result and drop all annotations from this schema
+                // and all subschemas
+                executionContext.getResults().setResult(instanceLocation, getSchemaLocation(), getEvaluationPath(), false);
+            }
+        } finally {
+            executionContext.evaluationSchema.pop();
         }
     }
 

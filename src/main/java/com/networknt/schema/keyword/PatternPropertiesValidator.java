@@ -67,7 +67,13 @@ public class PatternPropertiesValidator extends BaseKeywordValidator {
                 if (entry.getKey().matches(name)) {
                     NodePath path = instanceLocation.append(name);
                     int currentErrors = executionContext.getErrors().size();
-                    entry.getValue().validate(executionContext, n, rootNode, path);
+
+                    executionContext.getEvaluationPath().push(name);
+                    try {
+                        entry.getValue().validate(executionContext, n, rootNode, path);
+                    } finally {
+                        executionContext.getEvaluationPath().pop();
+                    }
                     if (currentErrors == executionContext.getErrors().size()) { // No new errors
                         if (collectAnnotations) {
                             if (matchedInstancePropertyNames == null) {

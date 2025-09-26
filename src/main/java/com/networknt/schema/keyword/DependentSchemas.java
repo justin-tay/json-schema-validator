@@ -31,11 +31,10 @@ import java.util.*;
 public class DependentSchemas extends BaseKeywordValidator {
     private final Map<String, Schema> schemaDependencies = new HashMap<>();
 
-    public DependentSchemas(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
-
+    public DependentSchemas(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode,
+            Schema parentSchema, SchemaContext schemaContext) {
         super(KeywordType.DEPENDENT_SCHEMAS, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
-
-        for (Iterator<String> it = schemaNode.fieldNames(); it.hasNext(); ) {
+        for (Iterator<String> it = schemaNode.fieldNames(); it.hasNext();) {
             String pname = it.next();
             JsonNode pvalue = schemaNode.get(pname);
             if (pvalue.isObject() || pvalue.isBoolean()) {
@@ -57,10 +56,15 @@ public class DependentSchemas extends BaseKeywordValidator {
             String pname = it.next();
             Schema schema = this.schemaDependencies.get(pname);
             if (schema != null) {
-                if(!walk) {
-                    schema.validate(executionContext, node, rootNode, instanceLocation);
-                } else {
-                    schema.walk(executionContext, node, rootNode, instanceLocation, true);   
+                executionContext.getEvaluationPath().push(pname);
+                try {
+                    if(!walk) {
+                        schema.validate(executionContext, node, rootNode, instanceLocation);
+                    } else {
+                        schema.walk(executionContext, node, rootNode, instanceLocation, true);   
+                    }
+                } finally {
+                    executionContext.getEvaluationPath().pop();
                 }
             }
         }
