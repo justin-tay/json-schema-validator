@@ -78,14 +78,11 @@ public class EvaluationPath implements Path {
         if (this.value == null) {
             StringBuilder builder = new StringBuilder();
             for (Object item : evaluationPath) {
-                //builder.append("/");
-                String string = null;
                 if (item instanceof Number) {
-                    string = PathType.JSON_POINTER.append("", ((Number)item).intValue());
+                    PathType.JSON_POINTER.append(builder, ((Number) item).intValue());
                 } else {
-                    string = PathType.JSON_POINTER.append("", item.toString());
+                    PathType.JSON_POINTER.append(builder, item.toString());
                 }
-                builder.append(string);
             }
             this.value = builder.toString();
         }
