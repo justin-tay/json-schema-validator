@@ -73,6 +73,7 @@ public class AnyOfValidator extends BaseKeywordValidator {
         // Save flag as nested schema evaluation shouldn't trigger fail fast
         boolean failFast = executionContext.isFailFast();
         try {
+            int schemaIndex = 0;
             executionContext.setFailFast(false);
             for (Schema schema : this.schemas) {
                 subSchemaErrors.clear(); // Reuse and clear for each run
@@ -87,14 +88,21 @@ public class AnyOfValidator extends BaseKeywordValidator {
                             allErrors = new ArrayList<>();
                         }
                         allErrors.addAll(subSchemaErrors);
+                        schemaIndex++;
                         continue;
                     }
                 }
-                if (!walk) {
-                    schema.validate(executionContext, node, rootNode, instanceLocation);
-                } else {
-                    schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                executionContext.getEvaluationPath().addLast(schemaIndex);
+                try {
+                    if (!walk) {
+                        schema.validate(executionContext, node, rootNode, instanceLocation);
+                    } else {
+                        schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                    }
+                } finally {
+                    executionContext.getEvaluationPath().removeLast();
                 }
+                schemaIndex++;
 
                 // check if any validation errors have occurred
                 if (subSchemaErrors.isEmpty()) {
@@ -202,7 +210,14 @@ public class AnyOfValidator extends BaseKeywordValidator {
             return;
         }
         for (Schema schema : this.schemas) {
-            schema.walk(executionContext, node, rootNode, instanceLocation, false);
+            int schemaIndex = 0;
+            executionContext.getEvaluationPath().addLast(schemaIndex);
+            try {
+                schema.walk(executionContext, node, rootNode, instanceLocation, false);
+            } finally {
+                executionContext.getEvaluationPath().removeLast();
+            }
+            schemaIndex++;
         }
     }
 
