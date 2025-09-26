@@ -705,14 +705,14 @@ public class Schema implements Validator {
 
     @Override
     public void validate(ExecutionContext executionContext, JsonNode jsonNode, JsonNode rootNode, NodePath instanceLocation) {
-//        String newEvaluationPath = new EvaluationPath(executionContext.getEvaluationPath()).toString();
-//        String oldEvaluationPath = getEvaluationPath().toString();
-//        if(!oldEvaluationPath.equals(newEvaluationPath)) {
-//            System.out.println("-----------------");
-//            System.out.println("MISMATCH OLD: "+oldEvaluationPath);
-//            System.out.println("MISMATCH NEW: "+newEvaluationPath);
-//            System.out.println("-----------------");
-//        }
+        String newEvaluationPath = new EvaluationPath(executionContext.getEvaluationPath()).toString();
+        String oldEvaluationPath = getEvaluationPath().toString();
+        if(!oldEvaluationPath.equals(newEvaluationPath)) {
+            System.out.println("-----------------");
+            System.out.println("MISMATCH OLD: "+oldEvaluationPath);
+            System.out.println("MISMATCH NEW: "+newEvaluationPath);
+            System.out.println("-----------------");
+        }
         executionContext.evaluationSchema.addLast(this);
         try {
             int currentErrors = executionContext.getErrors().size();
