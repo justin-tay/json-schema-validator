@@ -32,6 +32,7 @@ import java.util.function.Consumer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.keyword.KeywordValidator;
 import com.networknt.schema.keyword.TypeValidator;
+import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 import com.networknt.schema.path.PathType;
 import com.networknt.schema.keyword.KeywordType;
@@ -141,6 +142,14 @@ public class Schema implements Validator {
     }
 
     public void validate(ExecutionContext executionContext, JsonNode node) {
+        /*
+         * Sets the evaluationPath to point to the schema location fragment if it isn't
+         * pointing to the document
+         */
+        int count = this.schemaLocation.getFragment().getNameCount();
+        for (int x = 0; x < count; x++) {
+            executionContext.evaluationPath.addLast(this.schemaLocation.getFragment().getElement(x));
+        }
         validate(executionContext, node, node, atRoot());
     }
 
@@ -696,14 +705,32 @@ public class Schema implements Validator {
 
     @Override
     public void validate(ExecutionContext executionContext, JsonNode jsonNode, JsonNode rootNode, NodePath instanceLocation) {
-        int currentErrors = executionContext.getErrors().size();
-        for (KeywordValidator v : getValidators()) {
-            v.validate(executionContext, jsonNode, rootNode, instanceLocation);
-        }
-        if (executionContext.getErrors().size() > currentErrors) {
-            // Failed with assertion set result and drop all annotations from this schema
-            // and all subschemas
-            executionContext.getResults().setResult(instanceLocation, getSchemaLocation(), getEvaluationPath(), false);
+//        String newEvaluationPath = new EvaluationPath(executionContext.getEvaluationPath()).toString();
+//        String oldEvaluationPath = getEvaluationPath().toString();
+//        if(!oldEvaluationPath.equals(newEvaluationPath)) {
+//            System.out.println("-----------------");
+//            System.out.println("MISMATCH OLD: "+oldEvaluationPath);
+//            System.out.println("MISMATCH NEW: "+newEvaluationPath);
+//            System.out.println("-----------------");
+//        }
+        executionContext.evaluationSchema.addLast(this);
+        try {
+            int currentErrors = executionContext.getErrors().size();
+            for (KeywordValidator v : getValidators()) {
+                executionContext.evaluationPath.addLast(v.getKeyword());
+                try {
+                    v.validate(executionContext, jsonNode, rootNode, instanceLocation);
+                } finally {
+                    executionContext.evaluationPath.removeLast();
+                }
+            }
+            if (executionContext.getErrors().size() > currentErrors) {
+                // Failed with assertion set result and drop all annotations from this schema
+                // and all subschemas
+                executionContext.getResults().setResult(instanceLocation, getSchemaLocation(), getEvaluationPath(), false);
+            }
+        } finally {
+            executionContext.evaluationSchema.removeLast();
         }
     }
 
@@ -1274,7 +1301,12 @@ public class Schema implements Validator {
                 if (executionContext.getWalkConfig().getKeywordWalkListenerRunner().runPreWalkListeners(executionContext,
                         evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
                         this, validator)) {
-                    validator.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                    executionContext.evaluationPath.addLast(validator.getKeyword());
+                    try {
+                        validator.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                    } finally {
+                        executionContext.evaluationPath.removeLast();
+                    }
                 }
             } finally {
                 // Call all the post-walk listeners.

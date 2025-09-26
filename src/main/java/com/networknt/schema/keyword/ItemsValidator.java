@@ -163,7 +163,13 @@ public class ItemsValidator extends BaseKeywordValidator {
         } else if (this.tupleSchema != null) {
             if (i < this.tupleSchema.size()) {
                 // validate against tuple schema
-                this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
+                executionContext.getEvaluationPath().addLast(i);
+                try {
+                    this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
+                } finally {
+                    executionContext.getEvaluationPath().removeLast();
+                }
+                
             } else {
                 if ((this.additionalItems != null && this.additionalItems) || this.additionalSchema != null) {
                     isAdditionalItem = true;
@@ -171,7 +177,14 @@ public class ItemsValidator extends BaseKeywordValidator {
 
                 if (this.additionalSchema != null) {
                     // validate against additional item schema
-                    this.additionalSchema.validate(executionContext, node, rootNode, path);
+                    executionContext.getEvaluationPath().removeLast(); // remove items
+                    executionContext.getEvaluationPath().addLast("additionalItems");
+                    try {
+                        this.additionalSchema.validate(executionContext, node, rootNode, path);
+                    } finally {
+                        executionContext.getEvaluationPath().removeLast();
+                        executionContext.getEvaluationPath().addLast("items");
+                    }
                 } else if (this.additionalItems != null) {
                     if (this.additionalItems) {
 //                        evaluatedItems.add(path);
@@ -265,11 +278,21 @@ public class ItemsValidator extends BaseKeywordValidator {
                             n = defaultNode;
                         }
                     }
-                    walkSchema(executionContext, this.tupleSchema.get(i), n, rootNode, instanceLocation.append(i),
-                            shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    executionContext.getEvaluationPath().addLast(i);
+                    try {
+                        walkSchema(executionContext, this.tupleSchema.get(i), n, rootNode, instanceLocation.append(i),
+                                shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    } finally {
+                        executionContext.getEvaluationPath().removeLast();
+                    }
                 } else {
-                    walkSchema(executionContext, this.tupleSchema.get(i), null, rootNode, instanceLocation.append(i),
-                            shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    executionContext.getEvaluationPath().addLast(i);
+                    try {
+                        walkSchema(executionContext, this.tupleSchema.get(i), null, rootNode,
+                                instanceLocation.append(i), shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    } finally {
+                        executionContext.getEvaluationPath().removeLast();
+                    }
                 }
             }
             if (this.additionalSchema != null) {
@@ -333,7 +356,19 @@ public class ItemsValidator extends BaseKeywordValidator {
                 node, rootNode, instanceLocation, walkSchema, this);
         int currentErrors = executionContext.getErrors().size();
         if (executeWalk) {
-            walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+            boolean additionalItems = "additionalItems".equals(keyword);
+            if(additionalItems) {
+                executionContext.getEvaluationPath().removeLast(); // remove items
+                executionContext.getEvaluationPath().addLast(keyword);
+            }
+            try {
+                walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+            } finally {
+                if (additionalItems) {
+                    executionContext.getEvaluationPath().removeLast();    
+                    executionContext.getEvaluationPath().addLast("items");
+                }
+            }
         }
         executionContext.getWalkConfig().getItemWalkListenerRunner().runPostWalkListeners(executionContext, keyword, node, rootNode,
                 instanceLocation, walkSchema, this, executionContext.getErrors().subList(currentErrors, executionContext.getErrors().size()));

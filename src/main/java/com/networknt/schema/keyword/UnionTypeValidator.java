@@ -57,8 +57,9 @@ public class UnionTypeValidator extends BaseKeywordValidator implements KeywordV
             sep = ", ";
 
             if (n.isObject()) {
+                // TODO: Check if the evaluation path is really as follows... 
                 schemas.add(schemaContext.newSchema(schemaLocation.append(KeywordType.TYPE.getValue()),
-                        evaluationPath.append(KeywordType.TRUE.getValue()), n, parentSchema));
+                        evaluationPath.append(KeywordType.TYPE.getValue()), n, parentSchema));
             } else {
                 schemas.add(new TypeValidator(schemaLocation.append(i), evaluationPath.append(i), n, parentSchema,
                         schemaContext));
@@ -85,8 +86,15 @@ public class UnionTypeValidator extends BaseKeywordValidator implements KeywordV
             List<Error> test = new ArrayList<>();
             executionContext.setFailFast(false);
             executionContext.setErrors(test);
+            int schemaIndex = 0;
             for (Validator schema : schemas) {
-                schema.validate(executionContext, node, rootNode, instanceLocation);
+                executionContext.getEvaluationPath().addLast(schemaIndex);
+                try {
+                    schema.validate(executionContext, node, rootNode, instanceLocation);
+                } finally {
+                    executionContext.getEvaluationPath().removeLast();
+                }
+                schemaIndex++;
                 if (test.isEmpty()) {
                     valid = true;
                     break;

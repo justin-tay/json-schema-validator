@@ -66,8 +66,6 @@ public class IfValidator extends BaseKeywordValidator {
 
     @Override
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation) {
-        
-
         boolean ifConditionPassed = false;
 
         // Save flag as nested schema evaluation shouldn't trigger fail fast
@@ -86,9 +84,25 @@ public class IfValidator extends BaseKeywordValidator {
         }
 
         if (ifConditionPassed && this.thenSchema != null) {
-            this.thenSchema.validate(executionContext, node, rootNode, instanceLocation);
+            // The "if" keyword is a bit unusual as it actually handles multiple keywords
+            // This removes the "if" in the evaluation path so the rest of the evaluation paths will be correct
+            executionContext.getEvaluationPath().removeLast();
+            executionContext.getEvaluationPath().addLast("then");
+            try {
+                this.thenSchema.validate(executionContext, node, rootNode, instanceLocation);
+            } finally {
+                executionContext.getEvaluationPath().removeLast();
+                executionContext.getEvaluationPath().addLast("if");
+            }
         } else if (!ifConditionPassed && this.elseSchema != null) {
-            this.elseSchema.validate(executionContext, node, rootNode, instanceLocation);
+            executionContext.getEvaluationPath().removeLast();
+            executionContext.getEvaluationPath().addLast("else");
+            try {
+                this.elseSchema.validate(executionContext, node, rootNode, instanceLocation);
+            } finally {
+                executionContext.getEvaluationPath().removeLast();
+                executionContext.getEvaluationPath().addLast("if");
+            }
         }
     }
 
@@ -107,6 +121,9 @@ public class IfValidator extends BaseKeywordValidator {
 
     @Override
     public void walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation, boolean shouldValidateSchema) {
+        // The "if" keyword is a bit unusual as it actually handles multiple keywords
+        // This removes the "if" in the evaluation path so the rest of the evaluation paths will be correct
+
         boolean checkCondition = node != null && shouldValidateSchema;
         boolean ifConditionPassed = false;
 
@@ -126,17 +143,44 @@ public class IfValidator extends BaseKeywordValidator {
         }
         if (!checkCondition) {
             if (this.thenSchema != null) {
-                this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                executionContext.getEvaluationPath().removeLast();
+                executionContext.getEvaluationPath().addLast("then");
+                try {
+                    this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                } finally {
+                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.getEvaluationPath().addLast("if");
+                }
             }
             if (this.elseSchema != null) {
-                this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                executionContext.getEvaluationPath().removeLast();
+                executionContext.getEvaluationPath().addLast("else");
+                try {
+                    this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                } finally {
+                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.getEvaluationPath().addLast("if");
+                }
             }
         } else {
             if (this.thenSchema != null && ifConditionPassed) {
-                this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
-            }
-            else if (this.elseSchema != null && !ifConditionPassed) {
-                this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                executionContext.getEvaluationPath().removeLast();
+                executionContext.getEvaluationPath().addLast("then");
+                try {
+                    this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                } finally {
+                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.getEvaluationPath().addLast("if");
+                }
+            } else if (this.elseSchema != null && !ifConditionPassed) {
+                executionContext.getEvaluationPath().removeLast();
+                executionContext.getEvaluationPath().addLast("else");
+                try {
+                    this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                } finally {
+                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.getEvaluationPath().addLast("if");
+                }
             }
         }
     }
