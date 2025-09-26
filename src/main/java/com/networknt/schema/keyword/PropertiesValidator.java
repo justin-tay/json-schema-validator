@@ -78,12 +78,17 @@ public class PropertiesValidator extends BaseKeywordValidator {
                     }
                     matchedInstancePropertyNames.add(entry.getKey());
                 }
-                if (!walk) {
-                    //validate the child element(s)
-                    entry.getValue().validate(executionContext, propertyNode, rootNode, path);
-                } else {
-                    // check if walker is enabled. If it is enabled it is upto the walker implementation to decide about the validation.
-                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, executionContext.getWalkConfig().getPropertyWalkListenerRunner());
+                executionContext.getEvaluationPath().addLast(entry.getKey());
+                try {
+                    if (!walk) {
+                        //validate the child element(s)
+                        entry.getValue().validate(executionContext, propertyNode, rootNode, path);
+                    } else {
+                        // check if walker is enabled. If it is enabled it is upto the walker implementation to decide about the validation.
+                        walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, executionContext.getWalkConfig().getPropertyWalkListenerRunner());
+                    }
+                } finally {
+                    executionContext.getEvaluationPath().removeLast();
                 }
             } else {
                 if (walk) {
@@ -92,7 +97,13 @@ public class PropertiesValidator extends BaseKeywordValidator {
                     // null.
                     // The actual walk needs to be skipped as the validators assume that node is not
                     // null.
-                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, true, executionContext.getWalkConfig().getPropertyWalkListenerRunner());
+                    executionContext.getEvaluationPath().addLast(entry.getKey());
+                    try {
+                        walkSchema(executionContext, entry, node, rootNode, instanceLocation, true,
+                                executionContext.getWalkConfig().getPropertyWalkListenerRunner());
+                    } finally {
+                        executionContext.getEvaluationPath().removeLast();
+                    }
                 }
             }
         }

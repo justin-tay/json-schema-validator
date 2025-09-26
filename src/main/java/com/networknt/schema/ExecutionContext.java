@@ -16,6 +16,7 @@
 
 package com.networknt.schema;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +41,19 @@ public class ExecutionContext {
     private InstanceResults instanceResults = null;
     private List<Error> errors = new ArrayList<>();
 
-    private Map<NodePath, DiscriminatorState> discriminatorMapping = new HashMap<>();
+    private final Map<NodePath, DiscriminatorState> discriminatorMapping = new HashMap<>();
     
+    final ArrayDeque<Object> evaluationPath = new ArrayDeque<>(64);
+    final ArrayDeque<Schema> evaluationSchema = new ArrayDeque<>(64);
+    
+    public ArrayDeque<Object> getEvaluationPath() {
+        return evaluationPath;
+    }
+
+    public ArrayDeque<Schema> getEvaluationSchema() {
+        return evaluationSchema;
+    }
+
     public Map<NodePath, DiscriminatorState> getDiscriminatorMapping() {
 		return discriminatorMapping;
 	}

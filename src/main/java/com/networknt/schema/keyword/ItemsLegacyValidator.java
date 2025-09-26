@@ -16,18 +16,20 @@
 
 package com.networknt.schema.keyword;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
-import com.networknt.schema.SchemaRef;
-import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaContext;
+import com.networknt.schema.SchemaLocation;
+import com.networknt.schema.SchemaRef;
 import com.networknt.schema.annotation.Annotation;
 import com.networknt.schema.path.NodePath;
 import com.networknt.schema.utils.SchemaRefs;
-
-import java.util.*;
 
 /**
  * {@link KeywordValidator} for items Draft 4 to Draft 2019-09.
@@ -163,7 +165,13 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
         } else if (this.tupleSchema != null) {
             if (i < this.tupleSchema.size()) {
                 // validate against tuple schema
-                this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
+                executionContext.getEvaluationPath().addLast(i);
+                try {
+                    this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
+                } finally {
+                    executionContext.getEvaluationPath().removeLast();
+                }
+                
             } else {
                 if ((this.additionalItems != null && this.additionalItems) || this.additionalSchema != null) {
                     isAdditionalItem = true;
@@ -171,7 +179,14 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
 
                 if (this.additionalSchema != null) {
                     // validate against additional item schema
-                    this.additionalSchema.validate(executionContext, node, rootNode, path);
+                    executionContext.getEvaluationPath().removeLast(); // remove items
+                    executionContext.getEvaluationPath().addLast("additionalItems");
+                    try {
+                        this.additionalSchema.validate(executionContext, node, rootNode, path);
+                    } finally {
+                        executionContext.getEvaluationPath().removeLast();
+                        executionContext.getEvaluationPath().addLast("items");
+                    }
                 } else if (this.additionalItems != null) {
                     if (this.additionalItems) {
 //                        evaluatedItems.add(path);
@@ -242,10 +257,10 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
                             n = defaultNode;
                         }
                     }
-                    walkSchema(executionContext, this.schema, n, rootNode, instanceLocation.append(i), shouldValidateSchema, KeywordType.ITEMS_LEGACY.getValue());
+                    walkSchema(executionContext, this.schema, n, rootNode, instanceLocation.append(i), shouldValidateSchema, KeywordType.ITEMS.getValue());
                 }
             } else {
-                walkSchema(executionContext, this.schema, null, rootNode, instanceLocation.append(0), shouldValidateSchema, KeywordType.ITEMS_LEGACY.getValue());
+                walkSchema(executionContext, this.schema, null, rootNode, instanceLocation.append(0), shouldValidateSchema, KeywordType.ITEMS.getValue());
             }
         }
         else if (this.tupleSchema != null) {
@@ -265,11 +280,21 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
                             n = defaultNode;
                         }
                     }
-                    walkSchema(executionContext, this.tupleSchema.get(i), n, rootNode, instanceLocation.append(i),
-                            shouldValidateSchema, KeywordType.ITEMS_LEGACY.getValue());
+                    executionContext.getEvaluationPath().addLast(i);
+                    try {
+                        walkSchema(executionContext, this.tupleSchema.get(i), n, rootNode, instanceLocation.append(i),
+                                shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    } finally {
+                        executionContext.getEvaluationPath().removeLast();
+                    }
                 } else {
-                    walkSchema(executionContext, this.tupleSchema.get(i), null, rootNode, instanceLocation.append(i),
-                            shouldValidateSchema, KeywordType.ITEMS_LEGACY.getValue());
+                    executionContext.getEvaluationPath().addLast(i);
+                    try {
+                        walkSchema(executionContext, this.tupleSchema.get(i), null, rootNode,
+                                instanceLocation.append(i), shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    } finally {
+                        executionContext.getEvaluationPath().removeLast();
+                    }
                 }
             }
             if (this.additionalSchema != null) {
@@ -333,7 +358,19 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
                 node, rootNode, instanceLocation, walkSchema, this);
         int currentErrors = executionContext.getErrors().size();
         if (executeWalk) {
-            walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+            boolean additionalItems = "additionalItems".equals(keyword);
+            if(additionalItems) {
+                executionContext.getEvaluationPath().removeLast(); // remove items
+                executionContext.getEvaluationPath().addLast(keyword);
+            }
+            try {
+                walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+            } finally {
+                if (additionalItems) {
+                    executionContext.getEvaluationPath().removeLast();    
+                    executionContext.getEvaluationPath().addLast("items");
+                }
+            }
         }
         executionContext.getWalkConfig().getItemWalkListenerRunner().runPostWalkListeners(executionContext, keyword, node, rootNode,
                 instanceLocation, walkSchema, this, executionContext.getErrors().subList(currentErrors, executionContext.getErrors().size()));

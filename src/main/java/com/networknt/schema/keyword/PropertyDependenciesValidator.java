@@ -75,13 +75,23 @@ public class PropertyDependenciesValidator extends BaseKeywordValidator implemen
             if (propertyValue != null) {
                 Map<String, Schema> propertySchemas = this.propertyDependencies.get(propertyName);
                 if (propertySchemas != null) {
-                    Schema schema = propertySchemas.get(propertyValue);
-                    if (schema != null) {
-                        if (!walk) {
-                            schema.validate(executionContext, node, rootNode, instanceLocation);
-                        } else {
-                            schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                    executionContext.getEvaluationPath().addLast(propertyName);
+                    try {
+                        Schema schema = propertySchemas.get(propertyValue);
+                        if (schema != null) {
+                            executionContext.getEvaluationPath().addLast(propertyValue);
+                            try {
+                                if (!walk) {
+                                    schema.validate(executionContext, node, rootNode, instanceLocation);
+                                } else {
+                                    schema.walk(executionContext, node, rootNode, instanceLocation, true);
+                                }
+                            } finally {
+                                executionContext.getEvaluationPath().removeLast();
+                            }
                         }
+                    } finally {
+                        executionContext.getEvaluationPath().removeLast();
                     }
                 }
             }
@@ -96,9 +106,20 @@ public class PropertyDependenciesValidator extends BaseKeywordValidator implemen
             return;
         }
 
-        for (Map<String, Schema> properties : this.propertyDependencies.values()) {
-            for (Schema schema : properties.values()) {
-                schema.walk(executionContext, node, rootNode, instanceLocation, false);
+        for (Entry<String, Map<String, Schema>> property : this.propertyDependencies.entrySet()) {
+            String propertyName = property.getKey();
+            executionContext.getEvaluationPath().addLast(propertyName);
+            try {
+                for (Entry<String, Schema> propertyValue : property.getValue().entrySet()) {
+                    executionContext.getEvaluationPath().add(propertyValue.getKey());
+                    try {
+                        propertyValue.getValue().walk(executionContext, node, rootNode, instanceLocation, false);
+                    } finally {
+                        executionContext.getEvaluationPath().removeLast();
+                    }
+                }
+            } finally {
+                executionContext.getEvaluationPath().removeLast();
             }
         }
     }
@@ -106,6 +127,7 @@ public class PropertyDependenciesValidator extends BaseKeywordValidator implemen
     @Override
     public void preloadSchema() {
         for (Map<String, Schema> properties : propertyDependencies.values()) {
+
             for (Schema schema : properties.values()) {
                 schema.initializeValidators();
             }
