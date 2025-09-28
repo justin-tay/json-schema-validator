@@ -16,7 +16,6 @@
 
 package com.networknt.schema.keyword;
 
-import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
@@ -25,7 +24,6 @@ import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.annotation.Annotation;
-import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 
 /**
@@ -99,6 +97,10 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
      * @return true if annotations should be reported
      */
     protected boolean collectAnnotations(ExecutionContext executionContext) {
+        boolean hasUnevaluatedProperties = hasAdjacentKeywordInEvaluationPath(executionContext, "unevaluatedProperties");
+        if (hasUnevaluatedProperties) {
+            return true;
+        }
         return collectAnnotations(executionContext, getKeyword());
     }
 
@@ -144,15 +146,15 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
     protected boolean hasAdjacentKeywordInEvaluationPath(ExecutionContext executionContext, String keyword) {
         Iterator<Object> evaluationSchemaPathIterator = executionContext.getEvaluationSchemaPath().descendingIterator();
         Iterator<Schema> evaluationSchemaIterator = executionContext.getEvaluationSchema().descendingIterator();
+        boolean stop = false;
 
-        ArrayDeque<Object> current = executionContext.getEvaluationSchemaPath().clone();
-
+//        ArrayDeque<Object> current = executionContext.getEvaluationSchemaPath().clone();
+//
         // Skip the first as this is the path pointing to the current keyword eg. properties eg /$ref/properties
         // What is needed is the evaluationPath pointing to the current evaluationSchema eg /$ref
         if (evaluationSchemaPathIterator.hasNext()) {
-            evaluationSchemaPathIterator.next();
-            
-            current.removeLast();
+            evaluationSchemaPathIterator.next(); 
+//            current.removeLast();
         }
 
         while (evaluationSchemaIterator.hasNext()) {
@@ -162,19 +164,23 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
                     return true;
                 }
             }
-            String newPath = new EvaluationPath(current).toString();
-            String oldPath = schema.getEvaluationPath().toString(); 
-            if (!oldPath.equals(newPath)) {
-                System.out.println("OLD: "+oldPath);
-                System.out.println("NEW: "+newPath);
-            }
+//            String newPath = new EvaluationPath(current).toString();
+//            String oldPath = schema.getEvaluationPath().toString(); 
+//            if (!oldPath.equals(newPath)) {
+//                System.out.println("OLD: "+oldPath);
+//                System.out.println("NEW: "+newPath);
+//            }
 
+            if (stop) {
+                return false;
+            }
             if (evaluationSchemaPathIterator.hasNext()) {
                 Object evaluationPath = evaluationSchemaPathIterator.next();
-                current.removeLast();
+//                current.removeLast();
                 if ("properties".equals(evaluationPath) || "items".equals(evaluationPath)) {
-                    // If there is a change in instance location then return false
-                    return false;
+                    // If there is a change in instance location then after the next schema
+                    // stop
+                    stop = true;
                 }
             }
         }

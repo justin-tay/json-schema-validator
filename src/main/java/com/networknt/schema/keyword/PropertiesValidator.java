@@ -64,10 +64,13 @@ public class PropertiesValidator extends BaseKeywordValidator {
 
     protected void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             NodePath instanceLocation, boolean walk) {
-        
-        boolean c = hasAdjacentKeywordInEvaluationPath(executionContext, "unevaluatedProperties");
+//        boolean present = hasUnevaluatedPropertiesValidator();
+//        boolean check = hasAdjacentKeywordInEvaluationPath(executionContext, "unevaluatedProperties");
+//        if (present != check) {
+//            throw new RuntimeException();
+//        }
         Set<String> matchedInstancePropertyNames = null;
-        boolean collectAnnotations = collectAnnotations() || collectAnnotations(executionContext);
+        boolean collectAnnotations = /*collectAnnotations() ||*/ collectAnnotations(executionContext);
         for (Entry<String, Schema> entry : this.schemas.entrySet()) {
             JsonNode propertyNode = node.get(entry.getKey());
             if (propertyNode != null) {
@@ -139,16 +142,16 @@ public class PropertiesValidator extends BaseKeywordValidator {
         }
     }
 
-    private boolean collectAnnotations() {
-        return hasUnevaluatedPropertiesValidator();
-    }
-
-    private boolean hasUnevaluatedPropertiesValidator() {
-        if (this.hasUnevaluatedPropertiesValidator == null) {
-            this.hasUnevaluatedPropertiesValidator = hasAdjacentKeywordInEvaluationPath("unevaluatedProperties");
-        }
-        return hasUnevaluatedPropertiesValidator;
-    }
+//    private boolean collectAnnotations() {
+//        return hasUnevaluatedPropertiesValidator();
+//    }
+//
+//    private boolean hasUnevaluatedPropertiesValidator() {
+//        if (this.hasUnevaluatedPropertiesValidator == null) {
+//            this.hasUnevaluatedPropertiesValidator = hasAdjacentKeywordInEvaluationPath("unevaluatedProperties");
+//        }
+//        return hasUnevaluatedPropertiesValidator;
+//    }
 
     private void applyPropertyDefaults(ObjectNode node, ExecutionContext executionContext) {
         for (Map.Entry<String, Schema> entry : this.schemas.entrySet()) {
@@ -205,6 +208,6 @@ public class PropertiesValidator extends BaseKeywordValidator {
     @Override
     public void preloadSchema() {
         preloadSchemas(this.schemas.values());
-        collectAnnotations(); // cache the flag
+//        collectAnnotations(); // cache the flag
     }
 }
