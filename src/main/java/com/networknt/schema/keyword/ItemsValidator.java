@@ -153,11 +153,11 @@ public class ItemsValidator extends BaseKeywordValidator {
         
         // TOREMOVE
         // MISMATCH TEST
-        String newPath = new EvaluationPath(executionContext.getEvaluationPath()).toString();
-        String oldPath = walkSchema.getEvaluationPath().toString();
-        if (!newPath.equals(oldPath)) {
-            throw new RuntimeException("mismatch: old "+oldPath+" new "+newPath);
-        }
+//        String newPath = new EvaluationPath(executionContext.getEvaluationPath()).toString();
+//        String oldPath = walkSchema.getEvaluationPath().toString();
+//        if (!newPath.equals(oldPath)) {
+//            throw new RuntimeException("mismatch: old "+oldPath+" new "+newPath);
+//        }
         boolean executeWalk = executionContext.getWalkConfig().getItemWalkListenerRunner().runPreWalkListeners(
             executionContext,
             KeywordType.ITEMS.getValue(),
