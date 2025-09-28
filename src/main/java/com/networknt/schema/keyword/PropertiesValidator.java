@@ -129,7 +129,12 @@ public class PropertiesValidator extends BaseKeywordValidator {
         } else {
             WalkListenerRunner propertyWalkListenerRunner = executionContext.getWalkConfig().getPropertyWalkListenerRunner();
             for (Map.Entry<String, Schema> entry : this.schemas.entrySet()) {
-                walkSchema(executionContext, entry, node, rootNode, instanceLocation, shouldValidateSchema, propertyWalkListenerRunner);
+                executionContext.getEvaluationPath().addLast(entry.getKey());
+                try {
+                    walkSchema(executionContext, entry, node, rootNode, instanceLocation, shouldValidateSchema, propertyWalkListenerRunner);
+                } finally {
+                    executionContext.getEvaluationPath().removeLast();
+                }
             }
         }
     }

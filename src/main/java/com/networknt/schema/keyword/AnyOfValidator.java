@@ -209,8 +209,8 @@ public class AnyOfValidator extends BaseKeywordValidator {
             validate(executionContext, node, rootNode, instanceLocation, true);
             return;
         }
+        int schemaIndex = 0;
         for (Schema schema : this.schemas) {
-            int schemaIndex = 0;
             executionContext.getEvaluationPath().addLast(schemaIndex);
             try {
                 schema.walk(executionContext, node, rootNode, instanceLocation, false);
