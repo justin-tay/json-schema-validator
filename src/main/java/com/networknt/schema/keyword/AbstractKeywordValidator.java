@@ -16,12 +16,16 @@
 
 package com.networknt.schema.keyword;
 
+import java.util.ArrayDeque;
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.ExecutionContext;
+import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.annotation.Annotation;
+import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 
 /**
@@ -121,5 +125,59 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
                 .schemaLocation(this.schemaLocation).keyword(getKeyword());
         customizer.accept(builder);
         executionContext.getAnnotations().put(builder.build());
+    }
+
+    
+    /**
+     * Determines if the keyword exists adjacent in the evaluation path.
+     * <p>
+     * This does not check if the keyword exists in the current meta schema as this
+     * can be a cross-draft case where the properties keyword is in a Draft 7 schema
+     * and the unevaluatedProperties keyword is in an outer Draft 2020-12 schema.
+     * <p>
+     * The fact that the validator exists in the evaluation path implies that the
+     * keyword was valid in whatever meta schema for that schema it was created for.
+     * 
+     * @param keyword the keyword to check
+     * @return true if found
+     */
+    protected boolean hasAdjacentKeywordInEvaluationPath(ExecutionContext executionContext, String keyword) {
+        Iterator<Object> evaluationSchemaPathIterator = executionContext.getEvaluationSchemaPath().descendingIterator();
+        Iterator<Schema> evaluationSchemaIterator = executionContext.getEvaluationSchema().descendingIterator();
+
+        ArrayDeque<Object> current = executionContext.getEvaluationSchemaPath().clone();
+
+        // Skip the first as this is the path pointing to the current keyword eg. properties eg /$ref/properties
+        // What is needed is the evaluationPath pointing to the current evaluationSchema eg /$ref
+        if (evaluationSchemaPathIterator.hasNext()) {
+            evaluationSchemaPathIterator.next();
+            
+            current.removeLast();
+        }
+
+        while (evaluationSchemaIterator.hasNext()) {
+            Schema schema = evaluationSchemaIterator.next();
+            for (KeywordValidator validator : schema.getValidators()) {
+                if (keyword.equals(validator.getKeyword())) {
+                    return true;
+                }
+            }
+            String newPath = new EvaluationPath(current).toString();
+            String oldPath = schema.getEvaluationPath().toString(); 
+            if (!oldPath.equals(newPath)) {
+                System.out.println("OLD: "+oldPath);
+                System.out.println("NEW: "+newPath);
+            }
+
+            if (evaluationSchemaPathIterator.hasNext()) {
+                Object evaluationPath = evaluationSchemaPathIterator.next();
+                current.removeLast();
+                if ("properties".equals(evaluationPath) || "items".equals(evaluationPath)) {
+                    // If there is a change in instance location then return false
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -723,10 +723,12 @@ public class Schema implements Validator {
             int currentErrors = executionContext.getErrors().size();
             for (KeywordValidator v : getValidators()) {
                 executionContext.evaluationPath.addLast(v.getKeyword());
+                executionContext.evaluationSchemaPath.addLast(v.getKeyword());
                 try {
                     v.validate(executionContext, jsonNode, rootNode, instanceLocation);
                 } finally {
                     executionContext.evaluationPath.removeLast();
+                    executionContext.evaluationSchemaPath.removeLast();
                 }
             }
             if (executionContext.getErrors().size() > currentErrors) {
