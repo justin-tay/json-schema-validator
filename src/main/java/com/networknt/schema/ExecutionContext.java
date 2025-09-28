@@ -19,12 +19,14 @@ package com.networknt.schema;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import com.networknt.schema.annotation.Annotations;
 import com.networknt.schema.keyword.DiscriminatorState;
+import com.networknt.schema.keyword.KeywordValidator;
 import com.networknt.schema.path.NodePath;
 import com.networknt.schema.result.InstanceResults;
 import com.networknt.schema.walk.WalkConfig;
@@ -45,6 +47,7 @@ public class ExecutionContext {
     
     final ArrayDeque<Object> evaluationPath = new ArrayDeque<>(64);
     final ArrayDeque<Schema> evaluationSchema = new ArrayDeque<>(64);
+    final ArrayDeque<Object> evaluationSchemaPath = new ArrayDeque<>(64);
     
     public ArrayDeque<Object> getEvaluationPath() {
         return evaluationPath;
@@ -52,6 +55,10 @@ public class ExecutionContext {
 
     public ArrayDeque<Schema> getEvaluationSchema() {
         return evaluationSchema;
+    }
+    
+    public ArrayDeque<Object> getEvaluationSchemaPath() {
+        return evaluationSchemaPath;
     }
 
     public Map<NodePath, DiscriminatorState> getDiscriminatorMapping() {

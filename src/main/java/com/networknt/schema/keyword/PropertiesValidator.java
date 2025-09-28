@@ -65,7 +65,7 @@ public class PropertiesValidator extends BaseKeywordValidator {
     protected void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             NodePath instanceLocation, boolean walk) {
         
-
+        boolean c = hasAdjacentKeywordInEvaluationPath(executionContext, "unevaluatedProperties");
         Set<String> matchedInstancePropertyNames = null;
         boolean collectAnnotations = collectAnnotations() || collectAnnotations(executionContext);
         for (Entry<String, Schema> entry : this.schemas.entrySet()) {
