@@ -24,6 +24,7 @@ import com.networknt.schema.SchemaRef;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaContext;
 import com.networknt.schema.annotation.Annotation;
+import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 import com.networknt.schema.utils.SchemaRefs;
 
@@ -149,9 +150,17 @@ public class ItemsValidator extends BaseKeywordValidator {
     private void walkSchema(ExecutionContext executionContext, Schema walkSchema, JsonNode node, JsonNode rootNode,
             NodePath instanceLocation, boolean shouldValidateSchema) {
         //@formatter:off
+        
+        // TOREMOVE
+        // MISMATCH TEST
+        String newPath = new EvaluationPath(executionContext.getEvaluationPath()).toString();
+        String oldPath = walkSchema.getEvaluationPath().toString();
+        if (!newPath.equals(oldPath)) {
+            throw new RuntimeException("mismatch: old "+oldPath+" new "+newPath);
+        }
         boolean executeWalk = executionContext.getWalkConfig().getItemWalkListenerRunner().runPreWalkListeners(
             executionContext,
-            KeywordType.ITEMS_LEGACY.getValue(),
+            KeywordType.ITEMS.getValue(),
             node,
             rootNode,
             instanceLocation,
@@ -163,7 +172,7 @@ public class ItemsValidator extends BaseKeywordValidator {
         }
         executionContext.getWalkConfig().getItemWalkListenerRunner().runPostWalkListeners(
             executionContext,
-            KeywordType.ITEMS_LEGACY.getValue(),
+            KeywordType.ITEMS.getValue(),
             node,
             rootNode,
             instanceLocation,

@@ -148,14 +148,13 @@ public class Schema implements Validator {
     }
 
     public void validate(ExecutionContext executionContext, JsonNode node) {
-        /*
-         * Sets the evaluationPath to point to the schema location fragment if it isn't
-         * pointing to the document
+        /* Previously the evaluation path started with the fragment of the schema due to the way it was implemented
+         * as part of the schema's state
+         * int count = this.schemaLocation.getFragment().getNameCount(); 
+         * for (int x = 0; x < count; x++) {
+         *     executionContext.evaluationPath.addLast(this.schemaLocation.getFragment().getElement(x)); 
+         * }
          */
-        int count = this.schemaLocation.getFragment().getNameCount();
-        for (int x = 0; x < count; x++) {
-            executionContext.evaluationPath.addLast(this.schemaLocation.getFragment().getElement(x));
-        }
         validate(executionContext, node, node, atRoot());
     }
 
@@ -711,14 +710,14 @@ public class Schema implements Validator {
 
     @Override
     public void validate(ExecutionContext executionContext, JsonNode jsonNode, JsonNode rootNode, NodePath instanceLocation) {
-//        String newEvaluationPath = new EvaluationPath(executionContext.getEvaluationPath()).toString();
-//        String oldEvaluationPath = getEvaluationPath().toString();
-//        if (!oldEvaluationPath.equals(newEvaluationPath)) {
-//            System.out.println("-----------------");
-//            System.out.println("MISMATCH OLD: " + oldEvaluationPath);
-//            System.out.println("MISMATCH NEW: " + newEvaluationPath);
-//            System.out.println("-----------------");
-//        }
+        String newEvaluationPath = new EvaluationPath(executionContext.getEvaluationPath()).toString();
+        String oldEvaluationPath = getEvaluationPath().toString();
+        if (!oldEvaluationPath.equals(newEvaluationPath)) {
+            System.out.println("-----------------");
+            System.out.println("MISMATCH OLD: " + oldEvaluationPath);
+            System.out.println("MISMATCH NEW: " + newEvaluationPath);
+            System.out.println("-----------------");
+        }
         executionContext.evaluationSchema.addLast(this);
         try {
             int currentErrors = executionContext.getErrors().size();

@@ -28,6 +28,7 @@ import com.networknt.schema.SchemaContext;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaRef;
 import com.networknt.schema.annotation.Annotation;
+import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 import com.networknt.schema.utils.SchemaRefs;
 
@@ -257,10 +258,10 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
                             n = defaultNode;
                         }
                     }
-                    walkSchema(executionContext, this.schema, n, rootNode, instanceLocation.append(i), shouldValidateSchema, KeywordType.ITEMS.getValue());
+                    walkSchema(executionContext, this.schema, n, rootNode, instanceLocation.append(i), shouldValidateSchema, KeywordType.ITEMS_LEGACY.getValue());
                 }
             } else {
-                walkSchema(executionContext, this.schema, null, rootNode, instanceLocation.append(0), shouldValidateSchema, KeywordType.ITEMS.getValue());
+                walkSchema(executionContext, this.schema, null, rootNode, instanceLocation.append(0), shouldValidateSchema, KeywordType.ITEMS_LEGACY.getValue());
             }
         }
         else if (this.tupleSchema != null) {
@@ -283,7 +284,7 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
                     executionContext.getEvaluationPath().addLast(i);
                     try {
                         walkSchema(executionContext, this.tupleSchema.get(i), n, rootNode, instanceLocation.append(i),
-                                shouldValidateSchema, KeywordType.ITEMS.getValue());
+                                shouldValidateSchema, KeywordType.ITEMS_LEGACY.getValue());
                     } finally {
                         executionContext.getEvaluationPath().removeLast();
                     }
@@ -291,7 +292,7 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
                     executionContext.getEvaluationPath().addLast(i);
                     try {
                         walkSchema(executionContext, this.tupleSchema.get(i), null, rootNode,
-                                instanceLocation.append(i), shouldValidateSchema, KeywordType.ITEMS.getValue());
+                                instanceLocation.append(i), shouldValidateSchema, KeywordType.ITEMS_LEGACY.getValue());
                     } finally {
                         executionContext.getEvaluationPath().removeLast();
                     }
@@ -354,27 +355,35 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
 
     private void walkSchema(ExecutionContext executionContext, Schema walkSchema, JsonNode node, JsonNode rootNode,
             NodePath instanceLocation, boolean shouldValidateSchema, String keyword) {
-        boolean executeWalk = executionContext.getWalkConfig().getItemWalkListenerRunner().runPreWalkListeners(executionContext, keyword,
-                node, rootNode, instanceLocation, walkSchema, this);
-        int currentErrors = executionContext.getErrors().size();
-        if (executeWalk) {
-            boolean additionalItems = "additionalItems".equals(keyword);
-            if(additionalItems) {
-                executionContext.getEvaluationPath().removeLast(); // remove items
-                executionContext.getEvaluationPath().addLast(keyword);
+        boolean additionalItems = "additionalItems".equals(keyword);
+        if (additionalItems) {
+            executionContext.getEvaluationPath().removeLast(); // remove items
+            executionContext.getEvaluationPath().addLast(keyword);
+        }
+        try {
+            // TOREMOVE
+            // MISMATCH TEST
+            String newPath = new EvaluationPath(executionContext.getEvaluationPath()).toString();
+            String oldPath = walkSchema.getEvaluationPath().toString();
+            if (!newPath.equals(oldPath)) {
+                throw new RuntimeException("mismatch: old " + oldPath + " new " + newPath);
             }
-            try {
+
+            boolean executeWalk = executionContext.getWalkConfig().getItemWalkListenerRunner()
+                    .runPreWalkListeners(executionContext, keyword, node, rootNode, instanceLocation, walkSchema, this);
+            int currentErrors = executionContext.getErrors().size();
+            if (executeWalk) {
                 walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
-            } finally {
-                if (additionalItems) {
-                    executionContext.getEvaluationPath().removeLast();    
-                    executionContext.getEvaluationPath().addLast("items");
-                }
+            }
+            executionContext.getWalkConfig().getItemWalkListenerRunner().runPostWalkListeners(executionContext, keyword,
+                    node, rootNode, instanceLocation, walkSchema, this,
+                    executionContext.getErrors().subList(currentErrors, executionContext.getErrors().size()));
+        } finally {
+            if (additionalItems) {
+                executionContext.getEvaluationPath().removeLast();
+                executionContext.getEvaluationPath().addLast("items");
             }
         }
-        executionContext.getWalkConfig().getItemWalkListenerRunner().runPostWalkListeners(executionContext, keyword, node, rootNode,
-                instanceLocation, walkSchema, this, executionContext.getErrors().subList(currentErrors, executionContext.getErrors().size()));
-
     }
 
     public List<Schema> getTupleSchema() {
