@@ -159,11 +159,15 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
 
         while (evaluationSchemaIterator.hasNext()) {
             Schema schema = evaluationSchemaIterator.next();
-            for (KeywordValidator validator : schema.getValidators()) {
-                if (keyword.equals(validator.getKeyword())) {
-                    return true;
-                }
+            boolean hasKeyword = schema.getSchemaNode().has(keyword);
+            if (hasKeyword) {
+                return true;
             }
+//            for (KeywordValidator validator : schema.getValidators()) {
+//                if (keyword.equals(validator.getKeyword())) {
+//                    return true;
+//                }
+//            }
 //            String newPath = new EvaluationPath(current).toString();
 //            String oldPath = schema.getEvaluationPath().toString(); 
 //            if (!oldPath.equals(newPath)) {
