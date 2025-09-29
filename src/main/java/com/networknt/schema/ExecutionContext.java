@@ -256,10 +256,8 @@ public class ExecutionContext {
         return this.unevaluatedItemsPresent;
     }
     
-    public boolean setUnevaluatedPropertiesPresent(boolean set) {
-        boolean existing = this.unevaluatedPropertiesPresent;
+    public void setUnevaluatedPropertiesPresent(boolean set) {
         this.unevaluatedPropertiesPresent = set;
-        return existing;
     }
     
     public boolean setUnevaluatedItemsPresent(boolean set) {
