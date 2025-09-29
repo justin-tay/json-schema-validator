@@ -123,37 +123,6 @@ public abstract class BaseKeywordValidator extends AbstractKeywordValidator {
         }
     }
 
-    /**
-     * Determines if the keyword exists adjacent in the evaluation path.
-     * <p>
-     * This does not check if the keyword exists in the current meta schema as this
-     * can be a cross-draft case where the properties keyword is in a Draft 7 schema
-     * and the unevaluatedProperties keyword is in an outer Draft 2020-12 schema.
-     * <p>
-     * The fact that the validator exists in the evaluation path implies that the
-     * keyword was valid in whatever meta schema for that schema it was created for.
-     * 
-     * @param keyword the keyword to check
-     * @return true if found
-     */
-    protected boolean hasAdjacentKeywordInEvaluationPath(String keyword) {
-        Schema schema = getEvaluationParentSchema();
-        while (schema != null) {
-            for (KeywordValidator validator : schema.getValidators()) {
-                if (keyword.equals(validator.getKeyword())) {
-                    return true;
-                }
-            }
-            Object element = schema.getEvaluationPath().getElement(-1);
-            if ("properties".equals(element) || "items".equals(element)) {
-                // If there is a change in instance location then return false
-                return false;
-            }
-            schema = schema.getEvaluationParentSchema();
-        }
-        return false;
-    }
-
     protected MessageSourceError.Builder error() {
         return MessageSourceError
                 .builder(this.schemaContext.getSchemaRegistryConfig().getMessageSource(), this.errorMessage)

@@ -95,7 +95,8 @@ public class AdditionalPropertiesValidator extends BaseKeywordValidator {
 
         Set<String> matchedInstancePropertyNames = null;
         
-        boolean collectAnnotations = collectAnnotations() || collectAnnotations(executionContext);
+        boolean collectAnnotations = hasUnevaluatedPropertiesInEvaluationPath(executionContext)
+                || collectAnnotations(executionContext);
         // if allowAdditionalProperties is true, add all the properties as evaluated.
         if (allowAdditionalProperties && collectAnnotations) {
             for (Iterator<String> it = node.fieldNames(); it.hasNext();) {
@@ -180,22 +181,10 @@ public class AdditionalPropertiesValidator extends BaseKeywordValidator {
         return false;
     }
 
-    private boolean collectAnnotations() {
-        return hasUnevaluatedPropertiesValidator();
-    }
-
-    private boolean hasUnevaluatedPropertiesValidator() {
-        if (this.hasUnevaluatedPropertiesValidator == null) {
-            this.hasUnevaluatedPropertiesValidator = hasAdjacentKeywordInEvaluationPath("unevaluatedProperties");
-        }
-        return hasUnevaluatedPropertiesValidator;
-    }
-
     @Override
     public void preloadSchema() {
         if(additionalPropertiesSchema != null) {
             additionalPropertiesSchema.initializeValidators();
         }
-        collectAnnotations(); // cache the flag
     }
 }

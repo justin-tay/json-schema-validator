@@ -45,8 +45,6 @@ public class ContainsValidator extends BaseKeywordValidator {
     private final Integer min;
     private final Integer max;
 
-    private Boolean hasUnevaluatedItemsValidator = null;
-
     public ContainsValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
         super(KeywordType.CONTAINS, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
 
@@ -126,7 +124,7 @@ public class ContainsValidator extends BaseKeywordValidator {
             }
         }
         
-        boolean collectAnnotations = collectAnnotations();
+        boolean collectAnnotations = hasUnevaluatedItemsInEvaluationPath(executionContext);
         if (this.schema != null) {
             // This keyword produces an annotation value which is an array of the indexes to
             // which this keyword validates successfully when applying its subschema, in
@@ -181,7 +179,6 @@ public class ContainsValidator extends BaseKeywordValidator {
     @Override
     public void preloadSchema() {
         Optional.ofNullable(this.schema).ifPresent(Schema::initializeValidators);
-        collectAnnotations(); // cache the flag
     }
 
     private void boundsViolated(ExecutionContext executionContext, KeywordType validatorTypeCode, Locale locale,
@@ -197,21 +194,4 @@ public class ContainsValidator extends BaseKeywordValidator {
                         .keyword(validatorTypeCode.getValue()).build());
     }
     
-    /**
-     * Determine if annotations must be collected for evaluation.
-     * <p>
-     * This will be collected regardless of whether it is needed for reporting.
-     * 
-     * @return true if annotations must be collected for evaluation.
-     */
-    private boolean collectAnnotations() {
-        return hasUnevaluatedItemsValidator();
-    }
-
-    private boolean hasUnevaluatedItemsValidator() {
-        if (this.hasUnevaluatedItemsValidator == null) {
-            this.hasUnevaluatedItemsValidator = hasAdjacentKeywordInEvaluationPath("unevaluatedItems");
-        }
-        return hasUnevaluatedItemsValidator;
-    }
 }

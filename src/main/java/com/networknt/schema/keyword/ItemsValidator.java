@@ -85,7 +85,7 @@ public class ItemsValidator extends BaseKeywordValidator {
                 evaluated = true;
             }
             if (evaluated) {
-                if (collectAnnotations() || collectAnnotations(executionContext)) {
+                if (hasUnevaluatedItemsInEvaluationPath(executionContext) || collectAnnotations(executionContext)) {
                     // Applies to all
                     executionContext.getAnnotations()
                             .put(Annotation.builder().instanceLocation(instanceLocation)
@@ -120,7 +120,7 @@ public class ItemsValidator extends BaseKeywordValidator {
                 }
             }
             if (evaluated) {
-                if (collectAnnotations() || collectAnnotations(executionContext)) {
+                if (hasUnevaluatedItemsInEvaluationPath(executionContext) || collectAnnotations(executionContext)) {
                     // Applies to all
                     executionContext.getAnnotations()
                             .put(Annotation.builder().instanceLocation(instanceLocation)
@@ -189,18 +189,5 @@ public class ItemsValidator extends BaseKeywordValidator {
     @Override
     public void preloadSchema() {
         this.schema.initializeValidators();
-        collectAnnotations(); // cache the flag
     }
-
-    private boolean collectAnnotations() {
-        return hasUnevaluatedItemsValidator();
-    }
-
-    private boolean hasUnevaluatedItemsValidator() {
-        if (this.hasUnevaluatedItemsValidator == null) {
-            this.hasUnevaluatedItemsValidator = hasAdjacentKeywordInEvaluationPath("unevaluatedItems");
-        }
-        return hasUnevaluatedItemsValidator;
-    }
-
 }

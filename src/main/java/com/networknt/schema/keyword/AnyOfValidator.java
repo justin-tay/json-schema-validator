@@ -36,8 +36,6 @@ import com.networknt.schema.utils.TypeFactory;
 public class AnyOfValidator extends BaseKeywordValidator {
     private final List<Schema> schemas;
 
-    private Boolean canShortCircuit = null;
-
     public AnyOfValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode,
             Schema parentSchema, SchemaContext schemaContext) {
         super(KeywordType.ANY_OF, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
@@ -111,7 +109,7 @@ public class AnyOfValidator extends BaseKeywordValidator {
                 }
 
                 if (subSchemaErrors.isEmpty() && (!this.schemaContext.isDiscriminatorKeywordEnabled())
-                        && canShortCircuit() && canShortCircuit(executionContext)) {
+                        && canShortCircuit(executionContext)) {
                     // Successful so return only the existing errors, ie. no new errors
                     executionContext.setErrors(existingErrors);
                     return;
@@ -230,31 +228,17 @@ public class AnyOfValidator extends BaseKeywordValidator {
      * @return true if can short circuit
      */
     protected boolean canShortCircuit(ExecutionContext executionContext) {
-        return !executionContext.getExecutionConfig().isAnnotationCollectionEnabled();
-    }
-
-    /**
-     * If annotations are require for evaluation cannot short circuit.
-     * 
-     * @return true if can short circuit
-     */
-    protected boolean canShortCircuit() {
-        if (this.canShortCircuit == null) {
-            boolean canShortCircuit = true;
-            for (KeywordValidator validator : getEvaluationParentSchema().getValidators()) {
-                if ("unevaluatedProperties".equals(validator.getKeyword())
-                        || "unevaluatedItems".equals(validator.getKeyword())) {
-                    canShortCircuit = false;
-                }
-            }
-            this.canShortCircuit = canShortCircuit;
+        if (hasUnevaluatedItemsInEvaluationPath(executionContext)) {
+            return true;
         }
-        return this.canShortCircuit;
+        if (hasUnevaluatedPropertiesInEvaluationPath(executionContext)) {
+            return true;
+        }
+        return !executionContext.getExecutionConfig().isAnnotationCollectionEnabled();
     }
 
     @Override
     public void preloadSchema() {
         preloadSchemas(this.schemas);
-        canShortCircuit(); // cache flag
     }
 }
