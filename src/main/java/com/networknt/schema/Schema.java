@@ -64,6 +64,9 @@ public class Schema implements Validator {
      * The validators sorted and indexed by evaluation path.
      */
     private List<KeywordValidator> validators = null;
+    private boolean unevaluatedPropertiesPresent = false;
+    private boolean unevaluatedItemsPresent = false;
+    
     private boolean validatorsLoaded = false;
     private boolean recursiveAnchor = false;
     private TypeValidator typeValidator = null;
@@ -660,6 +663,11 @@ public class Schema implements Validator {
                         pname, nodeToUse, this);
                 if (validator != null) {
                     validators.add(validator);
+                    if ("unevaluatedProperties".equals(pname)) {
+                        this.unevaluatedPropertiesPresent = true;
+                    } else if ("unevaluatedItems".equals(pname)) {
+                        this.unevaluatedItemsPresent = true;
+                    }
 
                     if ("$ref".equals(pname)) {
                         refValidator = validator;
@@ -723,13 +731,13 @@ public class Schema implements Validator {
 //            System.out.println("-----------------");
 //        }
         executionContext.evaluationSchema.addLast(this);
-        boolean unevaluatedPropertiesPresent = executionContext.isUnevaluatedPropertiesPresent();
-        boolean unevaluatedItemsPresent =  executionContext.isUnevaluatedItemsPresent();
-        if (!unevaluatedPropertiesPresent) {
-            executionContext.setUnevaluatedPropertiesPresent(hasKeyword("unevaluatedProperties"));
+        boolean unevaluatedPropertiesPresent = executionContext.unevaluatedPropertiesPresent;
+        boolean unevaluatedItemsPresent =  executionContext.unevaluatedItemsPresent;
+        if (this.unevaluatedPropertiesPresent) {
+            executionContext.unevaluatedPropertiesPresent = this.unevaluatedPropertiesPresent;
         }
-        if (!unevaluatedItemsPresent) {
-            executionContext.setUnevaluatedItemsPresent(hasKeyword("unevaluatedItems"));
+        if (this.unevaluatedItemsPresent) {
+            executionContext.unevaluatedItemsPresent = this.unevaluatedItemsPresent;
         }
         try {
             int currentErrors = executionContext.getErrors().size();
@@ -750,8 +758,8 @@ public class Schema implements Validator {
             }
         } finally {
             executionContext.evaluationSchema.removeLast();
-            executionContext.setUnevaluatedPropertiesPresent(unevaluatedPropertiesPresent);
-            executionContext.setUnevaluatedItemsPresent(unevaluatedItemsPresent);
+            executionContext.unevaluatedPropertiesPresent = unevaluatedPropertiesPresent;
+            executionContext.unevaluatedItemsPresent = unevaluatedItemsPresent;
         }
     }
 
