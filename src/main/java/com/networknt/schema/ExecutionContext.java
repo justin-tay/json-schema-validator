@@ -243,4 +243,28 @@ public class ExecutionContext {
     	customizer.accept(builder);
     	this.walkConfig = builder.build();
     }
+    
+    private boolean unevaluatedPropertiesPresent = false;
+    
+    private boolean unevaluatedItemsPresent = false;
+    
+    public boolean isUnevaluatedPropertiesPresent() {
+        return this.unevaluatedPropertiesPresent;
+    }
+    
+    public boolean isUnevaluatedItemsPresent() {
+        return this.unevaluatedItemsPresent;
+    }
+    
+    public boolean setUnevaluatedPropertiesPresent(boolean set) {
+        boolean existing = this.unevaluatedPropertiesPresent;
+        this.unevaluatedPropertiesPresent = set;
+        return existing;
+    }
+    
+    public boolean setUnevaluatedItemsPresent(boolean set) {
+        boolean existing = this.unevaluatedItemsPresent;
+        this.unevaluatedItemsPresent = set;
+        return existing;
+    }
 }

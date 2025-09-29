@@ -403,6 +403,10 @@ public class Schema implements Validator {
     public SchemaContext getSchemaContext() {
         return this.schemaContext;
     }
+    
+    public boolean hasKeyword(String keyword) {
+        return this.schemaNode.has(keyword);
+    }
 
     /**
      * Find the schema node for $ref attribute.
@@ -719,6 +723,8 @@ public class Schema implements Validator {
 //            System.out.println("-----------------");
 //        }
         executionContext.evaluationSchema.addLast(this);
+        boolean unevaluatedPropertiesPresent = executionContext.setUnevaluatedPropertiesPresent(hasKeyword("unevaluatedProperties"));
+        boolean unevaluatedItemsPresent = executionContext.setUnevaluatedPropertiesPresent(hasKeyword("unevaluatedItems"));
         try {
             int currentErrors = executionContext.getErrors().size();
             for (KeywordValidator v : getValidators()) {
@@ -738,6 +744,8 @@ public class Schema implements Validator {
             }
         } finally {
             executionContext.evaluationSchema.removeLast();
+            executionContext.setUnevaluatedPropertiesPresent(unevaluatedPropertiesPresent);
+            executionContext.setUnevaluatedPropertiesPresent(unevaluatedItemsPresent);
         }
     }
 
