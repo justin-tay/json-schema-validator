@@ -244,9 +244,9 @@ public class ExecutionContext {
     	this.walkConfig = builder.build();
     }
     
-    private boolean unevaluatedPropertiesPresent = false;
+    boolean unevaluatedPropertiesPresent = false;
     
-    private boolean unevaluatedItemsPresent = false;
+    boolean unevaluatedItemsPresent = false;
     
     public boolean isUnevaluatedPropertiesPresent() {
         return this.unevaluatedPropertiesPresent;
