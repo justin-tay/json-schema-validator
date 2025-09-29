@@ -97,7 +97,7 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
      * @return true if annotations should be reported
      */
     protected boolean collectAnnotations(ExecutionContext executionContext) {
-        boolean hasUnevaluatedProperties = hasAdjacentKeywordInEvaluationPath(executionContext, "unevaluatedProperties");
+        boolean hasUnevaluatedProperties = executionContext.isUnevaluatedPropertiesPresent() && hasAdjacentKeywordInEvaluationPath(executionContext, "unevaluatedProperties");
         if (hasUnevaluatedProperties) {
             return true;
         }
