@@ -97,10 +97,6 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
      * @return true if annotations should be reported
      */
     protected boolean collectAnnotations(ExecutionContext executionContext) {
-        boolean hasUnevaluatedProperties = executionContext.isUnevaluatedPropertiesPresent() && hasAdjacentKeywordInEvaluationPath(executionContext, "unevaluatedProperties");
-        if (hasUnevaluatedProperties) {
-            return true;
-        }
         return collectAnnotations(executionContext, getKeyword());
     }
 
@@ -129,6 +125,7 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
         executionContext.getAnnotations().put(builder.build());
     }
 
+    
     
     /**
      * Determines if the keyword exists adjacent in the evaluation path.
@@ -190,4 +187,21 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
         }
         return false;
     }
+    
+    protected boolean hasUnevaluatedItemsInEvaluationPath(ExecutionContext executionContext) {
+        if (executionContext.isUnevaluatedItemsPresent()
+                && hasAdjacentKeywordInEvaluationPath(executionContext, "unevaluatedItems")) {
+            return true;
+        }
+        return false;
+    }
+    
+    protected boolean hasUnevaluatedPropertiesInEvaluationPath(ExecutionContext executionContext) {
+        if (executionContext.isUnevaluatedPropertiesPresent()
+                && hasAdjacentKeywordInEvaluationPath(executionContext, "unevaluatedProperties")) {
+            return true;
+        }
+        return false;
+    }
+
 }

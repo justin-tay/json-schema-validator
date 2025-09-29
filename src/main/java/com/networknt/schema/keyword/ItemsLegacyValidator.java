@@ -98,7 +98,7 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
             // ignores non-arrays
             return;
         }
-        boolean collectAnnotations = collectAnnotations();
+        boolean collectAnnotations = hasUnevaluatedItemsInEvaluationPath(executionContext);
 
         // Add items annotation
         if (collectAnnotations || collectAnnotations(executionContext)) {
@@ -211,7 +211,7 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
 
     @Override
     public void walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation, boolean shouldValidateSchema) {
-        boolean collectAnnotations = collectAnnotations();
+        boolean collectAnnotations = hasUnevaluatedItemsInEvaluationPath(executionContext);
 
         // Add items annotation
         if (collectAnnotations || collectAnnotations(executionContext)) {
@@ -394,17 +394,6 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
         return this.schema;
     }
     
-    private boolean collectAnnotations() {
-        return hasUnevaluatedItemsValidator();
-    }
-
-    private boolean hasUnevaluatedItemsValidator() {
-        if (this.hasUnevaluatedItemsValidator == null) {
-            this.hasUnevaluatedItemsValidator = hasAdjacentKeywordInEvaluationPath("unevaluatedItems");
-        }
-        return hasUnevaluatedItemsValidator;
-    }
-
     @Override
     public void preloadSchema() {
         if (null != this.schema) {
@@ -414,6 +403,5 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
         if (null != this.additionalSchema) {
             this.additionalSchema.initializeValidators();
         }
-        collectAnnotations(); // cache the flag
     }
 }
