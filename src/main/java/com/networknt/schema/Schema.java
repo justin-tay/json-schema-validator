@@ -723,8 +723,14 @@ public class Schema implements Validator {
 //            System.out.println("-----------------");
 //        }
         executionContext.evaluationSchema.addLast(this);
-        boolean unevaluatedPropertiesPresent = executionContext.setUnevaluatedPropertiesPresent(hasKeyword("unevaluatedProperties"));
-        boolean unevaluatedItemsPresent = executionContext.setUnevaluatedPropertiesPresent(hasKeyword("unevaluatedItems"));
+        boolean unevaluatedPropertiesPresent = executionContext.isUnevaluatedPropertiesPresent();
+        boolean unevaluatedItemsPresent =  executionContext.isUnevaluatedItemsPresent();
+        if (!unevaluatedPropertiesPresent) {
+            executionContext.setUnevaluatedPropertiesPresent(hasKeyword("unevaluatedProperties"));
+        }
+        if (!unevaluatedItemsPresent) {
+            executionContext.setUnevaluatedItemsPresent(hasKeyword("unevaluatedItems"));
+        }
         try {
             int currentErrors = executionContext.getErrors().size();
             for (KeywordValidator v : getValidators()) {
@@ -745,7 +751,7 @@ public class Schema implements Validator {
         } finally {
             executionContext.evaluationSchema.removeLast();
             executionContext.setUnevaluatedPropertiesPresent(unevaluatedPropertiesPresent);
-            executionContext.setUnevaluatedPropertiesPresent(unevaluatedItemsPresent);
+            executionContext.setUnevaluatedItemsPresent(unevaluatedItemsPresent);
         }
     }
 
