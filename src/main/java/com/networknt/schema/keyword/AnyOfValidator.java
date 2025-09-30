@@ -229,10 +229,10 @@ public class AnyOfValidator extends BaseKeywordValidator {
      */
     protected boolean canShortCircuit(ExecutionContext executionContext) {
         if (hasUnevaluatedItemsInEvaluationPath(executionContext)) {
-            return true;
+            return false;
         }
         if (hasUnevaluatedPropertiesInEvaluationPath(executionContext)) {
-            return true;
+            return false;
         }
         return !executionContext.getExecutionConfig().isAnnotationCollectionEnabled();
     }
