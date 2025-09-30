@@ -71,7 +71,7 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
             }
 
             // Add annotation
-            if (collectAnnotations() || collectAnnotations(executionContext)) {
+            if (hasUnevaluatedItemsInEvaluationPath(executionContext) || collectAnnotations(executionContext)) {
                 // Tuples
                 int items = node.isArray() ? node.size() : 1;
                 int schemas = this.tupleSchema.size();
@@ -113,7 +113,7 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
             }
 
             // Add annotation
-            if (collectAnnotations() || collectAnnotations(executionContext)) {
+            if (hasUnevaluatedItemsInEvaluationPath(executionContext) || collectAnnotations(executionContext)) {
                 // Tuples
                 int items = node.isArray() ? node.size() : 1;
                 int schemas = this.tupleSchema.size();
@@ -192,21 +192,9 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
         return this.tupleSchema;
     }
 
-    private boolean collectAnnotations() {
-        return hasUnevaluatedItemsValidator();
-    }
-
-    private boolean hasUnevaluatedItemsValidator() {
-        if (this.hasUnevaluatedItemsValidator == null) {
-            this.hasUnevaluatedItemsValidator = hasAdjacentKeywordInEvaluationPath("unevaluatedItems");
-        }
-        return hasUnevaluatedItemsValidator;
-    }
-
     @Override
     public void preloadSchema() {
         preloadSchemas(this.tupleSchema);
-        collectAnnotations(); // cache the flag
     }
 
 }

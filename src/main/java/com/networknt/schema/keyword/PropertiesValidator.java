@@ -44,8 +44,6 @@ public class PropertiesValidator extends BaseKeywordValidator {
     public static final String PROPERTY = "properties";
     private final Map<String, Schema> schemas = new LinkedHashMap<>();
     
-    private Boolean hasUnevaluatedPropertiesValidator;
-
     public PropertiesValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
         super(KeywordType.PROPERTIES, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
         for (Iterator<Entry<String, JsonNode>> it = schemaNode.fields(); it.hasNext();) {
@@ -70,7 +68,7 @@ public class PropertiesValidator extends BaseKeywordValidator {
 //            throw new RuntimeException();
 //        }
         Set<String> matchedInstancePropertyNames = null;
-        boolean collectAnnotations = /*collectAnnotations() ||*/ collectAnnotations(executionContext);
+        boolean collectAnnotations =  hasUnevaluatedPropertiesInEvaluationPath(executionContext) || collectAnnotations(executionContext);
         for (Entry<String, Schema> entry : this.schemas.entrySet()) {
             JsonNode propertyNode = node.get(entry.getKey());
             if (propertyNode != null) {
@@ -142,17 +140,6 @@ public class PropertiesValidator extends BaseKeywordValidator {
         }
     }
 
-//    private boolean collectAnnotations() {
-//        return hasUnevaluatedPropertiesValidator();
-//    }
-//
-//    private boolean hasUnevaluatedPropertiesValidator() {
-//        if (this.hasUnevaluatedPropertiesValidator == null) {
-//            this.hasUnevaluatedPropertiesValidator = hasAdjacentKeywordInEvaluationPath("unevaluatedProperties");
-//        }
-//        return hasUnevaluatedPropertiesValidator;
-//    }
-
     private void applyPropertyDefaults(ObjectNode node, ExecutionContext executionContext) {
         for (Map.Entry<String, Schema> entry : this.schemas.entrySet()) {
             JsonNode propertyNode = node.get(entry.getKey());
@@ -208,6 +195,5 @@ public class PropertiesValidator extends BaseKeywordValidator {
     @Override
     public void preloadSchema() {
         preloadSchemas(this.schemas.values());
-//        collectAnnotations(); // cache the flag
     }
 }
