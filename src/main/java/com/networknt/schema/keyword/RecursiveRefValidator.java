@@ -90,11 +90,47 @@ public class RecursiveRefValidator extends BaseKeywordValidator {
         }
         return refSchema;
     }
+
+    static Schema getSchema(Schema parentSchema, ExecutionContext executionContext) {
+        Schema refSchema = parentSchema.findSchemaResourceRoot(); // Get the document
+        Schema current = refSchema;
+        Schema check = null;
+        String base = null;
+        String baseCheck = null;
+        if (refSchema != null)
+            base = current.getSchemaLocation().getAbsoluteIri() != null ? current.getSchemaLocation().getAbsoluteIri().toString() : "";
+            if (current.isRecursiveAnchor()) {
+                // Check dynamic scope
+                for (Iterator<Schema> iter = executionContext.getEvaluationSchema().descendingIterator(); iter.hasNext();) {
+                    current = iter.next();
+                    baseCheck = current.getSchemaLocation().getAbsoluteIri() != null ? current.getSchemaLocation().getAbsoluteIri().toString() : "";
+                    if (!base.equals(baseCheck)) {
+                        base = baseCheck;
+                        // Check if it has a dynamic anchor
+                        check = current.findSchemaResourceRoot();
+                        if (check.isRecursiveAnchor()) {
+                            refSchema = check;
+                        }
+                    }
+                }
+            }
+        if (refSchema != null) {
+            System.out.println(refSchema);
+            // refSchema = refSchema.fromRef(parentSchema, evaluationPath);
+        }
+        return refSchema;
+    }
     
     @Override
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation) {
-        
         Schema refSchema = this.schema.getSchema();
+        /*
+        Schema check = getSchema(this.parentSchema, executionContext);
+        if (refSchema != null && !refSchema.getSchemaLocation().equals(check.getSchemaLocation())) {
+            System.out.println(check);
+            System.out.println(refSchema);
+        }
+        */
         if (refSchema == null) {
             Error error = error().keyword(KeywordType.RECURSIVE_REF.getValue())
                     .messageKey("internal.unresolvedRef").message("Reference {0} cannot be resolved")
