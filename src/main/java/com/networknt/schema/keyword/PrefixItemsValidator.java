@@ -36,16 +36,14 @@ import java.util.List;
 public class PrefixItemsValidator extends BaseKeywordValidator {
     private final List<Schema> tupleSchema;
     
-    private Boolean hasUnevaluatedItemsValidator = null;
-
-    public PrefixItemsValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
-        super(KeywordType.PREFIX_ITEMS, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
+    public PrefixItemsValidator(SchemaLocation schemaLocation, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
+        super(KeywordType.PREFIX_ITEMS, schemaNode, schemaLocation, parentSchema, schemaContext);
 
         if (schemaNode instanceof ArrayNode && !schemaNode.isEmpty()) {
             int i = 0;
             this.tupleSchema = new ArrayList<>(schemaNode.size());
             for (JsonNode s : schemaNode) {
-                this.tupleSchema.add(schemaContext.newSchema(schemaLocation.append(i), evaluationPath.append(i), s,
+                this.tupleSchema.add(schemaContext.newSchema(schemaLocation.append(i), s,
                         parentSchema));
                 i++;
             }
@@ -79,13 +77,13 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
                     // More items than schemas so the keyword only applied to the number of schemas
                     executionContext.getAnnotations()
                             .put(Annotation.builder().instanceLocation(instanceLocation)
-                                    .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                                    .evaluationPath(executionContext.getEvaluationPath()).schemaLocation(this.schemaLocation)
                                     .keyword(getKeyword()).value(schemas).build());
                 } else {
                     // Applies to all
                     executionContext.getAnnotations()
                             .put(Annotation.builder().instanceLocation(instanceLocation)
-                                    .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                                    .evaluationPath(executionContext.getEvaluationPath()).schemaLocation(this.schemaLocation)
                                     .keyword(getKeyword()).value(true).build());
                 }
             }
@@ -100,7 +98,7 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
             for (int i = 0; i < count; ++i) {
                 JsonNode n = node.get(i);
                 if (executionContext.getWalkConfig().getApplyDefaultsStrategy().shouldApplyArrayDefaults()) {
-                    JsonNode defaultNode = getDefaultNode(this.tupleSchema.get(i));
+                    JsonNode defaultNode = getDefaultNode(this.tupleSchema.get(i), executionContext);
                     if (n != null) {
                         // Defaults only set if array index is explicitly null
                         if (n.isNull() && defaultNode != null) {
@@ -121,13 +119,13 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
                     // More items than schemas so the keyword only applied to the number of schemas
                     executionContext.getAnnotations()
                             .put(Annotation.builder().instanceLocation(instanceLocation)
-                                    .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                                    .evaluationPath(executionContext.getEvaluationPath()).schemaLocation(this.schemaLocation)
                                     .keyword(getKeyword()).value(schemas).build());
                 } else {
                     // Applies to all
                     executionContext.getAnnotations()
                             .put(Annotation.builder().instanceLocation(instanceLocation)
-                                    .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                                    .evaluationPath(executionContext.getEvaluationPath()).schemaLocation(this.schemaLocation)
                                     .keyword(getKeyword()).value(true).build());
                 }
             }
@@ -139,12 +137,12 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
         }
     }
 
-    private static JsonNode getDefaultNode(Schema schema) {
+    private static JsonNode getDefaultNode(Schema schema, ExecutionContext executionContext) {
         JsonNode result = schema.getSchemaNode().get("default");
         if (result == null) {
-            SchemaRef schemaRef = SchemaRefs.from(schema);
+            SchemaRef schemaRef = SchemaRefs.from(schema, executionContext);
             if (schemaRef != null) {
-                result = getDefaultNode(schemaRef.getSchema());
+                result = getDefaultNode(schemaRef.getSchema(), executionContext);
             }
         }
         return result;

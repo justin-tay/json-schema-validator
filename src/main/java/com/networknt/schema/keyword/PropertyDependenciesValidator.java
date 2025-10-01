@@ -37,16 +37,14 @@ public class PropertyDependenciesValidator extends BaseKeywordValidator implemen
      */
     private final Map<String, Map<String, Schema>> propertyDependencies;
 
-    public PropertyDependenciesValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode,
+    public PropertyDependenciesValidator(SchemaLocation schemaLocation, JsonNode schemaNode,
             Schema parentSchema, SchemaContext schemaContext) {
-        super(KeywordType.PROPERTY_DEPENDENCIES, schemaNode, schemaLocation, parentSchema, schemaContext,
-                evaluationPath);
+        super(KeywordType.PROPERTY_DEPENDENCIES, schemaNode, schemaLocation, parentSchema, schemaContext);
         Set<Entry<String, JsonNode>> properties = schemaNode.properties();
         this.propertyDependencies = new LinkedHashMap<>(properties.size());
         for (Entry<String, JsonNode> property : properties) {
             String propertyName = property.getKey();
             SchemaLocation propertySchemaLocation = schemaLocation.append(propertyName);
-            NodePath propertyEvaluationPath = evaluationPath.append(propertyName);
 
             Set<Entry<String, JsonNode>> propertyValues = property.getValue().properties();
             for (Entry<String, JsonNode> propertyValue : propertyValues) {
@@ -54,7 +52,7 @@ public class PropertyDependenciesValidator extends BaseKeywordValidator implemen
                         key -> new LinkedHashMap<>());
                 valueSchemas.put(propertyValue.getKey(),
                         schemaContext.newSchema(propertySchemaLocation.append(propertyValue.getKey()),
-                                propertyEvaluationPath.append(propertyValue.getKey()), propertyValue.getValue(),
+                                propertyValue.getValue(),
                                 parentSchema));
             }
         }

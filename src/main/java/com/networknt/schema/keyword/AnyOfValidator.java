@@ -36,9 +36,9 @@ import com.networknt.schema.utils.TypeFactory;
 public class AnyOfValidator extends BaseKeywordValidator {
     private final List<Schema> schemas;
 
-    public AnyOfValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode,
+    public AnyOfValidator(SchemaLocation schemaLocation, JsonNode schemaNode,
             Schema parentSchema, SchemaContext schemaContext) {
-        super(KeywordType.ANY_OF, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
+        super(KeywordType.ANY_OF, schemaNode, schemaLocation, parentSchema, schemaContext);
         if (!schemaNode.isArray()) {
             JsonType nodeType = TypeFactory.getValueNodeType(schemaNode, this.schemaContext.getSchemaRegistryConfig());
             throw new SchemaException(error().instanceNode(schemaNode).instanceLocation(schemaLocation.getFragment())
@@ -47,7 +47,7 @@ public class AnyOfValidator extends BaseKeywordValidator {
         int size = schemaNode.size();
         this.schemas = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            this.schemas.add(schemaContext.newSchema(schemaLocation.append(i), evaluationPath.append(i),
+            this.schemas.add(schemaContext.newSchema(schemaLocation.append(i),
                     schemaNode.get(i), parentSchema));
         }
     }
@@ -80,14 +80,22 @@ public class AnyOfValidator extends BaseKeywordValidator {
                     // If schema has type validator and node type doesn't match with schemaType then
                     // ignore it
                     // For union type, it is a must to call TypeValidator
-                    if (typeValidator.getSchemaType() != JsonType.UNION && !typeValidator.equalsToSchemaType(node)) {
-                        typeValidator.validate(executionContext, node, rootNode, instanceLocation);
-                        if (allErrors == null) {
-                            allErrors = new ArrayList<>();
+                    executionContext.getEvaluationPath().addLast(schemaIndex);
+                    executionContext.getEvaluationPath().addLast("type");
+                    try {
+                        
+                        if (typeValidator.getSchemaType() != JsonType.UNION && !typeValidator.equalsToSchemaType(node, executionContext)) {
+                            typeValidator.validate(executionContext, node, rootNode, instanceLocation);
+                            if (allErrors == null) {
+                                allErrors = new ArrayList<>();
+                            }
+                            allErrors.addAll(subSchemaErrors);
+                            schemaIndex++;
+                            continue;
                         }
-                        allErrors.addAll(subSchemaErrors);
-                        schemaIndex++;
-                        continue;
+                    } finally {
+                        executionContext.getEvaluationPath().removeLast();
+                        executionContext.getEvaluationPath().removeLast();
                     }
                 }
                 executionContext.getEvaluationPath().addLast(schemaIndex);
@@ -178,7 +186,7 @@ public class AnyOfValidator extends BaseKeywordValidator {
                 // generating an assertion
                 // if the discriminatingValue is not set in the payload
                 existingErrors.add(error().keyword("discriminator").instanceNode(node)
-                        .instanceLocation(instanceLocation).locale(executionContext.getExecutionConfig().getLocale())
+                        .instanceLocation(instanceLocation).evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
                         .messageKey("discriminator.anyOf.no_match_found").arguments(state.getDiscriminatingValue())
                         .build());
             }

@@ -29,6 +29,7 @@ import java.util.Set;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaContext;
+import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 import com.networknt.schema.Error;
 
@@ -43,14 +44,14 @@ public class HierarchicalOutputUnitFormatter {
         Map<OutputUnitKey, Map<String, Object>> droppedAnnotations = data.getDroppedAnnotations();
         
         // Evaluation path to output unit
-        Map<NodePath, Map<NodePath, OutputUnit>> index = new LinkedHashMap<>();
+        Map<EvaluationPath, Map<NodePath, OutputUnit>> index = new LinkedHashMap<>();
         Map<NodePath, OutputUnit> r = new LinkedHashMap<>();
         r.put(rootPath, root);
-        index.put(rootPath, r);
+        index.put(new EvaluationPath(new ArrayDeque<Object>()), r);
         
         // Get all the evaluation paths with data
         // This is a map of evaluation path to instance location
-        Map<NodePath, Set<NodePath>> keys = new LinkedHashMap<>();
+        Map<EvaluationPath, Set<NodePath>> keys = new LinkedHashMap<>();
         errors.keySet().stream().forEach(k -> keys.computeIfAbsent(k.getEvaluationPath(), a -> new LinkedHashSet<>())
                 .add(k.getInstanceLocation()));
         annotations.keySet().stream().forEach(k -> keys
@@ -132,22 +133,22 @@ public class HierarchicalOutputUnitFormatter {
      * @param keys  that contain all the evaluation paths with instance data
      * @param root  the root output unit
      */
-    protected static void buildIndex(OutputUnitKey key, Map<NodePath, Map<NodePath, OutputUnit>> index,
-            Map<NodePath, Set<NodePath>> keys, OutputUnit root) {
+    protected static void buildIndex(OutputUnitKey key, Map<EvaluationPath, Map<NodePath, OutputUnit>> index,
+            Map<EvaluationPath, Set<NodePath>> keys, OutputUnit root) {
         if (index.containsKey(key.getEvaluationPath())) {
             return;
         }
         // Ensure the path is created
-        NodePath path = key.getEvaluationPath();
-        Deque<NodePath> stack = new ArrayDeque<>();
-        while (path != null && path.getElement(-1) != null) {
+        EvaluationPath path = key.getEvaluationPath();
+        Deque<EvaluationPath> stack = new ArrayDeque<>();
+        while (path != null && path.length() > 0) {
             stack.push(path);
             path = path.getParent();
         }
 
         OutputUnit parent = root;
         while (!stack.isEmpty()) {
-            NodePath current = stack.pop();
+            EvaluationPath current = stack.pop();
             if (!index.containsKey(current) && keys.containsKey(current)) {
                 // the index doesn't contain this path but this is a path with data
                 for (NodePath instanceLocation : keys.get(current)) {

@@ -21,7 +21,6 @@ import com.networknt.schema.Error;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.InvalidSchemaRefException;
 import com.networknt.schema.Schema;
-import com.networknt.schema.SchemaException;
 import com.networknt.schema.SchemaRef;
 import com.networknt.schema.path.NodePath;
 import com.networknt.schema.utils.ThreadSafeCachingSupplier;
@@ -35,52 +34,9 @@ import java.util.function.Supplier;
  * {@link KeywordValidator} that resolves $dynamicRef.
  */
 public class DynamicRefValidator extends BaseKeywordValidator {
-    protected final SchemaRef schema;
 
-    public DynamicRefValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
-        super(KeywordType.DYNAMIC_REF, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
-        String refValue = schemaNode.asText();
-        this.schema = getRefSchema(parentSchema, schemaContext, refValue, evaluationPath);
-    }
-
-    static SchemaRef getRefSchema(Schema parentSchema, SchemaContext schemaContext, String refValue,
-            NodePath evaluationPath) {
-        String ref = resolve(parentSchema, refValue);
-        return new SchemaRef(getSupplier(() -> {
-            Schema refSchema = schemaContext.getDynamicAnchors().get(ref);
-            if (refSchema == null) { // This is a $dynamicRef without a matching $dynamicAnchor
-                // A $dynamicRef without a matching $dynamicAnchor in the same schema resource
-                // behaves like a normal $ref to $anchor
-                // A $dynamicRef without anchor in fragment behaves identical to $ref
-                SchemaRef r = RefValidator.getRefSchema(parentSchema, schemaContext, refValue, evaluationPath);
-                if (r != null) {
-                    refSchema = r.getSchema();
-                }
-            } else {
-                // Check parents
-                Schema base = parentSchema;
-                int index = ref.indexOf("#");
-                String anchor = ref.substring(index);
-                String absoluteIri = ref.substring(0, index);
-                while (base.getEvaluationParentSchema() != null) {
-                    base = base.getEvaluationParentSchema();
-                    String baseAbsoluteIri = base.getSchemaLocation().getAbsoluteIri() != null ? base.getSchemaLocation().getAbsoluteIri().toString() : "";
-                    if (!baseAbsoluteIri.equals(absoluteIri)) {
-                        absoluteIri = baseAbsoluteIri;
-                        String parentRef = SchemaLocation.resolve(base.getSchemaLocation(), anchor);
-                        Schema parentRefSchema = schemaContext.getDynamicAnchors().get(parentRef);
-                        if (parentRefSchema != null) {
-                            refSchema = parentRefSchema;
-                        }
-                    }
-                }
-            }
-            
-            if (refSchema != null) {
-                refSchema = refSchema.fromRef(parentSchema, evaluationPath);
-            }
-            return refSchema;
-        }, schemaContext.getSchemaRegistryConfig().isCacheRefs()));
+    public DynamicRefValidator(SchemaLocation schemaLocation, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
+        super(KeywordType.DYNAMIC_REF, schemaNode, schemaLocation, parentSchema, schemaContext);
     }
 
     static SchemaRef getRefSchema(Schema parentSchema, String refValue,
@@ -93,7 +49,7 @@ public class DynamicRefValidator extends BaseKeywordValidator {
                 // A $dynamicRef without a matching $dynamicAnchor in the same schema resource
                 // behaves like a normal $ref to $anchor
                 // A $dynamicRef without anchor in fragment behaves identical to $ref
-                SchemaRef r = RefValidator.getRefSchema(parentSchema, schemaContext, refValue, null);
+                SchemaRef r = RefValidator.getRefSchema(parentSchema, schemaContext, refValue);
                 if (r != null) {
                     refSchema = r.getSchema();
                 }
@@ -109,16 +65,12 @@ public class DynamicRefValidator extends BaseKeywordValidator {
                     if (!baseAbsoluteIri.equals(absoluteIri)) {
                         absoluteIri = baseAbsoluteIri;
                         String parentRef = SchemaLocation.resolve(base.getSchemaLocation(), anchor);
-                        Schema parentRefSchema = schemaContext.getDynamicAnchors().get(parentRef);
+                        Schema parentRefSchema = base.getSchemaContext().getDynamicAnchors().get(parentRef);
                         if (parentRefSchema != null) {
                             refSchema = parentRefSchema;
                         }
                     }
                 }
-            }
-            
-            if (refSchema != null) {
-                refSchema = refSchema.fromRef(parentSchema, null);
             }
             return refSchema;
         }, false));
@@ -139,11 +91,11 @@ public class DynamicRefValidator extends BaseKeywordValidator {
 
     @Override
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation) {
-        Schema refSchema = this.schema.getSchema();
+        Schema refSchema = getSchemaRef(executionContext).getSchema();
         if (refSchema == null) {
             Error error = error().keyword(KeywordType.DYNAMIC_REF.getValue())
                     .messageKey("internal.unresolvedRef").message("Reference {0} cannot be resolved")
-                    .instanceLocation(instanceLocation).evaluationPath(getEvaluationPath())
+                    .instanceLocation(instanceLocation).evaluationPath(executionContext.getEvaluationPath())
                     .arguments(schemaNode.asText()).build();
             throw new InvalidSchemaRefException(error);
         }
@@ -155,11 +107,11 @@ public class DynamicRefValidator extends BaseKeywordValidator {
         // This is important because if we use same JsonSchemaFactory for creating multiple JSONSchema instances,
         // these schemas will be cached along with config. We have to replace the config for cached $ref references
         // with the latest config. Reset the config.
-        Schema refSchema = this.schema.getSchema();
+        Schema refSchema = getSchemaRef(executionContext).getSchema();
         if (refSchema == null) {
             Error error = error().keyword(KeywordType.DYNAMIC_REF.getValue())
                     .messageKey("internal.unresolvedRef").message("Reference {0} cannot be resolved")
-                    .instanceLocation(instanceLocation).evaluationPath(getEvaluationPath())
+                    .instanceLocation(instanceLocation).evaluationPath(executionContext.getEvaluationPath())
                     .arguments(schemaNode.asText()).build();
             throw new InvalidSchemaRefException(error);
         }
@@ -181,41 +133,8 @@ public class DynamicRefValidator extends BaseKeywordValidator {
         refSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
     }
 
-	public SchemaRef getSchemaRef() {
-		return this.schema;
+	public SchemaRef getSchemaRef(ExecutionContext executionContext ) {
+	    String refValue = schemaNode.asText();
+		return getRefSchema(this.getParentSchema(), refValue, executionContext);
 	}
-
-    @Override
-    public void preloadSchema() {
-        Schema jsonSchema = null;
-        try {
-            jsonSchema = this.schema.getSchema();
-        } catch (SchemaException e) {
-            throw e;
-        } catch (RuntimeException e) {
-            throw new SchemaException(e);
-        }
-        // Check for circular dependency
-        // Only one cycle is pre-loaded
-        // The rest of the cycles will load at execution time depending on the input
-        // data
-        /*
-        SchemaLocation schemaLocation = jsonSchema.getSchemaLocation();
-        Schema check = jsonSchema;
-        boolean circularDependency = false;
-        int depth = 0;
-        while (check.getEvaluationParentSchema() != null) {
-            depth++;
-            check = check.getEvaluationParentSchema();
-            if (check.getSchemaLocation().equals(schemaLocation)) {
-                circularDependency = true;
-                break;
-            }
-        }
-        if (this.schemaContext.getSchemaRegistryConfig().isCacheRefs() && !circularDependency
-                && depth < this.schemaContext.getSchemaRegistryConfig().getPreloadSchemaRefMaxNestingDepth()) {
-            jsonSchema.initializeValidators();
-        }
-        */
-    }
 }

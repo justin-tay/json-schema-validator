@@ -52,7 +52,7 @@ public class EvaluationPathTest {
         assertEquals(1, errors.size());
         // Previously the evaluation path was part of the state of the schema so the initial path might not be correct as it matches the schema location fragment 
         // assertEquals("/0/schema/items/items/$ref/type", errors.get(0).getEvaluationPath().toString());
-        assertEquals("/0/schema/items/items/$ref/type", errors.get(0).getEvaluationPath().toString());
+        assertEquals("/items/items/$ref/type", errors.get(0).getEvaluationPath().toString());
         assertEquals("http://localhost:1234/baseUriChange/folderInteger.json#/type", errors.get(0).getSchemaLocation().toString());
         assertEquals("/0/4", errors.get(0).getInstanceLocation().toString());
         assertEquals("type", errors.get(0).getKeyword());
@@ -73,12 +73,14 @@ public class EvaluationPathTest {
         assertEquals(2, errors.size());
         assertEquals("oneOf", errors.get(0).getKeyword());
         // Previously the evaluation path was part of the state of the schema so the initial path might not be correct as it matches the schema location fragment 
-        assertEquals("/paths/~1pet/post/requestBody/content/application~1json/schema/$ref/oneOf", errors.get(0).getEvaluationPath().toString());
+        //assertEquals("/paths/~1pet/post/requestBody/content/application~1json/schema/$ref/oneOf", errors.get(0).getEvaluationPath().toString());
+        assertEquals("/$ref/oneOf", errors.get(0).getEvaluationPath().toString());
         assertEquals("classpath:schema/oas/3.0/petstore.yaml#/components/schemas/PetRequest/oneOf", errors.get(0).getSchemaLocation().toString());
         assertEquals("", errors.get(0).getInstanceLocation().toString());
         assertEquals("required", errors.get(1).getKeyword());
         assertEquals("bark", errors.get(1).getProperty());
-        assertEquals("/paths/~1pet/post/requestBody/content/application~1json/schema/$ref/oneOf/1/$ref/allOf/1/required", errors.get(1).getEvaluationPath().toString());
+        //assertEquals("/paths/~1pet/post/requestBody/content/application~1json/schema/$ref/oneOf/1/$ref/allOf/1/required", errors.get(1).getEvaluationPath().toString());
+        assertEquals("/$ref/oneOf/1/$ref/allOf/1/required", errors.get(1).getEvaluationPath().toString());
         assertEquals("classpath:schema/oas/3.0/petstore.yaml#/components/schemas/Dog/allOf/1/required", errors.get(1).getSchemaLocation().toString());
         assertEquals("", errors.get(1).getInstanceLocation().toString());
     }

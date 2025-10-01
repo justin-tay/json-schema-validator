@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -32,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.keyword.KeywordType;
-import com.networknt.schema.path.NodePath;
+import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.walk.WalkListener;
 import com.networknt.schema.walk.KeywordWalkListenerRunner;
 import com.networknt.schema.walk.PropertyWalkListenerRunner;
@@ -48,12 +49,15 @@ class Issue467Test {
     @Test
     void shouldWalkKeywordWithValidation() throws URISyntaxException, IOException {
         InputStream schemaInputStream = Issue467Test.class.getResourceAsStream(schemaPath);
-        final Set<NodePath> properties = new LinkedHashSet<>();
+        final Set<EvaluationPath> properties = new LinkedHashSet<>();
         KeywordWalkListenerRunner keywordWalkListenerRunner = KeywordWalkListenerRunner.builder()
                 .keywordWalkListener(KeywordType.PROPERTIES.getValue(), new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
-                        properties.add(walkEvent.getSchema().getEvaluationPath().append(walkEvent.getKeyword()));
+                        ArrayDeque<Object> current = walkEvent.getExecutionContext().getEvaluationPath().clone();
+                        current.addLast(walkEvent.getKeyword());
+                        EvaluationPath evaluationPath = new EvaluationPath(current);
+                        properties.add(evaluationPath);
                         return WalkFlow.CONTINUE;
                     }
 
@@ -77,12 +81,12 @@ class Issue467Test {
     @Test
     void shouldWalkPropertiesWithValidation() throws URISyntaxException, IOException {
         InputStream schemaInputStream = Issue467Test.class.getResourceAsStream(schemaPath);
-        final Set<NodePath> properties = new LinkedHashSet<>();
+        final Set<EvaluationPath> properties = new LinkedHashSet<>();
         PropertyWalkListenerRunner propertyWalkListenerRunner = PropertyWalkListenerRunner.builder()
                 .propertyWalkListener(new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
-                        properties.add(walkEvent.getSchema().getEvaluationPath());
+                        properties.add(new EvaluationPath(walkEvent.getExecutionContext().getEvaluationPath()));
                         return WalkFlow.CONTINUE;
                     }
 

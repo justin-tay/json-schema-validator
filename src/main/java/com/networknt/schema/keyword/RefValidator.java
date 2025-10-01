@@ -39,14 +39,13 @@ public class RefValidator extends BaseKeywordValidator {
 
     private static final String REF_CURRENT = "#";
 
-    public RefValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
-        super(KeywordType.REF, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
+    public RefValidator(SchemaLocation schemaLocation, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
+        super(KeywordType.REF, schemaNode, schemaLocation, parentSchema, schemaContext);
         String refValue = schemaNode.asText();
-        this.schema = getRefSchema(parentSchema, schemaContext, refValue, evaluationPath);
+        this.schema = getRefSchema(parentSchema, schemaContext, refValue);
     }
 
-    static SchemaRef getRefSchema(Schema parentSchema, SchemaContext schemaContext, String refValue,
-            NodePath evaluationPath) {
+    static SchemaRef getRefSchema(Schema parentSchema, SchemaContext schemaContext, String refValue) {
         // The evaluationPath is used to derive the keywordLocation
         final String refValueOriginal = refValue;
 
@@ -77,7 +76,7 @@ public class RefValidator extends BaseKeywordValidator {
                     if (schemaResource == null) {
                         return null;
                     }
-                    return schemaResource.fromRef(parentSchema, evaluationPath);
+                    return schemaResource;
                 } else {
                     String newRefValue = refValue.substring(index);
                     String find = schemaLocation.getAbsoluteIri() + newRefValue;
@@ -88,13 +87,13 @@ public class RefValidator extends BaseKeywordValidator {
                     if (findSchemaResource != null) {
                         schemaResource = findSchemaResource;   
                     } else {
-                        schemaResource = getSchema(schemaResource, schemaContext, newRefValue, refValueOriginal,
-                                evaluationPath);
+                        schemaResource = getSchema(schemaResource, schemaContext, newRefValue, refValueOriginal
+                                );
                     }
                     if (schemaResource == null) {
                         return null;
                     }
-                    return schemaResource.fromRef(parentSchema, evaluationPath);
+                    return schemaResource;
                 }
             }, schemaContext.getSchemaRegistryConfig().isCacheRefs()));
             
@@ -107,22 +106,21 @@ public class RefValidator extends BaseKeywordValidator {
                     schemaResource = schemaContext.getDynamicAnchors().get(absoluteIri);
                 }
                 if (schemaResource == null) {
-                    schemaResource = getSchema(parentSchema, schemaContext, refValue, refValueOriginal, evaluationPath);
+                    schemaResource = getSchema(parentSchema, schemaContext, refValue, refValueOriginal);
                 }
                 if (schemaResource == null) {
                     return null;
                 }
-                return schemaResource.fromRef(parentSchema, evaluationPath);
+                return schemaResource;
             }, schemaContext.getSchemaRegistryConfig().isCacheRefs()));
         }
         if (refValue.equals(REF_CURRENT)) {
             return new SchemaRef(
-                    getSupplier(() -> parentSchema.findSchemaResourceRoot().fromRef(parentSchema, evaluationPath),
+                    getSupplier(() -> parentSchema.findSchemaResourceRoot(),
                             schemaContext.getSchemaRegistryConfig().isCacheRefs()));
         }
         return new SchemaRef(getSupplier(
-                () -> getSchema(parentSchema, schemaContext, refValue, refValueOriginal, evaluationPath)
-                        .fromRef(parentSchema, evaluationPath),
+                () -> getSchema(parentSchema, schemaContext, refValue, refValueOriginal),
                 schemaContext.getSchemaRegistryConfig().isCacheRefs()));
     }
 
@@ -157,8 +155,8 @@ public class RefValidator extends BaseKeywordValidator {
     private static Schema getSchema(Schema parent,
                                                   SchemaContext schemaContext,
                                                   String refValue,
-                                                  String refValueOriginal,
-                                                  NodePath evaluationPath) {
+                                                  String refValueOriginal
+                                                  ) {
         // This should be processing json pointer fragments only
         NodePath fragment = SchemaLocation.Fragment.of(refValue);
         String schemaReference = resolve(parent, refValueOriginal);
@@ -187,7 +185,7 @@ public class RefValidator extends BaseKeywordValidator {
         if (refSchema == null) {
             Error error = error().keyword(KeywordType.REF.getValue())
                     .messageKey("internal.unresolvedRef").message("Reference {0} cannot be resolved")
-                    .instanceLocation(instanceLocation).evaluationPath(getEvaluationPath())
+                    .instanceLocation(instanceLocation).evaluationPath(executionContext.getEvaluationPath())
                     .arguments(schemaNode.asText()).build();
             throw new InvalidSchemaRefException(error);
         }
@@ -204,7 +202,7 @@ public class RefValidator extends BaseKeywordValidator {
         if (refSchema == null) {
             Error error = error().keyword(KeywordType.REF.getValue())
                     .messageKey("internal.unresolvedRef").message("Reference {0} cannot be resolved")
-                    .instanceLocation(instanceLocation).evaluationPath(getEvaluationPath())
+                    .instanceLocation(instanceLocation).evaluationPath(executionContext.getEvaluationPath())
                     .arguments(schemaNode.asText()).build();
             throw new InvalidSchemaRefException(error);
         }
@@ -240,6 +238,7 @@ public class RefValidator extends BaseKeywordValidator {
         } catch (RuntimeException e) {
             throw new SchemaException(e);
         }
+        jsonSchema.initializeValidators();
         // Check for circular dependency
         // Only one cycle is pre-loaded
         // The rest of the cycles will load at execution time depending on the input
