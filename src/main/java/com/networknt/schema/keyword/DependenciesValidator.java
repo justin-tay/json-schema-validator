@@ -36,7 +36,6 @@ public class DependenciesValidator extends BaseKeywordValidator implements Keywo
      * Constructor.
      * 
      * @param schemaLocation    the schema location
-     * @param evaluationPath    the evaluation path
      * @param schemaNode        the schema node
      * @param parentSchema      the parent schema
      * @param schemaContext the schema context
