@@ -28,6 +28,7 @@ import com.networknt.schema.utils.ThreadSafeCachingSupplier;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaContext;
 
+import java.util.Iterator;
 import java.util.function.Supplier;
 
 /**
@@ -123,11 +124,10 @@ public class DynamicRefValidator extends BaseKeywordValidator {
         }
         if (node == null) {
             // Check for circular dependency
-            SchemaLocation schemaLocation = refSchema.getSchemaLocation();
-            Schema check = refSchema;
             boolean circularDependency = false;
-            while (check.getEvaluationParentSchema() != null) {
-                check = check.getEvaluationParentSchema();
+            SchemaLocation schemaLocation = refSchema.getSchemaLocation();
+            for (Iterator<Schema> iter = executionContext.getEvaluationSchema().descendingIterator(); iter.hasNext();) {
+                Schema check = iter.next();
                 if (check.getSchemaLocation().equals(schemaLocation)) {
                     circularDependency = true;
                     break;
@@ -158,6 +158,7 @@ public class DynamicRefValidator extends BaseKeywordValidator {
         // Only one cycle is pre-loaded
         // The rest of the cycles will load at execution time depending on the input
         // data
+        /*
         SchemaLocation schemaLocation = jsonSchema.getSchemaLocation();
         Schema check = jsonSchema;
         boolean circularDependency = false;
@@ -174,5 +175,6 @@ public class DynamicRefValidator extends BaseKeywordValidator {
                 && depth < this.schemaContext.getSchemaRegistryConfig().getPreloadSchemaRefMaxNestingDepth()) {
             jsonSchema.initializeValidators();
         }
+        */
     }
 }
