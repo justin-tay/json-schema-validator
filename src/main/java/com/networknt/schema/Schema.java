@@ -208,10 +208,6 @@ public class Schema implements Validator {
 
     private Schema(SchemaContext schemaContext, SchemaLocation schemaLocation, 
             JsonNode schemaNode, Schema parent, boolean suppressSubSchemaRetrieval) {
-        /*
-        super(resolve(schemaLocation, schemaNode, parent == null, schemaContext), evaluationPath, schemaNode, parent,
-                null, null, schemaContext, suppressSubSchemaRetrieval);
-        */
         this.schemaContext = schemaContext;
         this.schemaLocation = resolve(schemaLocation, schemaNode, parent == null, schemaContext);
         this.schemaNode = schemaNode;
@@ -273,26 +269,20 @@ public class Schema implements Validator {
      * @param schemaContext the schema context
      * @param parentSchema the parent schema
      * @param schemaLocation the schema location
-     * @param evaluationPath the evaluation path
-     * @param evaluationParentSchema the evaluation parent schema
      * @param errorMessage the error message
      */
     protected Schema(
-            /* Below from JsonSchema */
             List<KeywordValidator> validators,
             boolean validatorsLoaded,
             boolean recursiveAnchor,
             TypeValidator typeValidator,
             String id,            
-            /* Below from BaseJsonValidator */
             boolean suppressSubSchemaRetrieval,
             JsonNode schemaNode,
             SchemaContext schemaContext,
             Schema parentSchema,
             SchemaLocation schemaLocation,
             Map<String, String> errorMessage) {
-//        super(suppressSubSchemaRetrieval, schemaNode, schemaContext, errorMessageType, keyword,
-//                parentSchema, schemaLocation, evaluationPath, evaluationParentSchema, errorMessage);
         this.validators = validators;
         this.validatorsLoaded = validatorsLoaded;
         this.recursiveAnchor = recursiveAnchor;
@@ -619,14 +609,6 @@ public class Schema implements Validator {
 
     @Override
     public void validate(ExecutionContext executionContext, JsonNode jsonNode, JsonNode rootNode, NodePath instanceLocation) {
-//        String newEvaluationPath = new EvaluationPath(executionContext.getEvaluationPath()).toString();
-//        String oldEvaluationPath = getEvaluationPath().toString();
-//        if (!oldEvaluationPath.equals(newEvaluationPath)) {
-//            System.out.println("-----------------");
-//            System.out.println("MISMATCH OLD: " + oldEvaluationPath);
-//            System.out.println("MISMATCH NEW: " + newEvaluationPath);
-//            System.out.println("-----------------");
-//        }
         List<KeywordValidator> validators = getValidators(); // Load the validators before checking the flags
         executionContext.evaluationSchema.addLast(this);
         boolean unevaluatedPropertiesPresent = executionContext.unevaluatedPropertiesPresent;

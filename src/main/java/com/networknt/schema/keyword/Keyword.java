@@ -37,7 +37,6 @@ public interface Keyword {
      * Creates a new validator for the keyword.
      * 
      * @param schemaLocation the schema location
-     * @param evaluationPath the evaluation path
      * @param schemaNode the schema node
      * @param parentSchema the parent schema
      * @param schemaContext the schema context
