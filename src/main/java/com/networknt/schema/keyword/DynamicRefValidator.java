@@ -83,6 +83,47 @@ public class DynamicRefValidator extends BaseKeywordValidator {
         }, schemaContext.getSchemaRegistryConfig().isCacheRefs()));
     }
 
+    static SchemaRef getRefSchema(Schema parentSchema, String refValue,
+            ExecutionContext executionContext) {
+        String ref = resolve(parentSchema, refValue);
+        return new SchemaRef(getSupplier(() -> {
+            SchemaContext schemaContext = parentSchema.getSchemaContext();
+            Schema refSchema = parentSchema.getSchemaContext().getDynamicAnchors().get(ref);
+            if (refSchema == null) { // This is a $dynamicRef without a matching $dynamicAnchor
+                // A $dynamicRef without a matching $dynamicAnchor in the same schema resource
+                // behaves like a normal $ref to $anchor
+                // A $dynamicRef without anchor in fragment behaves identical to $ref
+                SchemaRef r = RefValidator.getRefSchema(parentSchema, schemaContext, refValue, null);
+                if (r != null) {
+                    refSchema = r.getSchema();
+                }
+            } else {
+                // Check parents
+                Schema base;
+                int index = ref.indexOf("#");
+                String anchor = ref.substring(index);
+                String absoluteIri = ref.substring(0, index);
+                for (Iterator<Schema> iter = executionContext.getEvaluationSchema().descendingIterator(); iter.hasNext();) {
+                    base = iter.next();
+                    String baseAbsoluteIri = base.getSchemaLocation().getAbsoluteIri() != null ? base.getSchemaLocation().getAbsoluteIri().toString() : "";
+                    if (!baseAbsoluteIri.equals(absoluteIri)) {
+                        absoluteIri = baseAbsoluteIri;
+                        String parentRef = SchemaLocation.resolve(base.getSchemaLocation(), anchor);
+                        Schema parentRefSchema = schemaContext.getDynamicAnchors().get(parentRef);
+                        if (parentRefSchema != null) {
+                            refSchema = parentRefSchema;
+                        }
+                    }
+                }
+            }
+            
+            if (refSchema != null) {
+                refSchema = refSchema.fromRef(parentSchema, null);
+            }
+            return refSchema;
+        }, false));
+    }
+
     static <T> Supplier<T> getSupplier(Supplier<T> supplier, boolean cache) {
         return cache ? new ThreadSafeCachingSupplier<>(supplier) : supplier;
     }
