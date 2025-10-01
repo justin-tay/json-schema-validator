@@ -24,7 +24,6 @@ import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.annotation.Annotation;
-import com.networknt.schema.path.NodePath;
 
 /**
  * Abstract {@link KeywordValidator}.
@@ -34,20 +33,16 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
     protected final JsonNode schemaNode;
     protected final SchemaLocation schemaLocation;
 
-    protected final NodePath evaluationPath;
-
     /**
      * Constructor.
      * @param keyword        the keyword
      * @param schemaNode     the schema node
      * @param schemaLocation the schema location
-     * @param evaluationPath the evaluation path
      */
-    public AbstractKeywordValidator(String keyword, JsonNode schemaNode, SchemaLocation schemaLocation, NodePath evaluationPath) {
+    public AbstractKeywordValidator(String keyword, JsonNode schemaNode, SchemaLocation schemaLocation) {
         this.keyword = keyword;
         this.schemaNode = schemaNode;
         this.schemaLocation = schemaLocation;
-        this.evaluationPath = evaluationPath;
     }
 
     /**
@@ -55,20 +50,14 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
      * @param keyword        the keyword
      * @param schemaNode     the schema node
      * @param schemaLocation the schema location
-     * @param evaluationPath the evaluation path
      */
-    public AbstractKeywordValidator(Keyword keyword, JsonNode schemaNode, SchemaLocation schemaLocation, NodePath evaluationPath) {
-        this(keyword.getValue(), schemaNode, schemaLocation, evaluationPath);
+    public AbstractKeywordValidator(Keyword keyword, JsonNode schemaNode, SchemaLocation schemaLocation) {
+        this(keyword.getValue(), schemaNode, schemaLocation);
     }
 
     @Override
     public SchemaLocation getSchemaLocation() {
         return schemaLocation;
-    }
-
-    @Override
-    public NodePath getEvaluationPath() {
-        return evaluationPath;
     }
 
     @Override
@@ -87,7 +76,7 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
 
     @Override
     public String toString() {
-        return getEvaluationPath().getName(-1);
+        return getKeyword();
     }
 
     /**
@@ -119,7 +108,7 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
      * @param customizer to customize the annotation
      */
     protected void putAnnotation(ExecutionContext executionContext, Consumer<Annotation.Builder> customizer) {
-        Annotation.Builder builder = Annotation.builder().evaluationPath(this.evaluationPath)
+        Annotation.Builder builder = Annotation.builder().evaluationPath(executionContext.getEvaluationPath())
                 .schemaLocation(this.schemaLocation).keyword(getKeyword());
         customizer.accept(builder);
         executionContext.getAnnotations().put(builder.build());

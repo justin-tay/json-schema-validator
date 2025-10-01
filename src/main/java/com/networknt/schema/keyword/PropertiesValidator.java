@@ -44,13 +44,13 @@ public class PropertiesValidator extends BaseKeywordValidator {
     public static final String PROPERTY = "properties";
     private final Map<String, Schema> schemas = new LinkedHashMap<>();
     
-    public PropertiesValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
-        super(KeywordType.PROPERTIES, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
+    public PropertiesValidator(SchemaLocation schemaLocation, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
+        super(KeywordType.PROPERTIES, schemaNode, schemaLocation, parentSchema, schemaContext);
         for (Iterator<Entry<String, JsonNode>> it = schemaNode.fields(); it.hasNext();) {
             Entry<String, JsonNode> entry = it.next();
             String pname = entry.getKey();
             this.schemas.put(pname, schemaContext.newSchema(schemaLocation.append(pname),
-                    evaluationPath.append(pname), entry.getValue(), parentSchema));
+                    entry.getValue(), parentSchema));
         }
     }
 
@@ -111,7 +111,7 @@ public class PropertiesValidator extends BaseKeywordValidator {
         if (collectAnnotations) {
             executionContext.getAnnotations()
                     .put(Annotation.builder().instanceLocation(instanceLocation)
-                            .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                            .evaluationPath(executionContext.getEvaluationPath()).schemaLocation(this.schemaLocation)
                             .keyword(getKeyword()).value(matchedInstancePropertyNames == null ? Collections.emptySet()
                                     : matchedInstancePropertyNames)
                             .build());
@@ -144,7 +144,7 @@ public class PropertiesValidator extends BaseKeywordValidator {
         for (Map.Entry<String, Schema> entry : this.schemas.entrySet()) {
             JsonNode propertyNode = node.get(entry.getKey());
 
-            JsonNode defaultNode = getDefaultNode(entry.getValue());
+            JsonNode defaultNode = getDefaultNode(entry.getValue(), executionContext);
             if (defaultNode == null) {
                 continue;
             }
@@ -156,12 +156,12 @@ public class PropertiesValidator extends BaseKeywordValidator {
         }
     }
 
-    private static JsonNode getDefaultNode(Schema schema) {
+    private static JsonNode getDefaultNode(Schema schema, ExecutionContext executionContext) {
         JsonNode result = schema.getSchemaNode().get("default");
         if (result == null) {
-            SchemaRef schemaRef = SchemaRefs.from(schema);
+            SchemaRef schemaRef = SchemaRefs.from(schema, executionContext);
             if (schemaRef != null) {
-                result = getDefaultNode(schemaRef.getSchema());
+                result = getDefaultNode(schemaRef.getSchema(), executionContext);
             }
         }
         return result;

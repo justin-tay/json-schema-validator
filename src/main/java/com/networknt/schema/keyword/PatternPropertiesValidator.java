@@ -34,9 +34,9 @@ public class PatternPropertiesValidator extends BaseKeywordValidator {
     public static final String PROPERTY = "patternProperties";
     private final Map<RegularExpression, Schema> schemas = new IdentityHashMap<>();
 
-    public PatternPropertiesValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema,
+    public PatternPropertiesValidator(SchemaLocation schemaLocation, JsonNode schemaNode, Schema parentSchema,
                                       SchemaContext schemaContext) {
-        super(KeywordType.PATTERN_PROPERTIES, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
+        super(KeywordType.PATTERN_PROPERTIES, schemaNode, schemaLocation, parentSchema, schemaContext);
         if (!schemaNode.isObject()) {
             throw new SchemaException("patternProperties must be an object node");
         }
@@ -44,7 +44,7 @@ public class PatternPropertiesValidator extends BaseKeywordValidator {
         while (names.hasNext()) {
             String name = names.next();
             RegularExpression pattern = RegularExpression.compile(name, schemaContext);
-            schemas.put(pattern, schemaContext.newSchema(schemaLocation.append(name), evaluationPath.append(name),
+            schemas.put(pattern, schemaContext.newSchema(schemaLocation.append(name), 
                     schemaNode.get(name), parentSchema));
         }
     }
@@ -86,7 +86,7 @@ public class PatternPropertiesValidator extends BaseKeywordValidator {
         if (collectAnnotations) {
             executionContext.getAnnotations()
                     .put(Annotation.builder().instanceLocation(instanceLocation)
-                            .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                            .evaluationPath(executionContext.getEvaluationPath()).schemaLocation(this.schemaLocation)
                             .keyword(getKeyword())
                             .value(matchedInstancePropertyNames != null ? matchedInstancePropertyNames
                                     : Collections.emptySet())

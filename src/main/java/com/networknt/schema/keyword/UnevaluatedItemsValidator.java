@@ -22,6 +22,7 @@ import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaContext;
 import com.networknt.schema.annotation.Annotation;
+import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 
 import static com.networknt.schema.SpecificationVersionRange.MIN_DRAFT_2020_12;
@@ -38,13 +39,12 @@ public class UnevaluatedItemsValidator extends BaseKeywordValidator {
 
     private final boolean isMinV202012;
 
-    public UnevaluatedItemsValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode,
+    public UnevaluatedItemsValidator(SchemaLocation schemaLocation, JsonNode schemaNode,
             Schema parentSchema, SchemaContext schemaContext) {
-        super(KeywordType.UNEVALUATED_ITEMS, schemaNode, schemaLocation, parentSchema, schemaContext,
-                evaluationPath);
+        super(KeywordType.UNEVALUATED_ITEMS, schemaNode, schemaLocation, parentSchema, schemaContext);
         isMinV202012 = MIN_DRAFT_2020_12.getVersions().contains(schemaContext.getDialect().getSpecificationVersion());
         if (schemaNode.isObject() || schemaNode.isBoolean()) {
-            this.schema = schemaContext.newSchema(schemaLocation, evaluationPath, schemaNode, parentSchema);
+            this.schema = schemaContext.newSchema(schemaLocation, schemaNode, parentSchema);
         } else {
             throw new IllegalArgumentException("The value of 'unevaluatedItems' MUST be a valid JSON Schema.");
         }
@@ -76,7 +76,7 @@ public class UnevaluatedItemsValidator extends BaseKeywordValidator {
         Predicate<Annotation> validEvaluationPathFilter = a -> executionContext.getInstanceResults().isValid(instanceLocation, a.getEvaluationPath());
 
         Predicate<Annotation> adjacentEvaluationPathFilter = a -> a.getEvaluationPath()
-                .startsWith(this.evaluationPath.getParent());
+                .startsWith(new EvaluationPath(executionContext.getEvaluationPath()).getParent());
 
         List<Annotation> instanceLocationAnnotations = executionContext.getAnnotations().asMap()
                 .getOrDefault(instanceLocation, Collections.emptyList());
@@ -173,7 +173,7 @@ public class UnevaluatedItemsValidator extends BaseKeywordValidator {
                         if (this.schemaNode.isBoolean() && this.schemaNode.booleanValue() == false) {
                             // All fails as "unevaluatedItems: false"
                             executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation).arguments(x)
-                                    .locale(executionContext.getExecutionConfig().getLocale())
+                                    .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
                                     .build());
                         } else {
                             // Schema errors will be reported as is
@@ -196,7 +196,7 @@ public class UnevaluatedItemsValidator extends BaseKeywordValidator {
         if (evaluated) {
             executionContext.getAnnotations()
                     .put(Annotation.builder().instanceLocation(instanceLocation)
-                            .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation)
+                            .evaluationPath(executionContext.getEvaluationPath()).schemaLocation(this.schemaLocation)
                             .keyword("unevaluatedItems").value(true).build());
         }
     }

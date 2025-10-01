@@ -41,9 +41,9 @@ public class DependenciesValidator extends BaseKeywordValidator implements Keywo
      * @param parentSchema      the parent schema
      * @param schemaContext the schema context
      */
-    public DependenciesValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
+    public DependenciesValidator(SchemaLocation schemaLocation, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
 
-        super(KeywordType.DEPENDENCIES, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
+        super(KeywordType.DEPENDENCIES, schemaNode, schemaLocation, parentSchema, schemaContext);
 
         for (Iterator<String> it = schemaNode.fieldNames(); it.hasNext(); ) {
             String pname = it.next();
@@ -59,7 +59,7 @@ public class DependenciesValidator extends BaseKeywordValidator implements Keywo
                 }
             } else if (pvalue.isObject() || pvalue.isBoolean()) {
                 schemaDeps.put(pname, schemaContext.newSchema(schemaLocation.append(pname),
-                        evaluationPath.append(pname), pvalue, parentSchema));
+                        pvalue, parentSchema));
             }
         }
     }
@@ -72,7 +72,7 @@ public class DependenciesValidator extends BaseKeywordValidator implements Keywo
                 for (String field : deps) {
                     if (node.get(field) == null) {
                         executionContext.addError(error().instanceNode(node).property(pname).instanceLocation(instanceLocation)
-                                .locale(executionContext.getExecutionConfig().getLocale())
+                                .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
                                 .arguments(propertyDeps.toString()).build());
                     }
                 }

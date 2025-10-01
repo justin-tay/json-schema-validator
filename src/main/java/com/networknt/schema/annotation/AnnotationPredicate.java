@@ -18,6 +18,7 @@ package com.networknt.schema.annotation;
 import java.util.function.Predicate;
 
 import com.networknt.schema.SchemaLocation;
+import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 
 /**
@@ -25,7 +26,7 @@ import com.networknt.schema.path.NodePath;
  */
 public class AnnotationPredicate implements Predicate<Annotation> {
     final Predicate<NodePath> instanceLocationPredicate;
-    final Predicate<NodePath> evaluationPathPredicate;
+    final Predicate<EvaluationPath> evaluationPathPredicate;
     final Predicate<SchemaLocation> schemaLocationPredicate;
     final Predicate<String> keywordPredicate;
     final Predicate<Object> valuePredicate;
@@ -40,7 +41,7 @@ public class AnnotationPredicate implements Predicate<Annotation> {
      * @param valuePredicate            for value
      */
     protected AnnotationPredicate(Predicate<NodePath> instanceLocationPredicate,
-            Predicate<NodePath> evaluationPathPredicate, Predicate<SchemaLocation> schemaLocationPredicate,
+            Predicate<EvaluationPath> evaluationPathPredicate, Predicate<SchemaLocation> schemaLocationPredicate,
             Predicate<String> keywordPredicate, Predicate<Object> valuePredicate) {
         super();
         this.instanceLocationPredicate = instanceLocationPredicate;
@@ -73,7 +74,7 @@ public class AnnotationPredicate implements Predicate<Annotation> {
      * 
      * @return the predicate
      */
-    public Predicate<NodePath> getEvaluationPathPredicate() {
+    public Predicate<EvaluationPath> getEvaluationPathPredicate() {
         return evaluationPathPredicate;
     }
 
@@ -118,7 +119,7 @@ public class AnnotationPredicate implements Predicate<Annotation> {
      */
     public static class Builder {
         Predicate<NodePath> instanceLocationPredicate;
-        Predicate<NodePath> evaluationPathPredicate;
+        Predicate<EvaluationPath> evaluationPathPredicate;
         Predicate<SchemaLocation> schemaLocationPredicate;
         Predicate<String> keywordPredicate;
         Predicate<Object> valuePredicate;
@@ -128,7 +129,7 @@ public class AnnotationPredicate implements Predicate<Annotation> {
             return this;
         }
 
-        public Builder evaluationPath(Predicate<NodePath> evaluationPathPredicate) {
+        public Builder evaluationPath(Predicate<EvaluationPath> evaluationPathPredicate) {
             this.evaluationPathPredicate = evaluationPathPredicate;
             return this;
         }

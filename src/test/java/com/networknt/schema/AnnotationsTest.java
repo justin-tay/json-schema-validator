@@ -17,10 +17,13 @@ package com.networknt.schema;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayDeque;
+
 import org.junit.jupiter.api.Test;
 
 import com.networknt.schema.annotation.Annotation;
 import com.networknt.schema.annotation.Annotations;
+import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 import com.networknt.schema.path.PathType;
 
@@ -32,7 +35,7 @@ class AnnotationsTest {
     void put() {
         Annotations annotations = new Annotations();
         Annotation annotation = new Annotation("unevaluatedProperties",
-                new NodePath(PathType.JSON_POINTER), SchemaLocation.of(""), new NodePath(PathType.JSON_POINTER),
+                new NodePath(PathType.JSON_POINTER), SchemaLocation.of(""), new EvaluationPath(new ArrayDeque<Object>()),
                 "test");
         annotations.put(annotation);
         assertTrue(annotations.asMap().get(annotation.getInstanceLocation()).contains(annotation));

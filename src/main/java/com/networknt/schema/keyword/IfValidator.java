@@ -36,8 +36,8 @@ public class IfValidator extends BaseKeywordValidator {
     private final Schema thenSchema;
     private final Schema elseSchema;
 
-    public IfValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
-        super(KeywordType.IF_THEN_ELSE, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
+    public IfValidator(SchemaLocation schemaLocation, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
+        super(KeywordType.IF_THEN_ELSE, schemaNode, schemaLocation, parentSchema, schemaContext);
 
         Schema foundIfSchema = null;
         Schema foundThenSchema = null;
@@ -46,15 +46,14 @@ public class IfValidator extends BaseKeywordValidator {
         for (final String keyword : KEYWORDS) {
             final JsonNode node = parentSchema.getSchemaNode().get(keyword);
             final SchemaLocation schemaLocationOfSchema = parentSchema.getSchemaLocation().append(keyword);
-            final NodePath evaluationPathOfSchema = parentSchema.getEvaluationPath().append(keyword);
             if (keyword.equals("if")) {
-                foundIfSchema = schemaContext.newSchema(schemaLocationOfSchema, evaluationPathOfSchema, node,
+                foundIfSchema = schemaContext.newSchema(schemaLocationOfSchema, node,
                         parentSchema);
             } else if (keyword.equals("then") && node != null) {
-                foundThenSchema = schemaContext.newSchema(schemaLocationOfSchema, evaluationPathOfSchema, node,
+                foundThenSchema = schemaContext.newSchema(schemaLocationOfSchema, node,
                         parentSchema);
             } else if (keyword.equals("else") && node != null) {
-                foundElseSchema = schemaContext.newSchema(schemaLocationOfSchema, evaluationPathOfSchema, node,
+                foundElseSchema = schemaContext.newSchema(schemaLocationOfSchema, node,
                         parentSchema);
             }
         }

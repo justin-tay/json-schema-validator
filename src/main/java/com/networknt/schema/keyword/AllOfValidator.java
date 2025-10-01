@@ -35,9 +35,9 @@ import com.networknt.schema.utils.TypeFactory;
 public class AllOfValidator extends BaseKeywordValidator {
     private final List<Schema> schemas;
 
-    public AllOfValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode,
+    public AllOfValidator(SchemaLocation schemaLocation, JsonNode schemaNode,
             Schema parentSchema, SchemaContext schemaContext) {
-        super(KeywordType.ALL_OF, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
+        super(KeywordType.ALL_OF, schemaNode, schemaLocation, parentSchema, schemaContext);
         if (!schemaNode.isArray()) {
             JsonType nodeType = TypeFactory.getValueNodeType(schemaNode, this.schemaContext.getSchemaRegistryConfig());
             throw new SchemaException(error().instanceNode(schemaNode).instanceLocation(schemaLocation.getFragment())
@@ -46,7 +46,7 @@ public class AllOfValidator extends BaseKeywordValidator {
         int size = schemaNode.size();
         this.schemas = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            this.schemas.add(schemaContext.newSchema(schemaLocation.append(i), evaluationPath.append(i),
+            this.schemas.add(schemaContext.newSchema(schemaLocation.append(i),
                     schemaNode.get(i), parentSchema));
         }
     }

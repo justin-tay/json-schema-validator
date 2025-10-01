@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.keyword.KeywordValidator;
+import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 
 /**
@@ -18,6 +19,11 @@ public class WalkEvent {
     private JsonNode instanceNode;
     private NodePath instanceLocation;
     private KeywordValidator validator;
+    private EvaluationPath evaluationPath;
+    
+    public EvaluationPath getEvaluationPath() {
+        return this.evaluationPath;
+    }
 
     /**
      * Gets the execution context.
@@ -93,7 +99,7 @@ public class WalkEvent {
 
     @Override
     public String toString() {
-        return "WalkEvent [evaluationPath=" + getSchema().getEvaluationPath() + ", schemaLocation="
+        return "WalkEvent [schemaLocation="
                 + getSchema().getSchemaLocation() + ", instanceLocation=" + instanceLocation + "]";
     }
 
@@ -141,6 +147,9 @@ public class WalkEvent {
         }
 
         public WalkEvent build() {
+            if (walkEvent.executionContext != null) {
+                walkEvent.evaluationPath = new EvaluationPath(walkEvent.executionContext.getEvaluationPath());
+            }
             return walkEvent;
         }
 

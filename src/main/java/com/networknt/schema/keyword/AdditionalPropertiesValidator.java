@@ -43,17 +43,15 @@ public class AdditionalPropertiesValidator extends BaseKeywordValidator {
     private final Set<String> allowedProperties;
     private final List<RegularExpression> patternProperties;
 
-    private Boolean hasUnevaluatedPropertiesValidator;
-
-    public AdditionalPropertiesValidator(SchemaLocation schemaLocation, NodePath evaluationPath, JsonNode schemaNode, Schema parentSchema,
+    public AdditionalPropertiesValidator(SchemaLocation schemaLocation, JsonNode schemaNode, Schema parentSchema,
                                          SchemaContext schemaContext) {
-        super(KeywordType.ADDITIONAL_PROPERTIES, schemaNode, schemaLocation, parentSchema, schemaContext, evaluationPath);
+        super(KeywordType.ADDITIONAL_PROPERTIES, schemaNode, schemaLocation, parentSchema, schemaContext);
         if (schemaNode.isBoolean()) {
             allowAdditionalProperties = schemaNode.booleanValue();
             additionalPropertiesSchema = null;
         } else if (schemaNode.isObject()) {
             allowAdditionalProperties = true;
-            additionalPropertiesSchema = schemaContext.newSchema(schemaLocation, evaluationPath, schemaNode, parentSchema);
+            additionalPropertiesSchema = schemaContext.newSchema(schemaLocation, schemaNode, parentSchema);
         } else {
             allowAdditionalProperties = false;
             additionalPropertiesSchema = null;
@@ -119,6 +117,7 @@ public class AdditionalPropertiesValidator extends BaseKeywordValidator {
                 if (!allowAdditionalProperties) {
                     executionContext.addError(error().instanceNode(node).property(pname)
                             .instanceLocation(instanceLocation)
+                            .evaluationPath(executionContext.getEvaluationPath())
                             .locale(executionContext.getExecutionConfig().getLocale())
                             .arguments(pname).build());
                 } else {
@@ -136,7 +135,7 @@ public class AdditionalPropertiesValidator extends BaseKeywordValidator {
         }
         if (collectAnnotations) {
             executionContext.getAnnotations().put(Annotation.builder().instanceLocation(instanceLocation)
-                    .evaluationPath(this.evaluationPath).schemaLocation(this.schemaLocation).keyword(getKeyword())
+                    .evaluationPath(executionContext.getEvaluationPath()).schemaLocation(this.schemaLocation).keyword(getKeyword())
                     .value(matchedInstancePropertyNames != null ? matchedInstancePropertyNames : Collections.emptySet())
                     .build());
         }

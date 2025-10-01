@@ -8,9 +8,7 @@ import com.networknt.schema.Result;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.SpecificationVersion;
-import com.networknt.schema.dialect.Dialect;
 import com.networknt.schema.dialect.Dialects;
-import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.walk.ApplyDefaultsStrategy;
 import com.networknt.schema.walk.KeywordWalkListenerRunner;
 import com.networknt.schema.walk.PropertyWalkListenerRunner;
@@ -72,20 +70,10 @@ class PropertiesValidatorTest extends BaseJsonSchemaValidatorTest {
                 .propertyWalkListener(new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
-                        String newPath = new EvaluationPath(walkEvent.getExecutionContext().getEvaluationPath()).toString();
-                        String oldPath = walkEvent.getSchema().getEvaluationPath().toString();
-                        if (!newPath.equals(oldPath)) {
-                            throw new RuntimeException("Mismatch");
-                        }
                         return WalkFlow.CONTINUE;
                     }
                     @Override
                     public void onWalkEnd(WalkEvent walkEvent, List<Error> errors) {
-                        String newPath = new EvaluationPath(walkEvent.getExecutionContext().getEvaluationPath()).toString();
-                        String oldPath = walkEvent.getSchema().getEvaluationPath().toString();
-                        if (!newPath.equals(oldPath)) {
-                            throw new RuntimeException("Mismatch");
-                        }
                     }
                 }).build();
 
@@ -93,20 +81,10 @@ class PropertiesValidatorTest extends BaseJsonSchemaValidatorTest {
                 .keywordWalkListener(new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
-                        String newPath = new EvaluationPath(walkEvent.getExecutionContext().getEvaluationPath()).toString();
-                        String oldPath = walkEvent.getSchema().getEvaluationPath().toString();
-                        if (!newPath.equals(oldPath)) {
-                            throw new RuntimeException("Mismatch");
-                        }
                         return WalkFlow.CONTINUE;
                     }
                     @Override
                     public void onWalkEnd(WalkEvent walkEvent, List<Error> errors) {
-                        String newPath = new EvaluationPath(walkEvent.getExecutionContext().getEvaluationPath()).toString();
-                        String oldPath = walkEvent.getSchema().getEvaluationPath().toString();
-                        if (!newPath.equals(oldPath)) {
-                            throw new RuntimeException("Mismatch");
-                        }
                     }
                 }).build();
 

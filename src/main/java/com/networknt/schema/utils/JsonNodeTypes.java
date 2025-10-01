@@ -1,6 +1,10 @@
 package com.networknt.schema.utils;
 
+import java.util.ArrayDeque;
+import java.util.Iterator;
+
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaContext;
 import com.networknt.schema.SchemaRegistryConfig;
@@ -19,7 +23,7 @@ public class JsonNodeTypes {
 	    return nullable != null && nullable.asBoolean();
     }
 
-    public static boolean equalsToSchemaType(JsonNode node, JsonType schemaType, Schema parentSchema, SchemaContext schemaContext) {
+    public static boolean equalsToSchemaType(JsonNode node, JsonType schemaType, Schema parentSchema, SchemaContext schemaContext, ExecutionContext executionContext) {
         SchemaRegistryConfig config = schemaContext.getSchemaRegistryConfig();
         JsonType nodeType = TypeFactory.getValueNodeType(node, config);
         // in the case that node type is not the same as schema type, try to convert node to the
@@ -49,7 +53,7 @@ public class JsonNodeTypes {
 
             // Skip the type validation when the schema is an enum object schema. Since the current type
             // of node itself can be used for type validation.
-            if (isEnumObjectSchema(parentSchema) && !config.isStrict("type", Boolean.TRUE)) {
+            if (isEnumObjectSchema(parentSchema, executionContext) && !config.isStrict("type", Boolean.TRUE)) {
                 return true;
             }
             if (config != null && config.isTypeLoose()) {
@@ -96,7 +100,8 @@ public class JsonNodeTypes {
         return false;
     }
 
-    private static boolean isEnumObjectSchema(Schema jsonSchema) {
+    private static boolean isEnumObjectSchema(Schema jsonSchema, ExecutionContext executionContext) {
+        
         // There are three conditions for enum object schema
         // 1. The current schema contains key "type", and the value is object
         // 2. The current schema contains key "enum", and the value is an array
@@ -110,7 +115,14 @@ public class JsonNodeTypes {
                 typeNode = jsonSchema.getSchemaNode().get(TYPE);
                 enumNode = jsonSchema.getSchemaNode().get(ENUM);
             }
-            refNode = REF.equals(jsonSchema.getEvaluationPath().getElement(-1));
+            ArrayDeque<Object> current = executionContext.getEvaluationPath();
+            if (current.size() >= 2) {
+                // Check the parent of the current path
+                // eg. properties > bar > $ref > type
+                Iterator<Object> iter = current.descendingIterator();
+                iter.next();
+                refNode = REF.equals(iter.next());
+            }
         }
         if (typeNode != null && enumNode != null && refNode) {
             return TypeFactory.getSchemaNodeType(typeNode) == JsonType.OBJECT && enumNode.isArray();
