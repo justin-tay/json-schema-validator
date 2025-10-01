@@ -730,6 +730,7 @@ public class Schema implements Validator {
 //            System.out.println("MISMATCH NEW: " + newEvaluationPath);
 //            System.out.println("-----------------");
 //        }
+        List<KeywordValidator> validators = getValidators(); // Load the validators before checking the flags
         executionContext.evaluationSchema.addLast(this);
         boolean unevaluatedPropertiesPresent = executionContext.unevaluatedPropertiesPresent;
         boolean unevaluatedItemsPresent =  executionContext.unevaluatedItemsPresent;
@@ -741,7 +742,7 @@ public class Schema implements Validator {
         }
         try {
             int currentErrors = executionContext.getErrors().size();
-            for (KeywordValidator v : getValidators()) {
+            for (KeywordValidator v : validators) {
                 executionContext.evaluationPath.addLast(v.getKeyword());
                 executionContext.evaluationSchemaPath.addLast(v.getKeyword());
                 try {
@@ -1626,29 +1627,47 @@ public class Schema implements Validator {
     public void walk(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             NodePath instanceLocation, boolean shouldValidateSchema) {
         // Walk through all the JSONWalker's.
-        int currentErrors = executionContext.getErrors().size();
-        for (KeywordValidator validator : getValidators()) {
-            NodePath evaluationPathWithKeyword = validator.getEvaluationPath();
-            try {
-                // Call all the pre-walk listeners. If at least one of the pre walk listeners
-                // returns SKIP, then skip the walk.
-                if (executionContext.getWalkConfig().getKeywordWalkListenerRunner().runPreWalkListeners(executionContext,
-                        evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
-                        this, validator)) {
-                    executionContext.evaluationPath.addLast(validator.getKeyword());
-                    try {
-                        validator.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
-                    } finally {
-                        executionContext.evaluationPath.removeLast();
+        List<KeywordValidator> validators = getValidators(); // Load the validators before checking the flags
+        executionContext.evaluationSchema.addLast(this);
+        boolean unevaluatedPropertiesPresent = executionContext.unevaluatedPropertiesPresent;
+        boolean unevaluatedItemsPresent =  executionContext.unevaluatedItemsPresent;
+        if (this.unevaluatedPropertiesPresent) {
+            executionContext.unevaluatedPropertiesPresent = this.unevaluatedPropertiesPresent;
+        }
+        if (this.unevaluatedItemsPresent) {
+            executionContext.unevaluatedItemsPresent = this.unevaluatedItemsPresent;
+        }
+        try {
+            int currentErrors = executionContext.getErrors().size();
+            for (KeywordValidator validator : validators) {
+                NodePath evaluationPathWithKeyword = validator.getEvaluationPath();
+                try {
+                    // Call all the pre-walk listeners. If at least one of the pre walk listeners
+                    // returns SKIP, then skip the walk.
+                    if (executionContext.getWalkConfig().getKeywordWalkListenerRunner().runPreWalkListeners(executionContext,
+                            evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
+                            this, validator)) {
+                        executionContext.evaluationPath.addLast(validator.getKeyword());
+                        executionContext.evaluationSchemaPath.addLast(validator.getKeyword());
+                        try {
+                            validator.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
+                        } finally {
+                            executionContext.evaluationPath.removeLast();
+                            executionContext.evaluationSchemaPath.removeLast();
+                        }
                     }
+                } finally {
+                    // Call all the post-walk listeners.
+                    executionContext.getWalkConfig().getKeywordWalkListenerRunner().runPostWalkListeners(executionContext,
+                            evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
+                            this, validator,
+                            executionContext.getErrors().subList(currentErrors, executionContext.getErrors().size()));
                 }
-            } finally {
-                // Call all the post-walk listeners.
-                executionContext.getWalkConfig().getKeywordWalkListenerRunner().runPostWalkListeners(executionContext,
-                        evaluationPathWithKeyword.getName(-1), node, rootNode, instanceLocation,
-                        this, validator,
-                        executionContext.getErrors().subList(currentErrors, executionContext.getErrors().size()));
             }
+        } finally {
+            executionContext.evaluationSchema.removeLast();
+            executionContext.unevaluatedPropertiesPresent = unevaluatedPropertiesPresent;
+            executionContext.unevaluatedItemsPresent = unevaluatedItemsPresent;
         }
     }
 
