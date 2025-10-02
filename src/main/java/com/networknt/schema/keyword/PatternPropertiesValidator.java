@@ -66,11 +66,11 @@ public class PatternPropertiesValidator extends BaseKeywordValidator {
                     NodePath path = instanceLocation.append(name);
                     int currentErrors = executionContext.getErrors().size();
                     Schema schema = entry.getValue();
-                    executionContext.getEvaluationPath().addLast(schema.getSchemaLocation().getFragment().getElement(-1));
+                    executionContext.evaluationPathAddLast(schema.getSchemaLocation().getFragment().getElement(-1).toString());
                     try {
                         schema.validate(executionContext, n, rootNode, path);
                     } finally {
-                        executionContext.getEvaluationPath().removeLast();
+                        executionContext.evaluationPathRemoveLast();
                     }
                     if (currentErrors == executionContext.getErrors().size()) { // No new errors
                         if (collectAnnotations) {

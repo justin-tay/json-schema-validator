@@ -24,13 +24,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.networknt.schema.i18n.MessageFormatter;
-import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 import com.networknt.schema.utils.CachingSupplier;
 import com.networknt.schema.utils.Strings;
 
 import java.text.MessageFormat;
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +49,7 @@ import java.util.function.Supplier;
 public class Error {
     private final String keyword;
     @JsonSerialize(using = ToStringSerializer.class)
-    private final EvaluationPath evaluationPath;
+    private final NodePath evaluationPath;
     @JsonSerialize(using = ToStringSerializer.class)
     private final SchemaLocation schemaLocation;
     @JsonSerialize(using = ToStringSerializer.class)
@@ -63,7 +61,7 @@ public class Error {
     private final JsonNode instanceNode;
     private final JsonNode schemaNode;
 
-    Error(String keyword, EvaluationPath evaluationPath, SchemaLocation schemaLocation,
+    Error(String keyword, NodePath evaluationPath, SchemaLocation schemaLocation,
             NodePath instanceLocation, Object[] arguments, Map<String, Object> details,
             String messageKey, Supplier<String> messageSupplier, JsonNode instanceNode, JsonNode schemaNode) {
         super();
@@ -96,7 +94,7 @@ public class Error {
      * 
      * @return the evaluation path
      */
-    public EvaluationPath getEvaluationPath() {
+    public NodePath getEvaluationPath() {
         return evaluationPath;
     }
     
@@ -242,7 +240,7 @@ public class Error {
         public abstract S self();
 
         protected String keyword;
-        protected EvaluationPath evaluationPath;
+        protected NodePath evaluationPath;
         protected SchemaLocation schemaLocation;
         protected NodePath instanceLocation;
         protected Object[] arguments;
@@ -311,13 +309,8 @@ public class Error {
          * @param evaluationPath the evaluation path
          * @return the builder
          */
-        public S evaluationPath(EvaluationPath evaluationPath) {
+        public S evaluationPath(NodePath evaluationPath) {
             this.evaluationPath = evaluationPath;
-            return self();
-        }
-        
-        public S evaluationPath(ArrayDeque<Object> evaluationPath) {
-            this.evaluationPath = new EvaluationPath(evaluationPath);
             return self();
         }
         
@@ -406,7 +399,7 @@ public class Error {
             return keyword;
         }
 
-        protected EvaluationPath getEvaluationPath() {
+        protected NodePath getEvaluationPath() {
             return evaluationPath;
         }
 

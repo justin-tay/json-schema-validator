@@ -85,22 +85,22 @@ public class IfValidator extends BaseKeywordValidator {
         if (ifConditionPassed && this.thenSchema != null) {
             // The "if" keyword is a bit unusual as it actually handles multiple keywords
             // This removes the "if" in the evaluation path so the rest of the evaluation paths will be correct
-            executionContext.getEvaluationPath().removeLast();
-            executionContext.getEvaluationPath().addLast("then");
+            executionContext.evaluationPathRemoveLast();
+            executionContext.evaluationPathAddLast("then");
             try {
                 this.thenSchema.validate(executionContext, node, rootNode, instanceLocation);
             } finally {
-                executionContext.getEvaluationPath().removeLast();
-                executionContext.getEvaluationPath().addLast("if");
+                executionContext.evaluationPathRemoveLast();
+                executionContext.evaluationPathAddLast("if");
             }
         } else if (!ifConditionPassed && this.elseSchema != null) {
-            executionContext.getEvaluationPath().removeLast();
-            executionContext.getEvaluationPath().addLast("else");
+            executionContext.evaluationPathRemoveLast();
+            executionContext.evaluationPathAddLast("else");
             try {
                 this.elseSchema.validate(executionContext, node, rootNode, instanceLocation);
             } finally {
-                executionContext.getEvaluationPath().removeLast();
-                executionContext.getEvaluationPath().addLast("if");
+                executionContext.evaluationPathRemoveLast();
+                executionContext.evaluationPathAddLast("if");
             }
         }
     }
@@ -142,43 +142,43 @@ public class IfValidator extends BaseKeywordValidator {
         }
         if (!checkCondition) {
             if (this.thenSchema != null) {
-                executionContext.getEvaluationPath().removeLast();
-                executionContext.getEvaluationPath().addLast("then");
+                executionContext.evaluationPathRemoveLast();
+                executionContext.evaluationPathAddLast("then");
                 try {
                     this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
-                    executionContext.getEvaluationPath().addLast("if");
+                    executionContext.evaluationPathRemoveLast();
+                    executionContext.evaluationPathAddLast("if");
                 }
             }
             if (this.elseSchema != null) {
-                executionContext.getEvaluationPath().removeLast();
-                executionContext.getEvaluationPath().addLast("else");
+                executionContext.evaluationPathRemoveLast();
+                executionContext.evaluationPathAddLast("else");
                 try {
                     this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
-                    executionContext.getEvaluationPath().addLast("if");
+                    executionContext.evaluationPathRemoveLast();
+                    executionContext.evaluationPathAddLast("if");
                 }
             }
         } else {
             if (this.thenSchema != null && ifConditionPassed) {
-                executionContext.getEvaluationPath().removeLast();
-                executionContext.getEvaluationPath().addLast("then");
+                executionContext.evaluationPathRemoveLast();
+                executionContext.evaluationPathAddLast("then");
                 try {
                     this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
-                    executionContext.getEvaluationPath().addLast("if");
+                    executionContext.evaluationPathRemoveLast();
+                    executionContext.evaluationPathAddLast("if");
                 }
             } else if (this.elseSchema != null && !ifConditionPassed) {
-                executionContext.getEvaluationPath().removeLast();
-                executionContext.getEvaluationPath().addLast("else");
+                executionContext.evaluationPathRemoveLast();
+                executionContext.evaluationPathAddLast("else");
                 try {
                     this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
-                    executionContext.getEvaluationPath().addLast("if");
+                    executionContext.evaluationPathRemoveLast();
+                    executionContext.evaluationPathAddLast("if");
                 }
             }
         }

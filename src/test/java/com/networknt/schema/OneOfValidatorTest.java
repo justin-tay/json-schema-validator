@@ -72,7 +72,7 @@ class OneOfValidatorTest {
         List<Error> assertions = messages.stream().collect(Collectors.toList());
         assertEquals("oneOf", assertions.get(0).getKeyword());
         assertEquals("$", assertions.get(0).getInstanceLocation().toString());
-        assertEquals("/oneOf", assertions.get(0).getEvaluationPath().toString());
+        assertEquals("$.oneOf", assertions.get(0).getEvaluationPath().toString());
         assertEquals("$: must be valid to one and only one schema, but 2 are valid with indexes '1, 2'",
                 assertions.get(0).toString());
     }
@@ -114,20 +114,20 @@ class OneOfValidatorTest {
         List<Error> assertions = messages.stream().collect(Collectors.toList());
         assertEquals("oneOf", assertions.get(0).getKeyword());
         assertEquals("$", assertions.get(0).getInstanceLocation().toString());
-        assertEquals("/oneOf", assertions.get(0).getEvaluationPath().toString());
+        assertEquals("$.oneOf", assertions.get(0).getEvaluationPath().toString());
         assertEquals("$: must be valid to one and only one schema, but 0 are valid", assertions.get(0).toString());
 
         assertEquals("additionalProperties", assertions.get(1).getKeyword());
         assertEquals("$", assertions.get(1).getInstanceLocation().toString());
-        assertEquals("/oneOf/0/additionalProperties", assertions.get(1).getEvaluationPath().toString());
+        assertEquals("$.oneOf[0].additionalProperties", assertions.get(1).getEvaluationPath().toString());
 
         assertEquals("type", assertions.get(2).getKeyword());
         assertEquals("$.test", assertions.get(2).getInstanceLocation().toString());
-        assertEquals("/oneOf/1/additionalProperties/type", assertions.get(2).getEvaluationPath().toString());
+        assertEquals("$.oneOf[1].additionalProperties.type", assertions.get(2).getEvaluationPath().toString());
 
         assertEquals("type", assertions.get(3).getKeyword());
         assertEquals("$.test", assertions.get(3).getInstanceLocation().toString());
-        assertEquals("/oneOf/2/additionalProperties/type", assertions.get(3).getEvaluationPath().toString());
+        assertEquals("$.oneOf[2].additionalProperties.type", assertions.get(3).getEvaluationPath().toString());
     }
 
     @Test

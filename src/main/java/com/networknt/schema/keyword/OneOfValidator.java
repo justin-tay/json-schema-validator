@@ -79,7 +79,7 @@ public class OneOfValidator extends BaseKeywordValidator {
             executionContext.setFailFast(false);
             for (Schema schema : this.schemas) {
                 subSchemaErrors.clear();
-                executionContext.getEvaluationPath().addLast(schemaIndex);
+                executionContext.evaluationPathAddLast(schemaIndex);
                 try {
                     if (!walk) {
                         schema.validate(executionContext, node, rootNode, instanceLocation);
@@ -87,7 +87,7 @@ public class OneOfValidator extends BaseKeywordValidator {
                         schema.walk(executionContext, node, rootNode, instanceLocation, true);
                     }
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.evaluationPathRemoveLast();
                 }
                 schemaIndex++;
 
@@ -242,11 +242,11 @@ public class OneOfValidator extends BaseKeywordValidator {
         } else {
             int schemaIndex = 0;
             for (Schema schema : this.schemas) {
-                executionContext.getEvaluationPath().addLast(schemaIndex);
+                executionContext.evaluationPathAddLast(schemaIndex);
                 try {
                     schema.walk(executionContext, node, rootNode, instanceLocation, false);
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.evaluationPathRemoveLast();
                 }
                 schemaIndex++;
             }

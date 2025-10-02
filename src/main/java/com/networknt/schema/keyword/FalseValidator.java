@@ -15,14 +15,12 @@
  */
 package com.networknt.schema.keyword;
 
-import java.util.Iterator;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
+import com.networknt.schema.SchemaContext;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.path.NodePath;
-import com.networknt.schema.SchemaContext;
 
 /**
  * {@link KeywordValidator} for false.
@@ -35,14 +33,7 @@ public class FalseValidator extends BaseKeywordValidator implements KeywordValid
 
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation) {
         // For the false validator, it is always not valid
-        Iterator<Object> iter = executionContext.getEvaluationPath().descendingIterator();
-        String reason = "";
-        if (iter.hasNext()) {
-            iter.next();
-        }
-        if (iter.hasNext()) {
-            reason = iter.next().toString();
-        }
+        String reason = executionContext.getEvaluationPath().getParent().getName(-1);
         executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
                 .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
                 .arguments(reason).build());

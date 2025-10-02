@@ -73,11 +73,11 @@ public class PropertyDependenciesValidator extends BaseKeywordValidator implemen
             if (propertyValue != null) {
                 Map<String, Schema> propertySchemas = this.propertyDependencies.get(propertyName);
                 if (propertySchemas != null) {
-                    executionContext.getEvaluationPath().addLast(propertyName);
+                    executionContext.evaluationPathAddLast(propertyName);
                     try {
                         Schema schema = propertySchemas.get(propertyValue);
                         if (schema != null) {
-                            executionContext.getEvaluationPath().addLast(propertyValue);
+                            executionContext.evaluationPathAddLast(propertyValue);
                             try {
                                 if (!walk) {
                                     schema.validate(executionContext, node, rootNode, instanceLocation);
@@ -85,11 +85,11 @@ public class PropertyDependenciesValidator extends BaseKeywordValidator implemen
                                     schema.walk(executionContext, node, rootNode, instanceLocation, true);
                                 }
                             } finally {
-                                executionContext.getEvaluationPath().removeLast();
+                                executionContext.evaluationPathRemoveLast();
                             }
                         }
                     } finally {
-                        executionContext.getEvaluationPath().removeLast();
+                        executionContext.evaluationPathRemoveLast();
                     }
                 }
             }
@@ -106,18 +106,18 @@ public class PropertyDependenciesValidator extends BaseKeywordValidator implemen
 
         for (Entry<String, Map<String, Schema>> property : this.propertyDependencies.entrySet()) {
             String propertyName = property.getKey();
-            executionContext.getEvaluationPath().addLast(propertyName);
+            executionContext.evaluationPathAddLast(propertyName);
             try {
                 for (Entry<String, Schema> propertyValue : property.getValue().entrySet()) {
-                    executionContext.getEvaluationPath().add(propertyValue.getKey());
+                    executionContext.evaluationPathAddLast(propertyValue.getKey());
                     try {
                         propertyValue.getValue().walk(executionContext, node, rootNode, instanceLocation, false);
                     } finally {
-                        executionContext.getEvaluationPath().removeLast();
+                        executionContext.evaluationPathRemoveLast();
                     }
                 }
             } finally {
-                executionContext.getEvaluationPath().removeLast();
+                executionContext.evaluationPathRemoveLast();
             }
         }
     }

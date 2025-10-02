@@ -1,8 +1,5 @@
 package com.networknt.schema.utils;
 
-import java.util.ArrayDeque;
-import java.util.Iterator;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
@@ -115,14 +112,7 @@ public class JsonNodeTypes {
                 typeNode = jsonSchema.getSchemaNode().get(TYPE);
                 enumNode = jsonSchema.getSchemaNode().get(ENUM);
             }
-            ArrayDeque<Object> current = executionContext.getEvaluationPath();
-            if (current.size() >= 2) {
-                // Check the parent of the current path
-                // eg. properties > bar > $ref > type
-                Iterator<Object> iter = current.descendingIterator();
-                iter.next();
-                refNode = REF.equals(iter.next());
-            }
+            refNode = REF.equals(executionContext.getEvaluationPath().getParent().getElement(-1));
         }
         if (typeNode != null && enumNode != null && refNode) {
             return TypeFactory.getSchemaNodeType(typeNode) == JsonType.OBJECT && enumNode.isArray();

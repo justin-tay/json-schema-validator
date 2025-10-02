@@ -30,7 +30,6 @@ import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaContext;
 import com.networknt.schema.annotation.Annotation;
-import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 
 /**
@@ -60,7 +59,7 @@ public class UnevaluatedPropertiesValidator extends BaseKeywordValidator {
         Predicate<Annotation> validEvaluationPathFilter = a -> executionContext.getInstanceResults().isValid(instanceLocation, a.getEvaluationPath());
 
         Predicate<Annotation> adjacentEvaluationPathFilter = a -> a.getEvaluationPath()
-                .startsWith(new EvaluationPath(executionContext.getEvaluationPath()).getParent());
+                .startsWith(executionContext.getEvaluationPath().getParent());
 
         List<Annotation> instanceLocationAnnotations = executionContext.getAnnotations().asMap()
                 .getOrDefault(instanceLocation, Collections.emptyList());

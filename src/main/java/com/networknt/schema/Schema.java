@@ -35,7 +35,6 @@ import java.util.function.Consumer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.keyword.KeywordValidator;
 import com.networknt.schema.keyword.TypeValidator;
-import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 import com.networknt.schema.path.PathType;
 import com.networknt.schema.resource.ClasspathResourceLoader;
@@ -144,6 +143,7 @@ public class Schema implements Validator {
          *     executionContext.evaluationPath.addLast(this.schemaLocation.getFragment().getElement(x)); 
          * }
          */
+        executionContext.evaluationPath = atRoot();
         validate(executionContext, node, node, atRoot());
     }
 
@@ -421,7 +421,7 @@ public class Schema implements Validator {
                             .message("Reference {0} cannot be resolved")
                             .instanceLocation(schemaLocation.getFragment())
                             .schemaLocation(schemaLocation)
-                            .evaluationPath((EvaluationPath)null)
+                            .evaluationPath(null)
                             .arguments(fragment).build();
                     throw new InvalidSchemaRefException(error);
                 }
@@ -537,7 +537,7 @@ public class Schema implements Validator {
                                 .message(
                                         "The value of a $recursiveAnchor must be a Boolean literal but is {0}")
                                 .instanceLocation(null)
-                                .evaluationPath((EvaluationPath) null)
+                                .evaluationPath(null)
                                 .schemaLocation(schemaPath)
                                 .arguments(nodeToUse.getNodeType().toString())
                                 .build();
@@ -622,12 +622,12 @@ public class Schema implements Validator {
         try {
             int currentErrors = executionContext.getErrors().size();
             for (KeywordValidator v : validators) {
-                executionContext.evaluationPath.addLast(v.getKeyword());
+                executionContext.evaluationPathAddLast(v.getKeyword());
                 executionContext.evaluationSchemaPath.addLast(v.getKeyword());
                 try {
                     v.validate(executionContext, jsonNode, rootNode, instanceLocation);
                 } finally {
-                    executionContext.evaluationPath.removeLast();
+                    executionContext.evaluationPathRemoveLast();
                     executionContext.evaluationSchemaPath.removeLast();
                 }
             }
@@ -1498,6 +1498,7 @@ public class Schema implements Validator {
             executionCustomizer.customize(executionContext, this.schemaContext);
         }
         // Walk through the schema.
+        executionContext.evaluationPath = atRoot();
         walk(executionContext, node, rootNode, instanceLocation, validate);
         return format.format(this, executionContext, this.schemaContext);
     }
@@ -1525,12 +1526,12 @@ public class Schema implements Validator {
                     if (executionContext.getWalkConfig().getKeywordWalkListenerRunner().runPreWalkListeners(executionContext,
                             validator.getKeyword(), node, rootNode, instanceLocation,
                             this, validator)) {
-                        executionContext.evaluationPath.addLast(validator.getKeyword());
+                        executionContext.evaluationPathAddLast(validator.getKeyword());
                         executionContext.evaluationSchemaPath.addLast(validator.getKeyword());
                         try {
                             validator.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
                         } finally {
-                            executionContext.evaluationPath.removeLast();
+                            executionContext.evaluationPathRemoveLast();
                             executionContext.evaluationSchemaPath.removeLast();
                         }
                     }

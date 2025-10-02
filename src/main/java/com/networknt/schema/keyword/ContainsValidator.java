@@ -155,26 +155,26 @@ public class ContainsValidator extends BaseKeywordValidator {
                     // Omitted keywords MUST NOT produce annotation results. However, as described
                     // in the section for contains, the absence of this keyword's annotation causes
                     // contains to assume a minimum value of 1.
-                    executionContext.getEvaluationPath().addLast(minContainsKeyword);
+                    executionContext.evaluationPathAddLast(minContainsKeyword);
                     executionContext.getAnnotations()
                             .put(Annotation.builder().instanceLocation(instanceLocation)
                                     .evaluationPath(executionContext.getEvaluationPath())
                                     .schemaLocation(this.schemaLocation.append(minContainsKeyword))
                                     .keyword(minContainsKeyword).value(this.min).build());
-                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.evaluationPathRemoveLast();
                 }
             }
             
             if (this.max != null) {
                 String maxContainsKeyword = "maxContains";
                 if (collectAnnotations || collectAnnotations(executionContext, maxContainsKeyword)) {
-                    executionContext.getEvaluationPath().addLast(maxContainsKeyword);
+                    executionContext.evaluationPathAddLast(maxContainsKeyword);
                     executionContext.getAnnotations()
                             .put(Annotation.builder().instanceLocation(instanceLocation)
                                     .evaluationPath(executionContext.getEvaluationPath())
                                     .schemaLocation(this.schemaLocation.append(maxContainsKeyword))
                                     .keyword(maxContainsKeyword).value(this.max).build());
-                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.evaluationPathRemoveLast();
                 }
             }
         }
