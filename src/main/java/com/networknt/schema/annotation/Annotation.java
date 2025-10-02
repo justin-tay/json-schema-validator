@@ -15,12 +15,10 @@
  */
 package com.networknt.schema.annotation;
 
-import java.util.ArrayDeque;
 import java.util.Objects;
 
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.keyword.Keyword;
-import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 
 /**
@@ -30,11 +28,11 @@ public class Annotation {
     private final String keyword;
     private final NodePath instanceLocation;
     private final SchemaLocation schemaLocation;
-    private final EvaluationPath evaluationPath;
+    private final NodePath evaluationPath;
     private final Object value;
 
     public Annotation(String keyword, NodePath instanceLocation, SchemaLocation schemaLocation,
-            EvaluationPath evaluationPath, Object value) {
+            NodePath evaluationPath, Object value) {
         super();
         this.keyword = keyword;
         this.instanceLocation = instanceLocation;
@@ -77,7 +75,7 @@ public class Annotation {
      * 
      * @return the evaluation path
      */
-    public EvaluationPath getEvaluationPath() {
+    public NodePath getEvaluationPath() {
         return evaluationPath;
     }
 
@@ -125,7 +123,7 @@ public class Annotation {
         private String keyword;
         private NodePath instanceLocation;
         private SchemaLocation schemaLocation;
-        private EvaluationPath evaluationPath;
+        private NodePath evaluationPath;
         private Object value;
 
         public Builder keyword(Keyword keyword) {
@@ -148,13 +146,8 @@ public class Annotation {
             return this;
         }
 
-        public Builder evaluationPath(EvaluationPath evaluationPath) {
+        public Builder evaluationPath(NodePath evaluationPath) {
             this.evaluationPath = evaluationPath;
-            return this;
-        }
-
-        public Builder evaluationPath(ArrayDeque<Object> evaluationPath) {
-            this.evaluationPath = new EvaluationPath(evaluationPath);
             return this;
         }
 

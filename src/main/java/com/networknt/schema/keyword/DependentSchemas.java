@@ -56,7 +56,7 @@ public class DependentSchemas extends BaseKeywordValidator {
             String pname = it.next();
             Schema schema = this.schemaDependencies.get(pname);
             if (schema != null) {
-                executionContext.getEvaluationPath().addLast(pname);
+                executionContext.evaluationPathAddLast(pname);
                 try {
                     if(!walk) {
                         schema.validate(executionContext, node, rootNode, instanceLocation);
@@ -64,7 +64,7 @@ public class DependentSchemas extends BaseKeywordValidator {
                         schema.walk(executionContext, node, rootNode, instanceLocation, true);   
                     }
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.evaluationPathRemoveLast();
                 }
             }
         }

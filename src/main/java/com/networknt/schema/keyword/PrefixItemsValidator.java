@@ -60,11 +60,11 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
             int count = Math.min(node.size(), this.tupleSchema.size());
             for (int i = 0; i < count; ++i) {
                 NodePath path = instanceLocation.append(i);
-                executionContext.getEvaluationPath().addLast(i);
+                executionContext.evaluationPathAddLast(i);
                 try {
                     this.tupleSchema.get(i).validate(executionContext, node.get(i), rootNode, path);
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.evaluationPathRemoveLast();
                 }
             }
 
@@ -167,11 +167,11 @@ public class PrefixItemsValidator extends BaseKeywordValidator {
         );
         int currentErrors = executionContext.getErrors().size();
         if (executeWalk) {
-            executionContext.getEvaluationPath().addLast(schemaIndex);
+            executionContext.evaluationPathAddLast(schemaIndex);
             try {
                 walkSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
             } finally {
-                executionContext.getEvaluationPath().removeLast();
+                executionContext.evaluationPathRemoveLast();
             }
         }
         executionContext.getWalkConfig().getItemWalkListenerRunner().runPostWalkListeners(

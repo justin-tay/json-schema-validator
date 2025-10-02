@@ -88,11 +88,11 @@ public class UnionTypeValidator extends BaseKeywordValidator implements KeywordV
             executionContext.setErrors(test);
             int schemaIndex = 0;
             for (Validator schema : schemas) {
-                executionContext.getEvaluationPath().addLast(schemaIndex);
+                executionContext.evaluationPathAddLast(schemaIndex);
                 try {
                     schema.validate(executionContext, node, rootNode, instanceLocation);
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.evaluationPathRemoveLast();
                 }
                 schemaIndex++;
                 if (test.isEmpty()) {

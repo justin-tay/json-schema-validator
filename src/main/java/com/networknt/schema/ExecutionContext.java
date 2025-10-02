@@ -43,13 +43,26 @@ public class ExecutionContext {
 
     private final Map<NodePath, DiscriminatorState> discriminatorMapping = new HashMap<>();
     
-    final ArrayDeque<Object> evaluationPath = new ArrayDeque<>(64);
+    NodePath evaluationPath;
     final ArrayDeque<Schema> evaluationSchema = new ArrayDeque<>(64);
     final ArrayDeque<Object> evaluationSchemaPath = new ArrayDeque<>(64);
     
-    public ArrayDeque<Object> getEvaluationPath() {
+    public NodePath getEvaluationPath() {
         return evaluationPath;
     }
+
+    public void evaluationPathAddLast(String token) {
+        this.evaluationPath = evaluationPath.append(token);
+    }
+    
+    public void evaluationPathAddLast(int token) {
+        this.evaluationPath = evaluationPath.append(token);
+    }
+
+    public void evaluationPathRemoveLast() {
+        this.evaluationPath = evaluationPath.getParent();
+    }
+
 
     public ArrayDeque<Schema> getEvaluationSchema() {
         return evaluationSchema;

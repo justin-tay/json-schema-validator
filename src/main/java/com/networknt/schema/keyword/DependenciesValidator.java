@@ -78,11 +78,11 @@ public class DependenciesValidator extends BaseKeywordValidator implements Keywo
             }
             Schema schema = schemaDeps.get(pname);
             if (schema != null) {
-                executionContext.getEvaluationPath().addLast(pname);
+                executionContext.evaluationPathAddLast(pname);
                 try {
                     schema.validate(executionContext, node, rootNode, instanceLocation);
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.evaluationPathRemoveLast();
                 }
             }
         }

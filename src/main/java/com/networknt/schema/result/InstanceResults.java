@@ -15,14 +15,12 @@
  */
 package com.networknt.schema.result;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.networknt.schema.SchemaLocation;
-import com.networknt.schema.path.EvaluationPath;
 import com.networknt.schema.path.NodePath;
 
 /**
@@ -35,14 +33,14 @@ public class InstanceResults {
      */
     private final Map<NodePath, List<InstanceResult>> values = new HashMap<>();
 
-    public void setResult(NodePath instanceLocation, SchemaLocation schemaLocation, ArrayDeque<Object> evaluationPath,
+    public void setResult(NodePath instanceLocation, SchemaLocation schemaLocation, NodePath evaluationPath,
             boolean valid) {
-        InstanceResult result = new InstanceResult(instanceLocation, schemaLocation, new EvaluationPath(evaluationPath), valid);
+        InstanceResult result = new InstanceResult(instanceLocation, schemaLocation, evaluationPath, valid);
         List<InstanceResult> v = values.computeIfAbsent(instanceLocation, k -> new ArrayList<>());
         v.add(result);
     }
 
-    public boolean isValid(NodePath instanceLocation, EvaluationPath evaluationPath) {
+    public boolean isValid(NodePath instanceLocation, NodePath evaluationPath) {
         List<InstanceResult> instance = values.get(instanceLocation);
         if (instance != null) {
             for (InstanceResult result : instance) {

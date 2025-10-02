@@ -61,7 +61,7 @@ public class AllOfValidator extends BaseKeywordValidator {
             NodePath instanceLocation, boolean walk) {
         int schemaIndex = 0;
         for (Schema schema : this.schemas) {
-            executionContext.getEvaluationPath().addLast(schemaIndex);
+            executionContext.evaluationPathAddLast(schemaIndex);
             try {
                 if (!walk) {
                     schema.validate(executionContext, node, rootNode, instanceLocation);
@@ -69,7 +69,7 @@ public class AllOfValidator extends BaseKeywordValidator {
                     schema.walk(executionContext, node, rootNode, instanceLocation, true);
                 }
             } finally {
-                executionContext.getEvaluationPath().removeLast();
+                executionContext.evaluationPathRemoveLast();
             }
             schemaIndex++;
         }
@@ -85,11 +85,11 @@ public class AllOfValidator extends BaseKeywordValidator {
         int schemaIndex = 0;
         for (Schema schema : this.schemas) {
             // Walk through the schema
-            executionContext.getEvaluationPath().addLast(schemaIndex);
+            executionContext.evaluationPathAddLast(schemaIndex);
             try {
                 schema.walk(executionContext, node, rootNode, instanceLocation, false);
             } finally {
-                executionContext.getEvaluationPath().removeLast();
+                executionContext.evaluationPathRemoveLast();
             }
             schemaIndex++;
         }

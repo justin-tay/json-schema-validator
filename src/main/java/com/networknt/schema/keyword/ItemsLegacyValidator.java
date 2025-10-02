@@ -140,13 +140,13 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
 
         if (hasAdditionalItem) {
             if (collectAnnotations || collectAnnotations(executionContext, "additionalItems")) {
-                executionContext.getEvaluationPath().addLast("additionalItems");
+                executionContext.evaluationPathAddLast("additionalItems");
                 executionContext.getAnnotations()
                         .put(Annotation.builder().instanceLocation(instanceLocation)
                                 .evaluationPath(executionContext.getEvaluationPath())
                                 .schemaLocation(this.additionalItemsSchemaLocation)
                                 .keyword("additionalItems").value(true).build());
-                executionContext.getEvaluationPath().removeLast();
+                executionContext.evaluationPathRemoveLast();
             }
         }
     }
@@ -163,11 +163,11 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
         } else if (this.tupleSchema != null) {
             if (i < this.tupleSchema.size()) {
                 // validate against tuple schema
-                executionContext.getEvaluationPath().addLast(i);
+                executionContext.evaluationPathAddLast(i);
                 try {
                     this.tupleSchema.get(i).validate(executionContext, node, rootNode, path);
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.evaluationPathRemoveLast();
                 }
                 
             } else {
@@ -177,21 +177,21 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
 
                 if (this.additionalSchema != null) {
                     // validate against additional item schema
-                    executionContext.getEvaluationPath().removeLast(); // remove items
-                    executionContext.getEvaluationPath().addLast("additionalItems");
+                    executionContext.evaluationPathRemoveLast(); // remove items
+                    executionContext.evaluationPathAddLast("additionalItems");
                     try {
                         this.additionalSchema.validate(executionContext, node, rootNode, path);
                     } finally {
-                        executionContext.getEvaluationPath().removeLast();
-                        executionContext.getEvaluationPath().addLast("items");
+                        executionContext.evaluationPathRemoveLast();
+                        executionContext.evaluationPathAddLast("items");
                     }
                 } else if (this.additionalItems != null) {
                     if (this.additionalItems) {
 //                        evaluatedItems.add(path);
                     } else {
                         // no additional item allowed, return error
-                        executionContext.getEvaluationPath().removeLast(); // remove items
-                        executionContext.getEvaluationPath().addLast("additionalItems");
+                        executionContext.evaluationPathRemoveLast(); // remove items
+                        executionContext.evaluationPathAddLast("additionalItems");
                         try  {
                             executionContext.addError(error().instanceNode(rootNode).instanceLocation(instanceLocation)
                                     .keyword("additionalItems")
@@ -203,8 +203,8 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
                                     .index(i)
                                     .arguments(i).build());
                         } finally {
-                            executionContext.getEvaluationPath().removeLast();
-                            executionContext.getEvaluationPath().addLast("items");
+                            executionContext.evaluationPathRemoveLast();
+                            executionContext.evaluationPathAddLast("items");
                         }
                     }
                 }
@@ -285,20 +285,20 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
                             n = defaultNode;
                         }
                     }
-                    executionContext.getEvaluationPath().addLast(i);
+                    executionContext.evaluationPathAddLast(i);
                     try {
                         walkSchema(executionContext, this.tupleSchema.get(i), n, rootNode, instanceLocation.append(i),
                                 shouldValidateSchema, KeywordType.ITEMS_LEGACY.getValue());
                     } finally {
-                        executionContext.getEvaluationPath().removeLast();
+                        executionContext.evaluationPathRemoveLast();
                     }
                 } else {
-                    executionContext.getEvaluationPath().addLast(i);
+                    executionContext.evaluationPathAddLast(i);
                     try {
                         walkSchema(executionContext, this.tupleSchema.get(i), null, rootNode,
                                 instanceLocation.append(i), shouldValidateSchema, KeywordType.ITEMS_LEGACY.getValue());
                     } finally {
-                        executionContext.getEvaluationPath().removeLast();
+                        executionContext.evaluationPathRemoveLast();
                     }
                 }
             }
@@ -335,13 +335,13 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
 
                 if (hasAdditionalItem) {
                     if (collectAnnotations || collectAnnotations(executionContext, "additionalItems")) {
-                        executionContext.getEvaluationPath().addLast("additionalItems");
+                        executionContext.evaluationPathAddLast("additionalItems");
                         executionContext.getAnnotations()
                                 .put(Annotation.builder().instanceLocation(instanceLocation)
                                         .evaluationPath(executionContext.getEvaluationPath())
                                         .schemaLocation(this.additionalItemsSchemaLocation)
                                         .keyword("additionalItems").value(true).build());
-                        executionContext.getEvaluationPath().removeLast();
+                        executionContext.evaluationPathRemoveLast();
                     }
                 }
             }
@@ -363,8 +363,8 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
             NodePath instanceLocation, boolean shouldValidateSchema, String keyword) {
         boolean additionalItems = "additionalItems".equals(keyword);
         if (additionalItems) {
-            executionContext.getEvaluationPath().removeLast(); // remove items
-            executionContext.getEvaluationPath().addLast(keyword);
+            executionContext.evaluationPathRemoveLast(); // remove items
+            executionContext.evaluationPathAddLast(keyword);
         }
         try {
             // TOREMOVE
@@ -386,8 +386,8 @@ public class ItemsLegacyValidator extends BaseKeywordValidator {
                     executionContext.getErrors().subList(currentErrors, executionContext.getErrors().size()));
         } finally {
             if (additionalItems) {
-                executionContext.getEvaluationPath().removeLast();
-                executionContext.getEvaluationPath().addLast("items");
+                executionContext.evaluationPathRemoveLast();
+                executionContext.evaluationPathAddLast("items");
             }
         }
     }

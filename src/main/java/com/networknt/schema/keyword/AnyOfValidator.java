@@ -80,8 +80,8 @@ public class AnyOfValidator extends BaseKeywordValidator {
                     // If schema has type validator and node type doesn't match with schemaType then
                     // ignore it
                     // For union type, it is a must to call TypeValidator
-                    executionContext.getEvaluationPath().addLast(schemaIndex);
-                    executionContext.getEvaluationPath().addLast("type");
+                    executionContext.evaluationPathAddLast(schemaIndex);
+                    executionContext.evaluationPathAddLast("type");
                     try {
                         
                         if (typeValidator.getSchemaType() != JsonType.UNION && !typeValidator.equalsToSchemaType(node, executionContext)) {
@@ -94,11 +94,11 @@ public class AnyOfValidator extends BaseKeywordValidator {
                             continue;
                         }
                     } finally {
-                        executionContext.getEvaluationPath().removeLast();
-                        executionContext.getEvaluationPath().removeLast();
+                        executionContext.evaluationPathRemoveLast();
+                        executionContext.evaluationPathRemoveLast();
                     }
                 }
-                executionContext.getEvaluationPath().addLast(schemaIndex);
+                executionContext.evaluationPathAddLast(schemaIndex);
                 try {
                     if (!walk) {
                         schema.validate(executionContext, node, rootNode, instanceLocation);
@@ -106,7 +106,7 @@ public class AnyOfValidator extends BaseKeywordValidator {
                         schema.walk(executionContext, node, rootNode, instanceLocation, true);
                     }
                 } finally {
-                    executionContext.getEvaluationPath().removeLast();
+                    executionContext.evaluationPathRemoveLast();
                 }
                 schemaIndex++;
 
@@ -217,11 +217,11 @@ public class AnyOfValidator extends BaseKeywordValidator {
         }
         int schemaIndex = 0;
         for (Schema schema : this.schemas) {
-            executionContext.getEvaluationPath().addLast(schemaIndex);
+            executionContext.evaluationPathAddLast(schemaIndex);
             try {
                 schema.walk(executionContext, node, rootNode, instanceLocation, false);
             } finally {
-                executionContext.getEvaluationPath().removeLast();
+                executionContext.evaluationPathRemoveLast();
             }
             schemaIndex++;
         }
