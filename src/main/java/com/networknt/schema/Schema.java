@@ -40,6 +40,7 @@ import com.networknt.schema.path.PathType;
 import com.networknt.schema.resource.ClasspathResourceLoader;
 import com.networknt.schema.resource.InputStreamSource;
 import com.networknt.schema.resource.ResourceLoader;
+import com.networknt.schema.annotation.Annotation;
 import com.networknt.schema.keyword.KeywordType;
 import com.networknt.schema.utils.JsonNodes;
 
@@ -634,7 +635,16 @@ public class Schema implements Validator {
             if (executionContext.getErrors().size() > currentErrors) {
                 // Failed with assertion set result and drop all annotations from this schema
                 // and all subschemas
-                executionContext.getInstanceResults().setResult(instanceLocation, getSchemaLocation(), executionContext.getEvaluationPath(), false);
+                List<Annotation> annotations = executionContext.getAnnotations().asMap().get(instanceLocation);
+                if (annotations != null) {
+                    for (Annotation annotation : annotations) {
+                        if (annotation.getEvaluationPath().startsWith(executionContext.getEvaluationPath())) {
+                            annotation.setValid(false);
+                        }
+                    }
+                }
+                
+                //executionContext.getInstanceResults().setResult(instanceLocation, getSchemaLocation(), executionContext.getEvaluationPath(), false);
             }
         } finally {
             executionContext.evaluationSchema.removeLast();

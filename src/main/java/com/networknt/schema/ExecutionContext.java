@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 import com.networknt.schema.annotation.Annotations;
 import com.networknt.schema.keyword.DiscriminatorState;
 import com.networknt.schema.path.NodePath;
-import com.networknt.schema.result.InstanceResults;
+//import com.networknt.schema.result.InstanceResults;
 import com.networknt.schema.walk.WalkConfig;
 
 /**
@@ -38,7 +38,7 @@ public class ExecutionContext {
     private CollectorContext collectorContext = null;
 
     private Annotations annotations = null;
-    private InstanceResults instanceResults = null;
+//    private InstanceResults instanceResults = null;
     private List<Error> errors = new ArrayList<>();
 
     private final Map<NodePath, DiscriminatorState> discriminatorMapping = new HashMap<>();
@@ -186,12 +186,12 @@ public class ExecutionContext {
         return annotations;
     }
 
-    public InstanceResults getInstanceResults() {
-        if (this.instanceResults == null) {
-            this.instanceResults = new InstanceResults();
-        }
-        return instanceResults;
-    }
+//    public InstanceResults getInstanceResults() {
+//        if (this.instanceResults == null) {
+//            this.instanceResults = new InstanceResults();
+//        }
+//        return instanceResults;
+//    }
 
     /**
      * Determines if the validator should immediately throw a fail fast exception if
