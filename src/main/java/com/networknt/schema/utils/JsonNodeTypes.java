@@ -50,7 +50,7 @@ public class JsonNodeTypes {
 
             // Skip the type validation when the schema is an enum object schema. Since the current type
             // of node itself can be used for type validation.
-            if (isEnumObjectSchema(parentSchema, executionContext) && !config.isStrict("type", Boolean.TRUE)) {
+            if (!config.isStrict("type", Boolean.TRUE) && isEnumObjectSchema(parentSchema, executionContext)) {
                 return true;
             }
             if (config != null && config.isTypeLoose()) {

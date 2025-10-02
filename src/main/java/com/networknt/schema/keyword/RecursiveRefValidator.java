@@ -78,13 +78,6 @@ public class RecursiveRefValidator extends BaseKeywordValidator {
     @Override
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation) {
         Schema refSchema = getSchemaRef(executionContext).getSchema();
-        /*
-        Schema check = getSchema(this.parentSchema, executionContext);
-        if (refSchema != null && !refSchema.getSchemaLocation().equals(check.getSchemaLocation())) {
-            System.out.println(check);
-            System.out.println(refSchema);
-        }
-        */
         if (refSchema == null) {
             Error error = error().keyword(KeywordType.RECURSIVE_REF.getValue())
                     .messageKey("internal.unresolvedRef").message("Reference {0} cannot be resolved")
