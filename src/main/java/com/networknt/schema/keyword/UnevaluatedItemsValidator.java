@@ -72,7 +72,8 @@ public class UnevaluatedItemsValidator extends BaseKeywordValidator {
         boolean evaluated = false;
 
         // Get all the valid adjacent annotations
-        Predicate<Annotation> validEvaluationPathFilter = a -> executionContext.getInstanceResults().isValid(instanceLocation, a.getEvaluationPath());
+        Predicate<Annotation> validEvaluationPathFilter = a -> a.isValid();
+        //Predicate<Annotation> validEvaluationPathFilter = a -> executionContext.getInstanceResults().isValid(instanceLocation, a.getEvaluationPath());
 
         Predicate<Annotation> adjacentEvaluationPathFilter = a -> a.getEvaluationPath()
                 .startsWith(executionContext.getEvaluationPath().getParent());
