@@ -54,7 +54,7 @@ public class RecursiveRefValidator extends BaseKeywordValidator {
         Schema check = null;
         String base = null;
         String baseCheck = null;
-        if (refSchema != null)
+        if (refSchema != null) {
             base = current.getSchemaLocation().getAbsoluteIri() != null ? current.getSchemaLocation().getAbsoluteIri().toString() : "";
             if (current.isRecursiveAnchor()) {
                 // Check dynamic scope
@@ -71,9 +71,6 @@ public class RecursiveRefValidator extends BaseKeywordValidator {
                     }
                 }
             }
-        if (refSchema != null) {
-            System.out.println(refSchema);
-            // refSchema = refSchema.fromRef(parentSchema, evaluationPath);
         }
         return refSchema;
     }

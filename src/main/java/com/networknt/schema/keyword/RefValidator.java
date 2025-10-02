@@ -157,14 +157,14 @@ public class RefValidator extends BaseKeywordValidator {
                                                   String refValue,
                                                   String refValueOriginal
                                                   ) {
-        // This should be processing json pointer fragments only
-        NodePath fragment = SchemaLocation.Fragment.of(refValue);
         String schemaReference = resolve(parent, refValueOriginal);
         // ConcurrentHashMap computeIfAbsent does not allow calls that result in a
         // recursive update to the map.
         // The getSubSchema potentially recurses to call back to getJsonSchema again
         Schema result = schemaContext.getSchemaReferences().get(schemaReference);
         if (result == null) {
+            // This should be processing json pointer fragments only
+            NodePath fragment = SchemaLocation.Fragment.of(refValue);
             synchronized (schemaContext.getSchemaRegistry()) { // acquire lock on shared factory object to prevent deadlock
                 result = schemaContext.getSchemaReferences().get(schemaReference);
                 if (result == null) {
