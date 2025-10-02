@@ -134,13 +134,10 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
         Iterator<Schema> evaluationSchemaIterator = executionContext.getEvaluationSchema().descendingIterator();
         boolean stop = false;
 
-//        ArrayDeque<Object> current = executionContext.getEvaluationSchemaPath().clone();
-//
         // Skip the first as this is the path pointing to the current keyword eg. properties eg /$ref/properties
         // What is needed is the evaluationPath pointing to the current evaluationSchema eg /$ref
         if (evaluationSchemaPathIterator.hasNext()) {
             evaluationSchemaPathIterator.next(); 
-//            current.removeLast();
         }
 
         while (evaluationSchemaIterator.hasNext()) {
@@ -149,24 +146,11 @@ public abstract class AbstractKeywordValidator implements KeywordValidator {
             if (hasKeyword) {
                 return true;
             }
-//            for (KeywordValidator validator : schema.getValidators()) {
-//                if (keyword.equals(validator.getKeyword())) {
-//                    return true;
-//                }
-//            }
-//            String newPath = new EvaluationPath(current).toString();
-//            String oldPath = schema.getEvaluationPath().toString(); 
-//            if (!oldPath.equals(newPath)) {
-//                System.out.println("OLD: "+oldPath);
-//                System.out.println("NEW: "+newPath);
-//            }
-
             if (stop) {
                 return false;
             }
             if (evaluationSchemaPathIterator.hasNext()) {
                 Object evaluationPath = evaluationSchemaPathIterator.next();
-//                current.removeLast();
                 if ("properties".equals(evaluationPath) || "items".equals(evaluationPath)) {
                     // If there is a change in instance location then after the next schema
                     // stop
