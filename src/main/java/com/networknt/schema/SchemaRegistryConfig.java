@@ -107,11 +107,6 @@ public class SchemaRegistryConfig {
     private final boolean preloadSchema;
 
     /**
-     * Controls the max depth of the evaluation path to preload when preloading refs.
-     */
-    private final int preloadSchemaRefMaxNestingDepth;
-
-    /**
      * Used to create {@link com.networknt.schema.regex.RegularExpression}.
      */
     private final RegularExpressionFactory regularExpressionFactory;
@@ -142,7 +137,7 @@ public class SchemaRegistryConfig {
             boolean javaSemantics,
             Locale locale, boolean losslessNarrowing,
             MessageSource messageSource, PathType pathType,
-            boolean preloadSchema, int preloadSchemaRefMaxNestingDepth,
+            boolean preloadSchema,
             RegularExpressionFactory regularExpressionFactory, SchemaIdValidator schemaIdValidator,
             Map<String, Boolean> strictness, boolean typeLoose) {
         super();
@@ -157,7 +152,6 @@ public class SchemaRegistryConfig {
         this.messageSource = messageSource;
         this.pathType = pathType;
         this.preloadSchema = preloadSchema;
-        this.preloadSchemaRefMaxNestingDepth = preloadSchemaRefMaxNestingDepth;
         this.regularExpressionFactory = regularExpressionFactory;
         this.schemaIdValidator = schemaIdValidator;
         this.strictness = strictness;
@@ -219,15 +213,6 @@ public class SchemaRegistryConfig {
      */
     public PathType getPathType() {
         return this.pathType;
-    }
-
-    /**
-     * Gets the max depth of the evaluation path to preload when preloading refs.
-     *
-     * @return the max depth to preload
-     */
-    public int getPreloadSchemaRefMaxNestingDepth() {
-        return preloadSchemaRefMaxNestingDepth;
     }
 
     /**
@@ -352,7 +337,6 @@ public class SchemaRegistryConfig {
         builder.messageSource = config.messageSource;
         builder.pathType = config.pathType;
         builder.preloadSchema = config.preloadSchema;
-        builder.preloadSchemaRefMaxNestingDepth = config.preloadSchemaRefMaxNestingDepth;
         builder.regularExpressionFactory = config.regularExpressionFactory;
         builder.schemaIdValidator = config.schemaIdValidator;
         builder.strictness = config.strictness;
@@ -572,13 +556,11 @@ public class SchemaRegistryConfig {
             this.typeLoose = typeLoose;
             return self();
         }
+
         public SchemaRegistryConfig build() {
-            return new SchemaRegistryConfig(cacheRefs, errorMessageKeyword,
-                    executionContextCustomizer, failFast, formatAssertionsEnabled, 
-                    javaSemantics, locale, losslessNarrowing, messageSource,
-                    pathType, preloadSchema, preloadSchemaRefMaxNestingDepth,
-                    regularExpressionFactory, schemaIdValidator, strictness, typeLoose
-                    );
+            return new SchemaRegistryConfig(cacheRefs, errorMessageKeyword, executionContextCustomizer, failFast,
+                    formatAssertionsEnabled, javaSemantics, locale, losslessNarrowing, messageSource, pathType,
+                    preloadSchema, regularExpressionFactory, schemaIdValidator, strictness, typeLoose);
         }
 
     }
