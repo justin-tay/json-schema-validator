@@ -1,6 +1,6 @@
 package com.networknt.schema.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaContext;
@@ -60,11 +60,11 @@ public class JsonNodeTypes {
                 }
                 if (nodeType == JsonType.STRING) {
                     if (schemaType == JsonType.INTEGER) {
-	                    return Strings.isInteger(node.textValue());
+	                    return Strings.isInteger(node.asString());
                     } else if (schemaType == JsonType.BOOLEAN) {
-	                    return Strings.isBoolean(node.textValue());
+	                    return Strings.isBoolean(node.asString());
                     } else if (schemaType == JsonType.NUMBER) {
-	                    return Strings.isNumeric(node.textValue());
+	                    return Strings.isNumeric(node.asString());
                     }
                 }
             }
@@ -91,7 +91,7 @@ public class JsonNodeTypes {
             return true;
         } else if (config.isTypeLoose()) {
             if (TypeFactory.getValueNodeType(node, config) == JsonType.STRING) {
-                return Strings.isNumeric(node.textValue());
+                return Strings.isNumeric(node.asString());
             }
         }
         return false;

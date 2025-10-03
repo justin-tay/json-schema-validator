@@ -9,8 +9,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 import com.networknt.schema.dialect.Dialects;
 import com.networknt.schema.serialization.JsonMapperFactory;
 
@@ -168,7 +168,7 @@ class QuickStartTest {
     }
 
     @Test
-    void schemaFromJsonNode() throws JsonProcessingException {
+    void schemaFromJsonNode() throws JacksonException {
         SchemaRegistry schemaRegistry = SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_2020_12);
         JsonNode schemaNode = JsonMapperFactory.getInstance().readTree(
                 "{\"$schema\": \"http://json-schema.org/draft-06/schema#\", \"properties\": { \"id\": {\"type\": \"number\"}}}");
