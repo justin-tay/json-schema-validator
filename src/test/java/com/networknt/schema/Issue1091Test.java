@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.networknt.schema.serialization.JsonMapperFactory;
 
 class Issue1091Test {
@@ -35,7 +35,7 @@ class Issue1091Test {
         Schema schema = SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_4, builder -> builder.schemaRegistryConfig(config))
                 .getSchema(SchemaLocation.of("classpath:schema/issue1091.json"));
         JsonNode node = JsonMapperFactory.getInstance()
-                .readTree(Issue1091Test.class.getClassLoader().getResource("data/issue1091.json"));
+                .readTree(Issue1091Test.class.getClassLoader().getResourceAsStream("data/issue1091.json"));
 
         List<String> messages = schema.validate(node)
                 .stream()
