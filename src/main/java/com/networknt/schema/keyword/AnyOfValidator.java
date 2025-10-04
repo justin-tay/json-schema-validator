@@ -75,29 +75,6 @@ public class AnyOfValidator extends BaseKeywordValidator {
             executionContext.setFailFast(false);
             for (Schema schema : this.schemas) {
                 subSchemaErrors.clear(); // Reuse and clear for each run
-                TypeValidator typeValidator = schema.getTypeValidator();
-                if (typeValidator != null) {
-                    // If schema has type validator and node type doesn't match with schemaType then
-                    // ignore it
-                    // For union type, it is a must to call TypeValidator
-                    executionContext.evaluationPathAddLast(schemaIndex);
-                    executionContext.evaluationPathAddLast("type");
-                    try {
-                        
-                        if (typeValidator.getSchemaType() != JsonType.UNION && !typeValidator.equalsToSchemaType(node, executionContext)) {
-                            typeValidator.validate(executionContext, node, rootNode, instanceLocation);
-                            if (allErrors == null) {
-                                allErrors = new ArrayList<>();
-                            }
-                            allErrors.addAll(subSchemaErrors);
-                            schemaIndex++;
-                            continue;
-                        }
-                    } finally {
-                        executionContext.evaluationPathRemoveLast();
-                        executionContext.evaluationPathRemoveLast();
-                    }
-                }
                 executionContext.evaluationPathAddLast(schemaIndex);
                 try {
                     if (!walk) {

@@ -69,7 +69,6 @@ public class Schema implements Validator {
     
     private boolean validatorsLoaded = false;
     private boolean recursiveAnchor = false;
-    private TypeValidator typeValidator = null;
 
     protected final JsonNode schemaNode;
     protected final Schema parentSchema;
@@ -263,7 +262,6 @@ public class Schema implements Validator {
      * @param validators the validators
      * @param validatorsLoaded whether the validators are preloaded
      * @param recursiveAnchor whether this is has a recursive anchor
-     * @param typeValidator the type validator
      * @param id the id
      * @param suppressSubSchemaRetrieval to suppress sub schema retrieval
      * @param schemaNode the schema node
@@ -287,7 +285,6 @@ public class Schema implements Validator {
         this.validators = validators;
         this.validatorsLoaded = validatorsLoaded;
         this.recursiveAnchor = recursiveAnchor;
-        this.typeValidator = typeValidator;
         this.id = id;
         
         this.schemaContext = schemaContext;
@@ -559,10 +556,6 @@ public class Schema implements Validator {
 
                     if ("$ref".equals(pname)) {
                         refValidator = validator;
-                    } else if ("type".equals(pname)) {
-                        if (validator instanceof TypeValidator) {
-                            this.typeValidator = (TypeValidator) validator;
-                        }
                     }
                 }
 
@@ -593,6 +586,9 @@ public class Schema implements Validator {
         // Discriminator needs to run first to set state in the execution context
         if (lhsName.equals("discriminator")) return -1;
         if (rhsName.equals("discriminator")) return 1;
+
+        if (lhsName.equals("type")) return -1;
+        if (rhsName.equals("type")) return 1;
 
         if (lhsName.equals("properties")) return -1;
         if (rhsName.equals("properties")) return 1;
@@ -1564,19 +1560,6 @@ public class Schema implements Validator {
     @Override
     public String toString() {
         return getSchemaNode().toString();
-    }
-
-    public boolean hasTypeValidator() {
-        return getTypeValidator() != null;
-    }
-
-    public TypeValidator getTypeValidator() {
-        // As the validators are lazy loaded the typeValidator is only known if the
-        // validators are not null
-        if (this.validators == null) {
-            getValidators();
-        }
-        return this.typeValidator;
     }
 
     public List<KeywordValidator> getValidators() {
