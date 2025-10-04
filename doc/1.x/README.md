@@ -13,7 +13,7 @@
 
 This is a Java implementation of the [JSON Schema Core Draft v4, v6, v7, v2019-09 and v2020-12](https://json-schema.org/specification) specification for JSON schema validation. This implementation supports [Customizing Meta-Schemas, Vocabularies, Keywords and Formats](doc/custom-meta-schema.md).
 
-In addition, [OpenAPI](doc/openapi.md) 3 request/response validation is supported with the use of the appropriate dialect. For users who want to collect information from a JSON node based on the schema, the [walkers](doc/walkers.md) can help. The JSON parser used is the [Jackson](https://github.com/FasterXML/jackson) parser. As it is a key component in our [light-4j](https://github.com/networknt/light-4j) microservices framework to validate request/response against OpenAPI specification for [light-rest-4j](http://www.networknt.com/style/light-rest-4j/) and RPC schema for [light-hybrid-4j](http://www.networknt.com/style/light-hybrid-4j/) at runtime, performance is the most important aspect in the design.
+In addition, [OpenAPI](doc/openapi.md) 3 request/response validation is supported with the use of the appropriate meta-schema. For users who want to collect information from a JSON node based on the schema, the [walkers](doc/walkers.md) can help. The JSON parser used is the [Jackson](https://github.com/FasterXML/jackson) parser. As it is a key component in our [light-4j](https://github.com/networknt/light-4j) microservices framework to validate request/response against OpenAPI specification for [light-rest-4j](http://www.networknt.com/style/light-rest-4j/) and RPC schema for [light-hybrid-4j](http://www.networknt.com/style/light-hybrid-4j/) at runtime, performance is the most important aspect in the design.
 
 ## JSON Schema Specification compatibility
 
@@ -28,7 +28,7 @@ Information on the compatibility support for each version, including known issue
 
 Since [Draft 2019-09](https://json-schema.org/draft/2019-09/json-schema-validation#rfc.section.7) the `format` keyword only generates annotations by default and does not generate assertions.
 
-This behavior can be overridden to generate assertions by setting the `formatAssertionsEnabled` to `true` in `SchemaRegistryConfig` or `ExecutionConfig`.
+This behavior can be overridden to generate assertions by setting the `setFormatAssertionsEnabled` to `true` in `SchemaValidatorsConfig` or `ExecutionConfig`.
 
 ## Upgrading to new versions
 
@@ -50,15 +50,15 @@ The [Bowtie](https://github.com/bowtie-json-schema/bowtie) project has a [report
 
 #### Performance
 
+This should be the fastest Java JSON Schema Validator implementation.
+
 The following is the benchmark results from the [JSON Schema Validator Perftest](https://github.com/networknt/json-schema-validator-perftest) project that uses the [Java Microbenchmark Harness](https://github.com/openjdk/jmh).
 
 Note that the benchmark results are highly dependent on the input data workloads and schemas used for the validation.
 
-In this case this workload is using the Draft 4 specification and largely tests the performance of the evaluating the `properties` keyword. You may refer to [Results of performance comparison of JVM based JSON Schema Validation Implementations](https://www.creekservice.org/json-schema-validation-comparison/performance#json-schema-test-suite-benchmark) for benchmark results that use the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
+In this case this workload is using the Draft 4 specification and largely tests the performance of the evaluating the `properties` keyword. You may refer to [Results of performance comparison of JVM based JSON Schema Validation Implementations](https://www.creekservice.org/json-schema-validation-comparison/performance#json-schema-test-suite-benchmark) for benchmark results for more typical workloads
 
 If performance is an important consideration, the specific sample workloads should be benchmarked, as there are different performance characteristics when certain keywords are used. For instance the use of the `unevaluatedProperties` or `unevaluatedItems` keyword will trigger annotation collection in the related validators, such as the `properties` or `items` validators, and annotation collection will adversely affect performance.
-
-Special attention should also be made for inefficient schemas using deeply nested `oneOf` or `anyOf` that do not have a condition to short-circuit the evaluation using `if` and `then`. The validator has no choice but to perform all the evaluations, and the error messages would be typically very confusing as it will return all the messages from the children.
 
 ##### NetworkNT 1.4.1
 
@@ -88,7 +88,7 @@ This implementation is tested against the [JSON Schema Test Suite](https://githu
 
 | Implementations | Overall                                                                 | DRAFT_03                                                          | DRAFT_04                                                            | DRAFT_06                                                           | DRAFT_07                                                               | DRAFT_2019_09                                                        | DRAFT_2020_12                                                          |
 |-----------------|-------------------------------------------------------------------------|-------------------------------------------------------------------|---------------------------------------------------------------------|--------------------------------------------------------------------|------------------------------------------------------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------|
-| NetworkNt       | pass: r:4840 (100.0%) o:2421 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%)    |                                                                   | pass: r:610 (100.0%) o:255 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%)  | pass: r:829 (100.0%) o:322 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%) | pass: r:913 (100.0%) o:554 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%)     | pass: r:1227 (100.0%) o:639 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%)  | pass: r:1261 (100.0%) o:651 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%)    |
+| NetworkNt       | pass: r:4803 (100.0%) o:2372 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%)    |                                                                   | pass: r:610 (100.0%) o:251 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%)  | pass: r:822 (100.0%) o:318 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%) | pass: r:906 (100.0%) o:541 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%)     | pass: r:1220 (100.0%) o:625 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%)  | pass: r:1245 (100.0%) o:637 (100.0%)<br>fail: r:0 (0.0%) o:0 (0.0%)    |
 
 * Note that this uses the `JoniRegularExpressionFactory` for the `pattern` and `format` `regex` tests.
 
@@ -102,7 +102,7 @@ The library works with JSON and YAML on both schema definitions and input data.
 
 #### OpenAPI Support
 
-The OpenAPI 3.0 specification is using JSON schema to validate the request/response. The library has support for the OpenAPI 3.0 and OpenAPI 3.1 dialects.
+The OpenAPI 3.0 specification is using JSON schema to validate the request/response, but there are some differences. With a configuration file, you can enable the library to work with OpenAPI 3.0 validation.
 
 #### Minimal Dependencies
 
@@ -238,33 +238,33 @@ dependencies {
 
 The following example demonstrates how inputs are validated against a schema. It comprises the following steps.
 
+* Creating a schema factory with the default schema dialect and how the schemas can be retrieved.
+  * Configuring mapping the `$id` to a retrieval URI using `schemaMappers`.
+  * Configuring how the schemas are loaded using the retrieval URI using `schemaLoaders`.
+    For instance a `Map<String, String> schemas` containing a mapping of retrieval URI to schema data as a `String` can by configured using `builder.schemaLoaders(schemaLoaders -> schemaLoaders.schemas(schemas))`. This also accepts a `Function<String, String> schemaRetrievalFunction`.
 * Creating a configuration for controlling validator behavior.
-* Creating a schema registry with the default schema dialect and how the schemas can be retrieved.
-  * Configuring mapping the `$id` to a retrieval IRI using `schemaIdResolvers`.
-  * Configuring how the schemas are loaded using the retrieval IRI.
-    For instance a `Map<String, String> schemas` containing a mapping of retrieval URI to schema data as a `String` can by configured using `builder.schemas(schemas)`. This also accepts a `Function<String, String> schemaRetrievalFunction`.
-* Loading a schema from a schema location.
+* Loading a schema from a schema location along with the validator configuration.
 * Using the schema to validate the data along with setting any execution specific configuration like for instance the locale or whether format assertions are enabled.
 
 ```java
-SchemaRegistryConfig.Builder builder = SchemaValidatorsConfig.builder();
+// This creates a schema factory that will use Draft 2020-12 as the default if $schema is not specified
+// in the schema data. If $schema is specified in the schema data then that schema dialect will be used
+// instead and this version is ignored.
+JsonSchemaFactory jsonSchemaFactory = JsonSchemaFactory.getInstance(VersionFlag.V202012, builder ->
+    // This creates a mapping from $id which starts with https://www.example.org/ to the retrieval URI classpath:schema/
+    builder.schemaMappers(schemaMappers -> schemaMappers.mapPrefix("https://www.example.org/", "classpath:schema/"))
+);
+
+SchemaValidatorsConfig.Builder builder = SchemaValidatorsConfig.builder();
 // By default the JDK regular expression implementation which is not ECMA 262 compliant is used
 // Note that setting this requires including optional dependencies
 // builder.regularExpressionFactory(GraalJSRegularExpressionFactory.getInstance());
 // builder.regularExpressionFactory(JoniRegularExpressionFactory.getInstance());
-SchemaRegistryConfig config = builder.build();
-
-// This creates a schema registry that supports all the standard dialects and will use Draft 2020-12 as
-// the default if $schema is not specified in the schema data. 
-// If $schema is specified in the schema data then that schema dialect will be used instead and this version is ignored.
-SchemaRegistry schemaRegistry = SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_2020_12,
-        // This creates a mapping from $id which starts with https://www.example.org/schema to the retrieval IRI classpath:schema
-        builder -> builder.schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers
-                .mapPrefix("https://www.example.com/schema", "classpath:schema")));
+SchemaValidatorsConfig config = builder.build();
 
 // Due to the mapping the schema will be retrieved from the classpath at classpath:schema/example-main.json.
 // If the schema data does not specify an $id the absolute IRI of the schema location will be used as the $id.
-Schema schema = schemaRegistry.getSchema(SchemaLocation.of("https://www.example.org/example-main.json"));
+JsonSchema schema = jsonSchemaFactory.getSchema(SchemaLocation.of("https://www.example.org/example-main.json"), config);
 String input = "{\r\n"
     + "  \"main\": {\r\n"
     + "    \"common\": {\r\n"
@@ -273,9 +273,9 @@ String input = "{\r\n"
     + "  }\r\n"
     + "}";
 
-List<Error> errors = schema.validate(input, InputFormat.JSON, executionContext -> {
+Set<ValidationMessage> assertions = schema.validate(input, InputFormat.JSON, executionContext -> {
     // By default since Draft 2019-09 the format keyword only generates annotations and not assertions
-    executionContext.executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true));
+    executionContext.getExecutionConfig().setFormatAssertionsEnabled(true);
 });
 ```
 
