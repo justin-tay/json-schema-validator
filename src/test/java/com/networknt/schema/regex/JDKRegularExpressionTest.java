@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -44,10 +43,33 @@ class JDKRegularExpressionTest {
     }
 
     @Test
-    @Disabled
     void anchorShouldNotMatchMultilineInput() {
         RegularExpression regex = new JDKRegularExpression("^[a-z]{1,10}$");
         assertFalse(regex.matches("abc\n"));
+    }
+
+    @Test
+    void dollarInCharacterClassShouldNotBeInterpretedAsAnchor() {
+        RegularExpression regex = new JDKRegularExpression("^[a$]{1,10}$");
+        assertTrue(regex.matches("a$a$a$a$aa"));
+    }
+
+    @Test
+    void escapedDollarShouldNotBeInterpretedAsAnchor() {
+        RegularExpression regex = new JDKRegularExpression("\\$");
+        assertTrue(regex.matches("$"));
+    }
+
+    @Test
+    void escapedDollarInCharacterClassShouldNotBeInterpretedAsAnchor() {
+        RegularExpression regex = new JDKRegularExpression("[\\$]");
+        assertTrue(regex.matches("$"));
+    }
+
+    @Test
+    void dollarInLiteralQuotingSectionShouldNotBeInterpretedAsAnchor() {
+        RegularExpression regex = new JDKRegularExpression("\\Q$\\E");
+        assertTrue(regex.matches("asd$$a"));
     }
 
     /**

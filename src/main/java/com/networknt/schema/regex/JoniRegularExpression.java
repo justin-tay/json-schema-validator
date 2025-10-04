@@ -4,6 +4,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
+import com.networknt.schema.utils.RegularExpressions;
+
 import org.jcodings.ApplyAllCaseFoldFunction;
 import org.jcodings.CaseFoldCodeItem;
 import org.jcodings.CodeRange;
@@ -50,6 +52,7 @@ class JoniRegularExpression implements RegularExpression {
 
     JoniRegularExpression(String regex, Syntax syntax) {
         validate(regex);
+        regex = RegularExpressions.replaceDollarAnchors(regex);
         byte[] bytes = regex.getBytes(StandardCharsets.UTF_8);
         this.pattern = new Regex(bytes, 0, bytes.length, Option.SINGLELINE, ECMAScriptUTF8Encoding.INSTANCE, syntax);
     }

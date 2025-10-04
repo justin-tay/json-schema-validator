@@ -2,6 +2,8 @@ package com.networknt.schema.regex;
 
 import java.util.regex.Pattern;
 
+import com.networknt.schema.utils.RegularExpressions;
+
 /**
  * JDK {@link RegularExpression}. 
  */
@@ -9,7 +11,7 @@ class JDKRegularExpression implements RegularExpression {
     private final Pattern pattern;
 
     JDKRegularExpression(String regex) {
-        this.pattern = Pattern.compile(regex);
+        this.pattern = Pattern.compile(RegularExpressions.replaceDollarAnchors(regex));
     }
 
     @Override
