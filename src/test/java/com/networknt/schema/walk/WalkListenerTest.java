@@ -88,10 +88,8 @@ class WalkListenerTest {
                 .keywordWalkListener(KeywordType.PROPERTIES.getValue(), new WalkListener() {
                     @Override
                     public WalkFlow onWalkStart(WalkEvent walkEvent) {
-                        @SuppressWarnings("unchecked")
-                        List<WalkEvent> propertyKeywords = (List<WalkEvent>) walkEvent.getExecutionContext()
+                        List<WalkEvent> propertyKeywords = walkEvent.getExecutionContext()
                                 .getCollectorContext()
-                                .getData()
                                 .computeIfAbsent("propertyKeywords", key -> new ArrayList<>());
                         propertyKeywords.add(walkEvent);
                         return WalkFlow.CONTINUE;
@@ -115,27 +113,23 @@ class WalkListenerTest {
                 + "    }\r\n"
                 + "  ]\r\n"
                 + "}";
-        WalkConfig walkConfig = WalkConfig.builder()
-                .keywordWalkListenerRunner(keywordWalkListenerRunner)
-                .build();
-        Result result = schema.walk(inputData, InputFormat.JSON, true, executionContext -> executionContext.setWalkConfig(walkConfig));
+        Result result = schema.walk(inputData, InputFormat.JSON, true, executionContext -> executionContext
+                .walkConfig(walkConfig -> walkConfig.keywordWalkListenerRunner(keywordWalkListenerRunner)));
         assertTrue(result.getErrors().isEmpty());
-        @SuppressWarnings("unchecked")
-        List<WalkEvent> propertyKeywords = (List<WalkEvent>) result.getExecutionContext().getCollectorContext().get("propertyKeywords"); 
+        List<WalkEvent> propertyKeywords = result.getCollectorContext().get("propertyKeywords");
         assertEquals(3, propertyKeywords.size());
         assertEquals("properties", propertyKeywords.get(0).getValidator().getKeyword());
         assertEquals("", propertyKeywords.get(0).getInstanceLocation().toString());
-        //assertEquals("/properties", propertyKeywords.get(0).getEvaluationPath()
-        //        .append(propertyKeywords.get(0).getKeyword()).toString());
+        assertEquals("/properties",
+                propertyKeywords.get(0).getEvaluationPath().append(propertyKeywords.get(0).getKeyword()).toString());
         assertEquals("/tags/0", propertyKeywords.get(1).getInstanceLocation().toString());
         assertEquals("image", propertyKeywords.get(1).getInstanceNode().get("name").asText());
-        //assertEquals("/properties/tags/items/$ref/properties",
-        //        propertyKeywords.get(1).getValidator().getEvaluationPath().toString());
-        //assertEquals("/properties/tags/items/$ref/properties", propertyKeywords.get(1).getEvaluationPath()
-        //        .append(propertyKeywords.get(1).getKeyword()).toString());
+        assertEquals("/properties/tags/items/$ref", propertyKeywords.get(1).getEvaluationPath().toString());
+        assertEquals("/properties/tags/items/$ref/properties",
+                propertyKeywords.get(1).getEvaluationPath().append(propertyKeywords.get(1).getKeyword()).toString());
         assertEquals("/tags/1", propertyKeywords.get(2).getInstanceLocation().toString());
-        //assertEquals("/properties/tags/items/$ref/properties", propertyKeywords.get(2).getEvaluationPath()
-        //        .append(propertyKeywords.get(2).getKeyword()).toString());
+        assertEquals("/properties/tags/items/$ref/properties",
+                propertyKeywords.get(2).getEvaluationPath().append(propertyKeywords.get(2).getKeyword()).toString());
         assertEquals("link", propertyKeywords.get(2).getInstanceNode().get("name").asText());
     }
 
