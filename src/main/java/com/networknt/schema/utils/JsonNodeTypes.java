@@ -17,7 +17,7 @@ public class JsonNodeTypes {
 
     public static boolean isNodeNullable(JsonNode schema){
         JsonNode nullable = schema.get(NULLABLE);
-	    return nullable != null && nullable.asBoolean();
+        return nullable != null && nullable.asBoolean();
     }
 
     public static boolean equalsToSchemaType(JsonNode node, JsonType schemaType, Schema parentSchema, SchemaContext schemaContext, ExecutionContext executionContext) {
@@ -53,18 +53,18 @@ public class JsonNodeTypes {
             if (!config.isStrict("type", Boolean.TRUE) && isEnumObjectSchema(parentSchema, executionContext)) {
                 return true;
             }
-            if (config != null && config.isTypeLoose()) {
+            if (config.isTypeLoose()) {
                 // if typeLoose is true, everything can be a size 1 array
                 if (schemaType == JsonType.ARRAY) {
                     return true;
                 }
                 if (nodeType == JsonType.STRING) {
                     if (schemaType == JsonType.INTEGER) {
-	                    return Strings.isInteger(node.textValue());
+                        return Strings.isInteger(node.textValue());
                     } else if (schemaType == JsonType.BOOLEAN) {
-	                    return Strings.isBoolean(node.textValue());
+                        return Strings.isBoolean(node.textValue());
                     } else if (schemaType == JsonType.NUMBER) {
-	                    return Strings.isNumeric(node.textValue());
+                        return Strings.isNumeric(node.textValue());
                     }
                 }
             }

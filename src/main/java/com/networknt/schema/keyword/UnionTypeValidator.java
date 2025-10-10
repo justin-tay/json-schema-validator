@@ -57,12 +57,9 @@ public class UnionTypeValidator extends BaseKeywordValidator implements KeywordV
             sep = ", ";
 
             if (n.isObject()) {
-                // TODO: Check if the evaluation path is really as follows... 
-                schemas.add(schemaContext.newSchema(schemaLocation.append(KeywordType.TYPE.getValue()),
-                        n, parentSchema));
+                schemas.add(schemaContext.newSchema(schemaLocation.append(i), n, parentSchema));
             } else {
-                schemas.add(new TypeValidator(schemaLocation.append(i), n, parentSchema,
-                        schemaContext));
+                schemas.add(new TypeValidator(schemaLocation.append(i), n, parentSchema, schemaContext));
             }
             i++;
         }
