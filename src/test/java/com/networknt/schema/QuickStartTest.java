@@ -3,7 +3,6 @@ package com.networknt.schema;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -19,7 +18,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.dialect.Dialects;
 import com.networknt.schema.output.OutputUnit;
 import com.networknt.schema.regex.JoniRegularExpressionFactory;
-import com.networknt.schema.resource.SchemaIdResolver;
 import com.networknt.schema.serialization.JsonMapperFactory;
 import com.networknt.schema.utils.JsonNodes;
 
