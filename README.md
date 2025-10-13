@@ -65,26 +65,26 @@ If performance is an important consideration, the specific sample workloads shou
 
 Special attention should also be made for inefficient schemas using deeply nested `oneOf` or `anyOf` that do not have a condition to short-circuit the evaluation using `if` and `then`. The validator has no choice but to perform all the evaluations, and the error messages would be typically very confusing as it will return all the messages from the children.
 
-##### NetworkNT 1.4.1
+##### NetworkNT 2.0.0
 
 ```
-Benchmark                                            Mode  Cnt      Score    Error   Units
-NetworkntBenchmark.testValidate                     thrpt   10   8352.126 ± 61.870   ops/s
-NetworkntBenchmark.testValidate:gc.alloc.rate       thrpt   10    721.296 ±  5.342  MB/sec
-NetworkntBenchmark.testValidate:gc.alloc.rate.norm  thrpt   10  90560.013 ±  0.001    B/op
-NetworkntBenchmark.testValidate:gc.count            thrpt   10     61.000           counts
-NetworkntBenchmark.testValidate:gc.time             thrpt   10     68.000               ms
+Benchmark                                     Mode  Cnt       Score     Error   Units
+NetworkntBenchmark.basic                     thrpt   10    5297.105 ± 290.078   ops/s
+NetworkntBenchmark.basic:gc.alloc.rate       thrpt   10    1618.328 ±  88.626  MB/sec
+NetworkntBenchmark.basic:gc.alloc.rate.norm  thrpt   10  320360.020 ±   0.002    B/op
+NetworkntBenchmark.basic:gc.count            thrpt   10     365.000            counts
+NetworkntBenchmark.basic:gc.time             thrpt   10     130.000                ms
 ```
 
-###### Everit 1.14.1
+###### Everit 1.14.6
 
 ```
-Benchmark                                            Mode  Cnt       Score    Error   Units
-EveritBenchmark.testValidate                        thrpt   10    3775.453 ± 44.023   ops/s
-EveritBenchmark.testValidate:gc.alloc.rate          thrpt   10    1667.345 ± 19.437  MB/sec
-EveritBenchmark.testValidate:gc.alloc.rate.norm     thrpt   10  463104.030 ±  0.003    B/op
-EveritBenchmark.testValidate:gc.count               thrpt   10     140.000           counts
-EveritBenchmark.testValidate:gc.time                thrpt   10     158.000               ms
+Benchmark                                     Mode  Cnt       Score     Error   Units
+EveritBenchmark.basic                        thrpt   10    4615.637 ± 151.195   ops/s
+EveritBenchmark.basic:gc.alloc.rate          thrpt   10    2097.810 ±  68.708  MB/sec
+EveritBenchmark.basic:gc.alloc.rate.norm     thrpt   10  476592.023 ±   0.001    B/op
+EveritBenchmark.basic:gc.count               thrpt   10     521.000            counts
+EveritBenchmark.basic:gc.time                thrpt   10     170.000                ms
 ```
 
 #### Functionality
