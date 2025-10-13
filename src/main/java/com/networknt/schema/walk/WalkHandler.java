@@ -9,12 +9,15 @@ import com.networknt.schema.Error;
 
 import java.util.List;
 
-public interface WalkListenerRunner {
+/**
+ * Walk handler that is called before and after visiting.
+ */
+public interface WalkHandler {
 
-    boolean runPreWalkListeners(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
-                                JsonNode rootNode, NodePath instanceLocation, Schema schema, KeywordValidator validator);
+    boolean preWalk(ExecutionContext executionContext, String keyword, JsonNode instanceNode, JsonNode rootNode,
+            NodePath instanceLocation, Schema schema, KeywordValidator validator);
 
-    void runPostWalkListeners(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
-                              JsonNode rootNode, NodePath instanceLocation, Schema schema, KeywordValidator validator, List<Error> errors);
+    void postWalk(ExecutionContext executionContext, String keyword, JsonNode instanceNode, JsonNode rootNode,
+            NodePath instanceLocation, Schema schema, KeywordValidator validator, List<Error> errors);
 
 }

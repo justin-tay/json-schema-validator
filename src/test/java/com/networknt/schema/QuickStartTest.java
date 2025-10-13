@@ -1,8 +1,11 @@
 package com.networknt.schema;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.dialect.Dialects;
 import com.networknt.schema.output.OutputUnit;
 import com.networknt.schema.regex.JoniRegularExpressionFactory;
+import com.networknt.schema.resource.SchemaIdResolver;
 import com.networknt.schema.serialization.JsonMapperFactory;
 import com.networknt.schema.utils.JsonNodes;
 
@@ -341,5 +345,34 @@ class QuickStartTest {
                 executionContext -> executionContext
                         .executionConfig(executionConfig -> executionConfig.formatAssertionsEnabled(true)));
         assertEquals(1, errors.size());
+    }
+    
+    @Test
+    void defaults() throws IOException {
+        String schemaData = "{\r\n"
+                + "  \"$schema\": \"http://json-schema.org/draft-04/schema#\",\r\n"
+                + "  \"title\": \"Schema with default values \",\r\n"
+                + "  \"type\": \"object\",\r\n"
+                + "  \"properties\": {\r\n"
+                + "    \"intValue\": {\r\n"
+                + "      \"type\": \"integer\",\r\n"
+                + "      \"default\": 15, \r\n"
+                + "      \"minimum\": 20\r\n"
+                + "    }\r\n"
+                + "  },\r\n"
+                + "  \"required\": [\"intValue\"]\r\n"
+                + "}";
+        
+        String inputData = "{}";
+        
+        SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(Dialects.getDraft4());
+        Schema schema =  schemaRegistry.getSchema(schemaData);
+
+        JsonNode inputNode = JsonMapperFactory.getInstance().readTree(inputData);
+        Result result = schema.walk(inputNode, true, executionContext -> executionContext.walkConfig(
+                walkConfig -> walkConfig.applyDefaultsStrategy(applyDefaultsStrategy -> applyDefaultsStrategy
+                        .applyArrayDefaults(true).applyPropertyDefaults(true).applyPropertyDefaultsIfNull(true))));
+        assertFalse(result.getErrors().isEmpty());
+        assertEquals("{\"intValue\":15}", inputNode.toString());
     }
 }

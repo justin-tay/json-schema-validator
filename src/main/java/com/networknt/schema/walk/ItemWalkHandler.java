@@ -28,18 +28,18 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * A {@link WalkListenerRunner} for walking items.
+ * A {@link WalkHandler} for walking items.
  */
-public class ItemWalkListenerRunner extends AbstractWalkListenerRunner {
+public class ItemWalkHandler extends AbstractWalkHandler {
 
     private final List<WalkListener> itemWalkListeners;
 
-    public ItemWalkListenerRunner(List<WalkListener> itemWalkListeners) {
+    public ItemWalkHandler(List<WalkListener> itemWalkListeners) {
         this.itemWalkListeners = itemWalkListeners;
     }
 
     @Override
-    public boolean runPreWalkListeners(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
+    public boolean preWalk(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
             JsonNode rootNode, NodePath instanceLocation, Schema schema, KeywordValidator validator) {
         WalkEvent walkEvent = constructWalkEvent(executionContext, keyword, instanceNode, rootNode, instanceLocation,
                 schema, validator);
@@ -47,7 +47,7 @@ public class ItemWalkListenerRunner extends AbstractWalkListenerRunner {
     }
 
     @Override
-    public void runPostWalkListeners(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
+    public void postWalk(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
             JsonNode rootNode, NodePath instanceLocation, Schema schema, KeywordValidator validator, List<Error> errors) {
         WalkEvent walkEvent = constructWalkEvent(executionContext, keyword, instanceNode, rootNode, instanceLocation,
                 schema, validator);
@@ -71,8 +71,8 @@ public class ItemWalkListenerRunner extends AbstractWalkListenerRunner {
             return this;
         }
 
-        public ItemWalkListenerRunner build() {
-            return new ItemWalkListenerRunner(itemWalkListeners);
+        public ItemWalkHandler build() {
+            return new ItemWalkHandler(itemWalkListeners);
         }
     }
 

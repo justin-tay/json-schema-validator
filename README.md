@@ -366,8 +366,8 @@ Assertions contains the following additional information
 | Message Key   | The message key used for generating the message for localization.                                                                                                                                                                                                                                                             |
 | Arguments     | The arguments used for generating the message.                                                                                                                                                                                                                                                                                |
 | Keyword       | The keyword that generated the message.                                                                                                                                                                                                                                                                                       |
-| Schema Node   | The `JsonNode` pointed to by the Schema Location. This is the schema data that caused the input data to fail. It is possible to get the location information by configuring the `JsonSchemaFactory` with a `JsonNodeReader` that uses the `LocationJsonNodeFactoryFactory` and using `JsonNodes.tokenLocationOf(schemaNode)`. |
-| Instance Node | The `JsonNode` pointed to by the Instance Location. This is the input data that failed validation. It is possible to get the location information by configuring the `JsonSchemaFactory` with a `JsonNodeReader` that uses the `LocationJsonNodeFactoryFactory` and using `JsonNodes.tokenLocationOf(instanceNode)`.          |
+| Schema Node   | The `JsonNode` pointed to by the Schema Location. This is the schema data that caused the input data to fail. It is possible to get the location information by configuring the `SchemaRegistry` with a `NodeReader` that uses the `LocationJsonNodeFactoryFactory` and using `JsonNodes.tokenStreamLocationOf(schemaNode)`. |
+| Instance Node | The `JsonNode` pointed to by the Instance Location. This is the input data that failed validation. It is possible to get the location information by configuring the `SchemaRegistry` with a `NodeReader` that uses the `LocationJsonNodeFactoryFactory` and using `JsonNodes.tokenStreamLocationOf(instanceNode)`.          |
 | Error         | The error.                                                                                                                                                                                                                                                                                                                    |
 | Details       | Additional details that can be set by custom keyword validator implementations. The library will set the `property` and `index` details for certain errors. For instane the `required` keyword will set the `property`. Note that this is not part of the instance location as that points to the instance node.              |
 
@@ -381,7 +381,7 @@ Annotations contains the following additional information
 
 The library can be configured to store line and column information in the `JsonNode` instances for the instance and schema nodes. This will adversely affect performance and is not configured by default.
 
-This is done by configuring a `NodeReader` that uses the `LocationJsonNodeFactoryFactory`on the `SchemaRegistry`. The `JsonLocation` information can then be retrieved using `JsonNodes.tokenStreamLocationOf(jsonNode)`.
+This is done by configuring a `NodeReader` that uses the `LocationJsonNodeFactoryFactory` on the `SchemaRegistry`. The `JsonLocation` information can then be retrieved using `JsonNodes.tokenStreamLocationOf(jsonNode)`.
 
 ```java
 String schemaData = "{\r\n"
@@ -554,13 +554,13 @@ The following is sample output from the Hierarchical format.
 | `failFast`                   | Whether to return failure immediately when an assertion is generated.                                                                                                                                                                             | `false`                                     |
 | `formatAssertionsEnabled`    | The default is to generate format assertions from Draft 4 to Draft 7 and to only generate annotations from Draft 2019-09. Setting to `true` or `false` will override the default behavior.                                                        | `null`                                      |
 | `locale`                     | The locale to use for generating messages in `Error`.                                                                                                                                                                                             | `Locale.getDefault()`                       |
-| `losslessNarrowing`          | Whether lossless narrowing is used for the `type` keyword.                                                                                                                                                                                        | `false`                                     |
+| `losslessNarrowing`          | Whether lossless narrowing is used for the `type` keyword. Since Draft 6 a value of `1.0` is interpreted as an integer whether or not this is enabled.                                                                                            | `false`                                     |
 | `messageSource`              | This is used to retrieve the locale specific messages.                                                                                                                                                                                            | `DefaultMessageSource.getInstance()`        |
 | `pathType`                   | The path type to use for reporting the instance location and evaluation path. Set to `PathType.JSON_PATH` to use JSON Path.                                                                                                                       | `PathType.JSON_POINTER`                     |
-| `preloadJsonSchema`          | Whether the schema will be preloaded before processing any input. This will use memory but the execution of the validation will be faster.                                                                                                        | `true`                                      |
+| `preloadSchema`              | Whether the schema will be preloaded before processing any input. This will use memory but the execution of the validation will be faster.                                                                                                        | `true`                                      |
 | `regularExpressionFactory`   | The factory to use to create regular expressions for instance `JoniRegularExpressionFactory` or `GraalJSRegularExpressionFactory`. This requires the dependency to be manually added to the project or a `ClassNotFoundException` will be thrown. | `JDKRegularExpressionFactory.getInstance()` |
 | `schemaIdValidator`          | This is used to customize how the `$id` values are validated. Note that the default implementation allows non-empty fragments where no base IRI is specified and also allows non-absolute IRI `$id` values in the root schema.                    | `JsonSchemaIdValidator.DEFAULT`             |
-| `strict`                     | This is set whether keywords are strict in their validation. What this does depends on the individual validators.                                                                                                                                 |
+| `strict`                     | This is set whether keywords are strict in their validation. What this does depends on the individual validators.                                                                                                                                 |                                             |
 | `typeLoose`                  | Whether types are interpreted in a loose manner. If set to true, a single value can be interpreted as a size 1 array. Strings may also be interpreted as number, integer or boolean.                                                              | `false`                                     |
 
 ### Walk Configuration
@@ -568,9 +568,9 @@ The following is sample output from the Hierarchical format.
 | Name                         | Description                                                                                 | Default Value                                         |
 | ---------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | `applyDefaultsStrategy`      | The strategy for applying defaults when walking when missing or null nodes are encountered. | `ApplyDefaultsStrategy.EMPTY_APPLY_DEFAULTS_STRATEGY` |
-| `keywordWalkListenerRunner`  | The `WalkListenerRunner` triggered for keywords.                                            | `NoOpWalkListenerRunner.getInstance()`                |
-| `propertyWalkListenerRunner` | The `WalkListenerRunner` triggered for properties.                                          | `NoOpWalkListenerRunner.getInstance()`                |
-| `itemWalkListenerRunner`     | The `WalkListenerRunner` triggered for items.                                               | `NoOpWalkListenerRunner.getInstance()`                |
+| `keywordWalkHandler`         | The `WalkHandler` triggered for keywords.                                                   | `NoOpWalkHandler.getInstance()`                       |
+| `propertyWalkHandler`        | The `WalkHandler` triggered for properties.                                                 | `NoOpWalkHandler.getInstance()`                       |
+| `itemWalkHandler`            | The `WalkHandler` triggered for items.                                                      | `NoOpWalkHandler.getInstance()`                       |
 
 ## Performance Considerations
 
@@ -603,7 +603,7 @@ The library assumes that the schemas being loaded are trusted. This security mod
 
 ## [OpenAPI Specification](doc/openapi.md)
 
-## [JSON Schema Walkers and WalkListeners](doc/walkers.md)
+## [Schema Walkers](doc/walkers.md)
 
 ## [Regular Expressions](doc/ecma-262.md)
 

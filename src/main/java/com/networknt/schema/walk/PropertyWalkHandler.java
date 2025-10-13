@@ -28,18 +28,18 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * A {@link WalkListenerRunner} for walking properties.
+ * A {@link WalkHandler} for walking properties.
  */
-public class PropertyWalkListenerRunner extends AbstractWalkListenerRunner {
+public class PropertyWalkHandler extends AbstractWalkHandler {
 
     private final List<WalkListener> propertyWalkListeners;
 
-    public PropertyWalkListenerRunner(List<WalkListener> propertyWalkListeners) {
+    public PropertyWalkHandler(List<WalkListener> propertyWalkListeners) {
         this.propertyWalkListeners = propertyWalkListeners;
     }
 
     @Override
-    public boolean runPreWalkListeners(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
+    public boolean preWalk(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
             JsonNode rootNode, NodePath instanceLocation, Schema schema, KeywordValidator validator) {
         WalkEvent walkEvent = constructWalkEvent(executionContext, keyword, instanceNode, rootNode, instanceLocation,
                 schema, validator);
@@ -47,7 +47,7 @@ public class PropertyWalkListenerRunner extends AbstractWalkListenerRunner {
     }
 
     @Override
-    public void runPostWalkListeners(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
+    public void postWalk(ExecutionContext executionContext, String keyword, JsonNode instanceNode,
             JsonNode rootNode, NodePath instanceLocation, Schema schema, KeywordValidator validator,
             List<Error> errors) {
         WalkEvent walkEvent = constructWalkEvent(executionContext, keyword, instanceNode, rootNode, instanceLocation,
@@ -72,8 +72,8 @@ public class PropertyWalkListenerRunner extends AbstractWalkListenerRunner {
             return this;
         }
 
-        public PropertyWalkListenerRunner build() {
-            return new PropertyWalkListenerRunner(propertyWalkListeners);
+        public PropertyWalkHandler build() {
+            return new PropertyWalkHandler(propertyWalkListeners);
         }
     }
 }
