@@ -17,6 +17,8 @@
 package com.networknt.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.SpecVersion.VersionFlag;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,7 +145,8 @@ public class RefValidator extends BaseJsonValidator {
     private static String resolve(JsonSchema parentSchema, String refValue) {
         // $ref prevents a sibling $id from changing the base uri
         JsonSchema base = parentSchema;
-        if (parentSchema.getId() != null && parentSchema.parentSchema != null) {
+        if (parentSchema.getId() != null && parentSchema.parentSchema != null && parentSchema.getValidationContext()
+                .getMetaSchema().getSpecification().getVersionFlagValue() <= VersionFlag.V7.getVersionFlagValue()) {
             base = parentSchema.parentSchema;
         }
         return SchemaLocation.resolve(base.getSchemaLocation(), refValue);
