@@ -30,7 +30,6 @@ import com.networknt.schema.utils.Strings;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -44,7 +43,7 @@ import java.util.function.Supplier;
  */
 @JsonIgnoreProperties({ "messageSupplier", "schemaNode", "instanceNode", "valid" })
 @JsonPropertyOrder({ "keyword", "instanceLocation", "message", "evaluationPath", "schemaLocation",
-        "messageKey", "arguments", "details" })
+        "messageKey", "arguments", "details", "property", "index" })
 @JsonInclude(Include.NON_NULL)
 public class Error {
     private final String keyword;
@@ -60,10 +59,12 @@ public class Error {
     private final Map<String, Object> details;
     private final JsonNode instanceNode;
     private final JsonNode schemaNode;
+    private final String property;
+    private final Integer index;
 
     Error(String keyword, NodePath evaluationPath, SchemaLocation schemaLocation,
             NodePath instanceLocation, Object[] arguments, Map<String, Object> details,
-            String messageKey, Supplier<String> messageSupplier, JsonNode instanceNode, JsonNode schemaNode) {
+            String messageKey, Supplier<String> messageSupplier, JsonNode instanceNode, JsonNode schemaNode, String property, Integer index) {
         super();
         this.keyword = keyword;
         this.instanceLocation = instanceLocation;
@@ -75,6 +76,8 @@ public class Error {
         this.messageSupplier = messageSupplier;
         this.instanceNode = instanceNode;
         this.schemaNode = schemaNode;
+        this.property = property;
+        this.index = index;
     }
 
     /**
@@ -142,17 +145,11 @@ public class Error {
      * @return the property name
      */
     public String getProperty() {
-        if (details == null) {
-            return null;
-        }
-        return (String) getDetails().get("property");
+        return this.property;
     }
 
     public Integer getIndex() {
-        if (details == null) {
-            return null;
-        }
-        return (Integer) getDetails().get("index");
+        return this.index;
     }
 
     public Object[] getArguments() {
@@ -207,6 +204,8 @@ public class Error {
         if (evaluationPath != null ? !evaluationPath.equals(that.evaluationPath) : that.evaluationPath != null) return false;
         if (details != null ? !details.equals(that.details) : that.details != null) return false;
         if (messageKey != null ? !messageKey.equals(that.messageKey) : that.messageKey != null) return false;
+        if (property != null ? !property.equals(that.property) : that.property != null) return false;
+        if (index != null ? !index.equals(that.index) : that.index != null) return false;
 	    return Arrays.equals(arguments, that.arguments);
     }
 
@@ -218,6 +217,8 @@ public class Error {
         result = 31 * result + (details != null ? details.hashCode() : 0);
         result = 31 * result + (arguments != null ? Arrays.hashCode(arguments) : 0);
         result = 31 * result + (messageKey != null ? messageKey.hashCode() : 0);
+        result = 31 * result + (property != null ? property.hashCode() : 0);
+        result = 31 * result + (index != null ? index.hashCode() : 0);
         return result;
     }
 
@@ -252,25 +253,21 @@ public class Error {
         protected String messageKey;
         protected JsonNode instanceNode;
         protected JsonNode schemaNode;
+        protected String property;
+        protected Integer index;
 
         public S keyword(String keyword) {
             this.keyword = keyword;
             return self();
         }
 
-        public S property(String properties) {
-            if (this.details == null) {
-                this.details = new HashMap<>();
-            }
-            this.details.put("property", properties);
+        public S property(String property) {
+            this.property = property;
             return self();
         }
 
         public S index(Integer index) {
-            if (this.details == null) {
-                this.details = new HashMap<>();
-            }
-            this.details.put("index", index);
+            this.index = index;
             return self();
         }
 
@@ -388,7 +385,7 @@ public class Error {
                 });
             }
             return new Error(keyword, evaluationPath, schemaLocation, instanceLocation,
-                    arguments, details, messageKey, messageSupplier, this.instanceNode, this.schemaNode);
+                    arguments, details, messageKey, messageSupplier, this.instanceNode, this.schemaNode, this.property, this.index);
         }
 
         protected Object[] getMessageArguments() {

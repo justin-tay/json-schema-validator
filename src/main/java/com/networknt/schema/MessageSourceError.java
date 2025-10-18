@@ -56,8 +56,8 @@ public class MessageSourceError {
             String messagePattern = null;
             if (this.errorMessage != null) {
                 messagePattern = this.errorMessage.get("");
-                if (this.details != null && this.details.get("property") != null) {
-                    String specificMessagePattern = this.errorMessage.get(this.details.get("property"));
+                if (this.property != null) {
+                    String specificMessagePattern = this.errorMessage.get(this.property);
                     if (specificMessagePattern != null) {
                         messagePattern = specificMessagePattern;
                     }
