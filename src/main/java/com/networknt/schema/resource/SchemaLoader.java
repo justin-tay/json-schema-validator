@@ -107,7 +107,9 @@ public class SchemaLoader {
             }
         }
         AbsoluteIri mappedResult = absoluteIri;
-        for (SchemaIdResolver mapper : schemaIdResolvers) {
+        int schemaIdResolversSize = schemaIdResolvers.size();
+        for (int x = 0; x < schemaIdResolversSize; x++) {
+            SchemaIdResolver mapper = schemaIdResolvers.get(x);
             AbsoluteIri mapped = mapper.resolve(mappedResult);
             if (mapped != null) {
                 mappedResult = mapped;
@@ -121,7 +123,9 @@ public class SchemaLoader {
         if (result != null) {
             return result;
         }
-        for (ResourceLoader loader : resourceLoaders) {
+        int resourceLoadersSize = resourceLoaders.size();
+        for (int x = 0; x < resourceLoadersSize; x++) {
+            ResourceLoader loader = resourceLoaders.get(x);
             result = loader.getResource(mappedResult);
             if (result != null) {
                 return result;

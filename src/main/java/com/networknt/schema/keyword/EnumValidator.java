@@ -144,7 +144,8 @@ public class EnumValidator extends BaseKeywordValidator implements KeywordValida
             return node;
         }
         ArrayNode a = node.deepCopy();
-        for (int x = 0; x < a.size(); x++) {
+        int size = a.size();
+        for (int x = 0; x < size; x++) {
             JsonNode v = a.get(x);
             if (v.isNumber()) {
                 v = processNumberNode(v);
@@ -161,7 +162,8 @@ public class EnumValidator extends BaseKeywordValidator implements KeywordValida
      * @return the node
      */
     protected boolean hasNumber(ArrayNode node) {
-        for (int x = 0; x < node.size(); x++) {
+        int size = node.size();
+        for (int x = 0; x < size; x++) {
             JsonNode v = node.get(x);
             if (v.isNumber()) {
                 return true;
