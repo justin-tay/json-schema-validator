@@ -172,7 +172,9 @@ public class AdditionalPropertiesValidator extends BaseKeywordValidator {
     }
 
     private boolean handledByPatternProperties(String pname) {
-        for (RegularExpression pattern : this.patternProperties) {
+        int size = this.patternProperties.size();
+        for (int x = 0; x < size; x++) {
+            RegularExpression pattern = this.patternProperties.get(x);
             if (pattern.matches(pname)) {
                 return true;
             }

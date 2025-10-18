@@ -22,6 +22,7 @@ import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.path.NodePath;
+import com.networknt.schema.utils.Flag;
 import com.networknt.schema.SchemaContext;
 
 import java.util.*;
@@ -30,37 +31,33 @@ import java.util.*;
  * {@link KeywordValidator} for if.
  */
 public class IfValidator extends BaseKeywordValidator {
-    private static final List<String> KEYWORDS = Arrays.asList("if", "then", "else");
-
     private final Schema ifSchema;
     private final Schema thenSchema;
     private final Schema elseSchema;
 
     public IfValidator(SchemaLocation schemaLocation, JsonNode schemaNode, Schema parentSchema, SchemaContext schemaContext) {
         super(KeywordType.IF_THEN_ELSE, schemaNode, schemaLocation, parentSchema, schemaContext);
-
-        Schema foundIfSchema = null;
-        Schema foundThenSchema = null;
-        Schema foundElseSchema = null;
-
-        for (final String keyword : KEYWORDS) {
-            final JsonNode node = parentSchema.getSchemaNode().get(keyword);
-            final SchemaLocation schemaLocationOfSchema = parentSchema.getSchemaLocation().append(keyword);
-            if (keyword.equals("if")) {
-                foundIfSchema = schemaContext.newSchema(schemaLocationOfSchema, node,
-                        parentSchema);
-            } else if (keyword.equals("then") && node != null) {
-                foundThenSchema = schemaContext.newSchema(schemaLocationOfSchema, node,
-                        parentSchema);
-            } else if (keyword.equals("else") && node != null) {
-                foundElseSchema = schemaContext.newSchema(schemaLocationOfSchema, node,
-                        parentSchema);
-            }
+        JsonNode node = parentSchema.getSchemaNode().get("if");
+        if (node != null) {
+            SchemaLocation schemaLocationOfSchema = parentSchema.getSchemaLocation().append("if");
+            this.ifSchema = schemaContext.newSchema(schemaLocationOfSchema, node, parentSchema);
+        } else {
+            this.ifSchema = null;
         }
-
-        this.ifSchema = foundIfSchema;
-        this.thenSchema = foundThenSchema;
-        this.elseSchema = foundElseSchema;
+        node = parentSchema.getSchemaNode().get("then");
+        if (node != null) {
+            SchemaLocation schemaLocationOfSchema = parentSchema.getSchemaLocation().append("then");
+            this.thenSchema = schemaContext.newSchema(schemaLocationOfSchema, node, parentSchema);
+        } else {
+            this.thenSchema = null;
+        }
+        node = parentSchema.getSchemaNode().get("else");
+        if (node != null) {
+            SchemaLocation schemaLocationOfSchema = parentSchema.getSchemaLocation().append("else");
+            this.elseSchema = schemaContext.newSchema(schemaLocationOfSchema, node, parentSchema);
+        } else {
+            this.elseSchema = null;
+        }
     }
 
     @Override
@@ -70,7 +67,7 @@ public class IfValidator extends BaseKeywordValidator {
         // Save flag as nested schema evaluation shouldn't trigger fail fast
         boolean failFast = executionContext.isFailFast();
         List<Error> existingErrors = executionContext.getErrors();
-        List<Error> test = new ArrayList<>();
+        List<Error> test = new Flag<>();
         executionContext.setErrors(test);
         try {
             executionContext.setFailFast(false);
@@ -87,21 +84,22 @@ public class IfValidator extends BaseKeywordValidator {
             // This removes the "if" in the evaluation path so the rest of the evaluation paths will be correct
             executionContext.evaluationPathRemoveLast();
             executionContext.evaluationPathAddLast("then");
-            try {
+            // For performance the "if" isn't replaced on the evaluation path
+//            try {
                 this.thenSchema.validate(executionContext, node, rootNode, instanceLocation);
-            } finally {
-                executionContext.evaluationPathRemoveLast();
-                executionContext.evaluationPathAddLast("if");
-            }
+//            } finally {
+//                executionContext.evaluationPathRemoveLast();
+//                executionContext.evaluationPathAddLast("if");
+//            }
         } else if (!ifConditionPassed && this.elseSchema != null) {
             executionContext.evaluationPathRemoveLast();
             executionContext.evaluationPathAddLast("else");
-            try {
+//            try {
                 this.elseSchema.validate(executionContext, node, rootNode, instanceLocation);
-            } finally {
-                executionContext.evaluationPathRemoveLast();
-                executionContext.evaluationPathAddLast("if");
-            }
+//            } finally {
+//                executionContext.evaluationPathRemoveLast();
+//                executionContext.evaluationPathAddLast("if");
+//            }
         }
     }
 
@@ -144,42 +142,42 @@ public class IfValidator extends BaseKeywordValidator {
             if (this.thenSchema != null) {
                 executionContext.evaluationPathRemoveLast();
                 executionContext.evaluationPathAddLast("then");
-                try {
+//                try {
                     this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
-                } finally {
-                    executionContext.evaluationPathRemoveLast();
-                    executionContext.evaluationPathAddLast("if");
-                }
+//                } finally {
+//                    executionContext.evaluationPathRemoveLast();
+//                    executionContext.evaluationPathAddLast("if");
+//                }
             }
             if (this.elseSchema != null) {
                 executionContext.evaluationPathRemoveLast();
                 executionContext.evaluationPathAddLast("else");
-                try {
+//                try {
                     this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
-                } finally {
-                    executionContext.evaluationPathRemoveLast();
-                    executionContext.evaluationPathAddLast("if");
-                }
+//                } finally {
+//                    executionContext.evaluationPathRemoveLast();
+//                    executionContext.evaluationPathAddLast("if");
+//                }
             }
         } else {
             if (this.thenSchema != null && ifConditionPassed) {
                 executionContext.evaluationPathRemoveLast();
                 executionContext.evaluationPathAddLast("then");
-                try {
+//                try {
                     this.thenSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
-                } finally {
-                    executionContext.evaluationPathRemoveLast();
-                    executionContext.evaluationPathAddLast("if");
-                }
+//                } finally {
+//                    executionContext.evaluationPathRemoveLast();
+//                    executionContext.evaluationPathAddLast("if");
+//                }
             } else if (this.elseSchema != null && !ifConditionPassed) {
                 executionContext.evaluationPathRemoveLast();
                 executionContext.evaluationPathAddLast("else");
-                try {
+//                try {
                     this.elseSchema.walk(executionContext, node, rootNode, instanceLocation, shouldValidateSchema);
-                } finally {
-                    executionContext.evaluationPathRemoveLast();
-                    executionContext.evaluationPathAddLast("if");
-                }
+//                } finally {
+//                    executionContext.evaluationPathRemoveLast();
+//                    executionContext.evaluationPathAddLast("if");
+//                }
             }
         }
     }

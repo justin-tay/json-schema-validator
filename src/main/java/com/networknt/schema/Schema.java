@@ -618,7 +618,9 @@ public class Schema implements Validator {
         }
         try {
             int currentErrors = executionContext.getErrors().size();
-            for (KeywordValidator v : validators) {
+            int size = validators.size();
+            for (int x = 0; x < size; x++) {
+                KeywordValidator v = validators.get(x);
                 executionContext.evaluationPathAddLast(v.getKeyword());
                 executionContext.evaluationSchemaPath.addLast(v.getKeyword());
                 try {
@@ -633,7 +635,9 @@ public class Schema implements Validator {
                 // and all subschemas
                 List<Annotation> annotations = executionContext.getAnnotations().asMap().get(instanceLocation);
                 if (annotations != null) {
-                    for (Annotation annotation : annotations) {
+                    int annotationsSize = annotations.size();
+                    for (int x = 0; x < annotationsSize; x++) {
+                        Annotation annotation = annotations.get(x);
                         if (annotation.getEvaluationPath().startsWith(executionContext.getEvaluationPath())) {
                             annotation.setValid(false);
                         }
@@ -1226,7 +1230,9 @@ public class Schema implements Validator {
         InputStreamSource result = null;
         List<ResourceLoader> resourceLoaders = this.getSchemaContext().getSchemaRegistry().getSchemaLoader()
                 .getResourceLoaders();
-        for (ResourceLoader loader : resourceLoaders) {
+        int size = resourceLoaders.size();
+        for (int x = 0; x < size; x++) {
+            ResourceLoader loader = resourceLoaders.get(x);
             result = loader.getResource(input);
             if (result != null) {
                 return result;
@@ -1565,7 +1571,9 @@ public class Schema implements Validator {
         }
         try {
             int currentErrors = executionContext.getErrors().size();
-            for (KeywordValidator validator : validators) {
+            int size = validators.size();
+            for (int x = 0; x < size; x++) {
+                KeywordValidator validator = validators.get(x);
                 try {
                     // Call all the pre-walk listeners. If at least one of the pre walk listeners
                     // returns SKIP, then skip the walk.
@@ -1625,7 +1633,10 @@ public class Schema implements Validator {
              */
             this.validatorsLoaded = true;
             try {
-                for (final KeywordValidator validator : getValidators()) {
+                List<KeywordValidator> validators = getValidators();
+                int size = validators.size();
+                for (int x = 0; x < size; x++) {
+                    KeywordValidator validator = validators.get(x);
                     validator.preloadSchema();
                 }
             } catch (RuntimeException e) {

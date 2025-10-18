@@ -59,8 +59,9 @@ public class AllOfValidator extends BaseKeywordValidator {
 
     protected void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode,
             NodePath instanceLocation, boolean walk) {
-        int schemaIndex = 0;
-        for (Schema schema : this.schemas) {
+        int size = this.schemas.size();
+        for (int schemaIndex = 0; schemaIndex < size; schemaIndex++) {
+            Schema schema = this.schemas.get(schemaIndex);
             executionContext.evaluationPathAddLast(schemaIndex);
             try {
                 if (!walk) {
@@ -71,7 +72,6 @@ public class AllOfValidator extends BaseKeywordValidator {
             } finally {
                 executionContext.evaluationPathRemoveLast();
             }
-            schemaIndex++;
         }
     }
 
@@ -82,8 +82,9 @@ public class AllOfValidator extends BaseKeywordValidator {
             validate(executionContext, node, rootNode, instanceLocation, true);
             return;
         }
-        int schemaIndex = 0;
-        for (Schema schema : this.schemas) {
+        int size = this.schemas.size();
+        for (int schemaIndex = 0; schemaIndex < size; schemaIndex++) {
+            Schema schema = this.schemas.get(schemaIndex);
             // Walk through the schema
             executionContext.evaluationPathAddLast(schemaIndex);
             try {
@@ -91,7 +92,6 @@ public class AllOfValidator extends BaseKeywordValidator {
             } finally {
                 executionContext.evaluationPathRemoveLast();
             }
-            schemaIndex++;
         }
     }
 

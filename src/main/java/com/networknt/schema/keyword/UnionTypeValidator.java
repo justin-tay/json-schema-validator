@@ -83,15 +83,15 @@ public class UnionTypeValidator extends BaseKeywordValidator implements KeywordV
             List<Error> test = new ArrayList<>();
             executionContext.setFailFast(false);
             executionContext.setErrors(test);
-            int schemaIndex = 0;
-            for (Validator schema : schemas) {
+            int size = this.schemas.size();
+            for (int schemaIndex = 0; schemaIndex < size; schemaIndex++) {
+                Validator schema = this.schemas.get(schemaIndex);
                 executionContext.evaluationPathAddLast(schemaIndex);
                 try {
                     schema.validate(executionContext, node, rootNode, instanceLocation);
                 } finally {
                     executionContext.evaluationPathRemoveLast();
                 }
-                schemaIndex++;
                 if (test.isEmpty()) {
                     valid = true;
                     break;

@@ -70,7 +70,9 @@ public class DependenciesValidator extends BaseKeywordValidator implements Keywo
             String pname = it.next();
             List<String> deps = propertyDeps.get(pname);
             if (deps != null && !deps.isEmpty()) {
-                for (String field : deps) {
+                int size = deps.size();
+                for (int x = 0; x < size; x++) {
+                    String field = deps.get(x);
                     if (node.get(field) == null) {
                         executionContext.addError(error().instanceNode(node).property(pname).instanceLocation(instanceLocation)
                                 .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())

@@ -74,10 +74,11 @@ public class OneOfValidator extends BaseKeywordValidator {
         // Save flag as nested schema evaluation shouldn't trigger fail fast
         boolean failFast = executionContext.isFailFast();
         Boolean canShortCircuit = null;
-        int schemaIndex = 0;
         try {
             executionContext.setFailFast(false);
-            for (Schema schema : this.schemas) {
+            int size = this.schemas.size();
+            for (int schemaIndex = 0; schemaIndex < size; schemaIndex++) {
+                Schema schema = this.schemas.get(schemaIndex);
                 subSchemaErrors.clear();
                 executionContext.evaluationPathAddLast(schemaIndex);
                 try {
@@ -89,7 +90,6 @@ public class OneOfValidator extends BaseKeywordValidator {
                 } finally {
                     executionContext.evaluationPathRemoveLast();
                 }
-                schemaIndex++;
 
                 // check if any validation errors have occurred
                 if (subSchemaErrors.isEmpty()) { // No new errors
@@ -240,15 +240,15 @@ public class OneOfValidator extends BaseKeywordValidator {
         if (shouldValidateSchema && node != null) {
             validate(executionContext, node, rootNode, instanceLocation, true);
         } else {
-            int schemaIndex = 0;
-            for (Schema schema : this.schemas) {
+            int size = this.schemas.size();
+            for (int schemaIndex = 0; schemaIndex < size; schemaIndex++) {
+                Schema schema = this.schemas.get(schemaIndex);
                 executionContext.evaluationPathAddLast(schemaIndex);
                 try {
                     schema.walk(executionContext, node, rootNode, instanceLocation, false);
                 } finally {
                     executionContext.evaluationPathRemoveLast();
                 }
-                schemaIndex++;
             }
         }
     }
