@@ -103,4 +103,8 @@ public abstract class BaseKeywordValidator extends AbstractKeywordValidator {
                 .schemaNode(this.schemaNode).schemaLocation(this.schemaLocation)
                 .keyword(this.getKeyword()).messageKey(this.getKeyword());
     }
+
+    public Map<String, String> getErrorMessage() {
+        return this.errorMessage;
+    }
 }

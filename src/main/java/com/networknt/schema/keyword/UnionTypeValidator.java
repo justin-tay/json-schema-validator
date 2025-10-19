@@ -17,6 +17,7 @@
 package com.networknt.schema.keyword;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.Assertion;
 import com.networknt.schema.Error;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
@@ -106,11 +107,14 @@ public class UnionTypeValidator extends BaseKeywordValidator implements KeywordV
         }
 
         if (!valid) {
-            executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
-                    .keyword("type")
-                    .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
-                    .arguments(nodeType.toString(), error)
-                    .build());
+//            executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
+//                    .keyword("type")
+//                    .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
+//                    .arguments(nodeType.toString(), error)
+//                    .build());
+            executionContext.addError(new Assertion(this, node, instanceLocation, executionContext.getEvaluationPath(),
+                    executionContext.getExecutionConfig().getLocale(), getKeyword(),
+                    new Object[] { nodeType.toString(), error }));
         }
     }
 

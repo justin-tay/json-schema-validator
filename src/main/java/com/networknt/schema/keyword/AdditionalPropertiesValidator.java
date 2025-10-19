@@ -17,6 +17,7 @@
 package com.networknt.schema.keyword;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.Assertion;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
@@ -115,11 +116,15 @@ public class AdditionalPropertiesValidator extends BaseKeywordValidator {
             }
             if (!allowedProperties.contains(pname) && !handledByPatternProperties(pname)) {
                 if (!allowAdditionalProperties) {
-                    executionContext.addError(error().instanceNode(node).property(pname)
-                            .instanceLocation(instanceLocation)
-                            .evaluationPath(executionContext.getEvaluationPath())
-                            .locale(executionContext.getExecutionConfig().getLocale())
-                            .arguments(pname).build());
+//                    executionContext.addError(error().instanceNode(node).property(pname)
+//                            .instanceLocation(instanceLocation)
+//                            .evaluationPath(executionContext.getEvaluationPath())
+//                            .locale(executionContext.getExecutionConfig().getLocale())
+//                            .arguments(pname).build());
+                    executionContext.addError(new Assertion(this, node, instanceLocation, executionContext.getEvaluationPath(),
+                            executionContext.getExecutionConfig().getLocale(), getKeyword(),
+                            new Object[] { pname }, pname));
+                    
                 } else {
                     if (additionalPropertiesSchema != null) {
                         if (!walk) {

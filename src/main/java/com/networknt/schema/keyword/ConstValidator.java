@@ -16,6 +16,7 @@
 package com.networknt.schema.keyword;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.Assertion;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
@@ -34,14 +35,20 @@ public class ConstValidator extends BaseKeywordValidator implements KeywordValid
     public void validate(ExecutionContext executionContext, JsonNode node, JsonNode rootNode, NodePath instanceLocation) {
         if (schemaNode.isNumber() && node.isNumber()) {
             if (schemaNode.decimalValue().compareTo(node.decimalValue()) != 0) {
-                executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
-                        .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
-                        .arguments(schemaNode.asText(), node.asText())
-                        .build());
+//                executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
+//                        .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
+//                        .arguments(schemaNode.asText(), node.asText())
+//                        .build());
+                executionContext.addError(new Assertion(this, node, instanceLocation,
+                        executionContext.getEvaluationPath(), executionContext.getExecutionConfig().getLocale(),
+                        getKeyword(), new Object[] { schemaNode.asText(), node.asText() }));
             }
         } else if (!schemaNode.equals(node)) {
-            executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
-                    .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale()).arguments(schemaNode.asText(), node.asText()).build());
+//            executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
+//                    .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale()).arguments(schemaNode.asText(), node.asText()).build());
+            executionContext.addError(new Assertion(this, node, instanceLocation, executionContext.getEvaluationPath(),
+                    executionContext.getExecutionConfig().getLocale(), getKeyword(),
+                    new Object[] { schemaNode.asText(), node.asText() }));
         }
     }
 }

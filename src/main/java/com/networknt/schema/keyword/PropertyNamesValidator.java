@@ -21,6 +21,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.networknt.schema.Assertion;
 import com.networknt.schema.Error;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
@@ -46,10 +47,13 @@ public class PropertyNamesValidator extends BaseKeywordValidator implements Keyw
             final TextNode pnameText = TextNode.valueOf(pname);
             innerSchema.validate(executionContext, pnameText, node, instanceLocation.append(pname));
             for (final Error schemaError : schemaErrors) {
-                existingErrors.add(
-                        error().property(pname).instanceNode(node).instanceLocation(instanceLocation)
-                                .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
-                                .arguments(pname, schemaError.getMessage()).build());
+//                existingErrors.add(
+//                        error().property(pname).instanceNode(node).instanceLocation(instanceLocation)
+//                                .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
+//                                .arguments(pname, schemaError.getMessage()).build());
+                existingErrors.add(new Assertion(this, node, instanceLocation, executionContext.getEvaluationPath(),
+                        executionContext.getExecutionConfig().getLocale(), getKeyword(),
+                        new Object[] { pname, schemaError.getMessage() }, pname));
             }
             schemaErrors.clear();
         }

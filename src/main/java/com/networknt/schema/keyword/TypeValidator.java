@@ -17,6 +17,7 @@
 package com.networknt.schema.keyword;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.Assertion;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
@@ -62,9 +63,13 @@ public class TypeValidator extends BaseKeywordValidator {
 
         if (!equalsToSchemaType(node, executionContext)) {
             JsonType nodeType = TypeFactory.getValueNodeType(node, this.schemaContext.getSchemaRegistryConfig());
-            executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
-                    .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
-                    .arguments(nodeType.toString(), this.schemaType.toString()).build());
+//            executionContext.addError(error().instanceNode(node).instanceLocation(instanceLocation)
+//                    .evaluationPath(executionContext.getEvaluationPath())
+//                    .locale(executionContext.getExecutionConfig().getLocale())
+//                    .arguments(nodeType.toString(), this.schemaType.toString()).build());
+            executionContext.addError(new Assertion(this, node, instanceLocation, executionContext.getEvaluationPath(),
+                    executionContext.getExecutionConfig().getLocale(), getKeyword(),
+                    new Object[] { nodeType.toString(), this.schemaType.toString() }));
         }
     }
 }

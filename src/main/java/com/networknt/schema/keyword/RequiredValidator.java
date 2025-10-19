@@ -17,6 +17,7 @@
 package com.networknt.schema.keyword;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.Assertion;
 import com.networknt.schema.ExecutionContext;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
@@ -72,9 +73,13 @@ public class RequiredValidator extends BaseKeywordValidator implements KeywordVa
                  * <p>
                  * @see <a href="https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-01#name-basic">Basic</a>
                  */
-                executionContext.addError(error().instanceNode(node).property(fieldName).instanceLocation(instanceLocation)
-                        .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
-                        .arguments(fieldName).build());
+//                executionContext.addError(error().instanceNode(node).property(fieldName).instanceLocation(instanceLocation)
+//                        .evaluationPath(executionContext.getEvaluationPath()).locale(executionContext.getExecutionConfig().getLocale())
+//                        .arguments(fieldName).build());
+                
+                executionContext.addError(new Assertion(this, node, instanceLocation,
+                        executionContext.getEvaluationPath(), executionContext.getExecutionConfig().getLocale(),
+                        getKeyword(), new Object[] { fieldName }, fieldName));
             }
         }
     }

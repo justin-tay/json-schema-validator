@@ -40,7 +40,7 @@ public class MessageSourceError {
         }
     }
 
-    public abstract static class BuilderSupport<S> extends Error.BuilderSupport<S> {
+    public abstract static class BuilderSupport<S> extends BasicError.BuilderSupport<S> {
         private final MessageSource messageSource;
         private final Map<String, String> errorMessage;
         private Locale locale;
