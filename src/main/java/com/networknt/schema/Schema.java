@@ -167,6 +167,10 @@ public class Schema implements Validator {
         return new Schema(schemaContext, schemaLocation, schemaNode, parent, suppressSubSchemaRetrieval);
     }
 
+    static Schema from(SchemaContext schemaContext, SchemaLocation schemaLocation, JsonNode schemaNode, Schema parent, boolean suppressSubSchemaRetrieval, boolean loadValidators) {
+        return new Schema(schemaContext, schemaLocation, schemaNode, parent, suppressSubSchemaRetrieval, loadValidators);
+    }
+
     private boolean hasNoFragment(SchemaLocation schemaLocation) {
         NodePath fragment = this.schemaLocation.getFragment();
         return fragment == null || (fragment.getParent() == null && fragment.getNameCount() == 0);
@@ -206,8 +210,13 @@ public class Schema implements Validator {
         }
     }
 
+    private Schema(SchemaContext schemaContext, SchemaLocation schemaLocation, JsonNode schemaNode, Schema parent,
+            boolean suppressSubSchemaRetrieval) {
+        this(schemaContext, schemaLocation, schemaNode, parent, suppressSubSchemaRetrieval, true);
+    }
+
     private Schema(SchemaContext schemaContext, SchemaLocation schemaLocation, 
-            JsonNode schemaNode, Schema parent, boolean suppressSubSchemaRetrieval) {
+            JsonNode schemaNode, Schema parent, boolean suppressSubSchemaRetrieval, boolean loadValidators) {
         this.schemaContext = schemaContext;
         this.schemaLocation = resolve(schemaLocation, schemaNode, parent == null, schemaContext);
         this.schemaNode = schemaNode;
@@ -253,7 +262,9 @@ public class Schema implements Validator {
             this.schemaContext.getDynamicAnchors()
                     .putIfAbsent(absoluteIri + "#" + dynamicAnchor, this);
         }
-        getValidators();
+        if (loadValidators) {
+            getValidators();
+        }
     }
 
     /**

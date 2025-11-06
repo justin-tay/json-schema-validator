@@ -494,6 +494,12 @@ public class SchemaRegistry {
                 parentSchema, suppressSubSchemaRetrieval);
     }
 
+    private Schema doCreate(SchemaContext schemaContext, SchemaLocation schemaLocation,
+            JsonNode schemaNode, Schema parentSchema, boolean suppressSubSchemaRetrieval, boolean loadValidators) {
+        return Schema.from(withDialect(schemaContext, schemaNode), schemaLocation, schemaNode,
+                parentSchema, suppressSubSchemaRetrieval, loadValidators);
+    }
+
     /**
      * Determines the schema context to use for the schema given the parent schema
      * context.
@@ -767,7 +773,7 @@ public class SchemaRegistry {
                     final SchemaContext schemaContext = createSchemaContext(schemaNode);
                     SchemaLocation documentLocation = new SchemaLocation(schemaUri.getAbsoluteIri());
                     Schema document = doCreate(schemaContext, documentLocation, schemaNode, null,
-                            false);
+                            false, false);
                     return document.getRefSchema(schemaUri.getFragment());
                 }
             } catch (IOException e) {

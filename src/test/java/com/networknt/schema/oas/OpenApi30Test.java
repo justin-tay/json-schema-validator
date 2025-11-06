@@ -15,11 +15,14 @@
  */
 package com.networknt.schema.oas;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -30,6 +33,7 @@ import com.networknt.schema.SchemaRegistry;
 import com.networknt.schema.OutputFormat;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaRegistryConfig;
+import com.networknt.schema.dialect.Dialect;
 import com.networknt.schema.dialect.Dialects;
 import com.networknt.schema.path.PathType;
 import com.networknt.schema.Error;
@@ -110,5 +114,71 @@ class OpenApi30Test {
         SchemaRegistry factory = SchemaRegistry.withDialect(Dialects.getOpenApi30());
         Schema schema = factory.getSchema(schemaData);
         assertFalse(schema.validate("0", InputFormat.JSON, OutputFormat.BOOLEAN));
+    }
+
+    @Test
+    void jsonPointerToSchemaShouldNotFlagUnknownKeywords() {
+        String schemaData = "openapi: 3.0.0\r\n"
+                + "info:\r\n"
+                + "  title: \"Foo\"\r\n"
+                + "  version: 1.0.0-dev\r\n"
+                + "security:\r\n"
+                + "  - apiKey: []\r\n"
+                + "servers:\r\n"
+                + "  - url: http://localhost:5000\r\n"
+                + "paths:\r\n"
+                + "  /items:\r\n"
+                + "    post:\r\n"
+                + "      requestBody:\r\n"
+                + "        required: true\r\n"
+                + "        content:\r\n"
+                + "          application/json:\r\n"
+                + "            schema:\r\n"
+                + "              type: array\r\n"
+                + "              items:\r\n"
+                + "                $ref: \"#/components/schemas/Item\"\r\n"
+                + "      responses:\r\n"
+                + "        '200':\r\n"
+                + "          description: Foo\r\n"
+                + "        '400':\r\n"
+                + "          description: Validation failed for the given request\r\n"
+                + "          content:\r\n"
+                + "            application/json:\r\n"
+                + "              schema:\r\n"
+                + "                type: string\r\n"
+                + "                description: The validation error\r\n"
+                + "        '401':\r\n"
+                + "          description: Unauthorized\r\n"
+                + "components:\r\n"
+                + "  schemas:\r\n"
+                + "    Item:\r\n"
+                + "      type: object\r\n"
+                + "      properties:\r\n"
+                + "        Foo:\r\n"
+                + "          type: string\r\n"
+                + "          pattern: \"^[0-9]+$\"\r\n"
+                + "        Bar:\r\n"
+                + "          type: string\r\n"
+                + "        Baz:\r\n"
+                + "          type: string\r\n"
+                + "      required:\r\n"
+                + "        - Foo\r\n"
+                + "        - Bar\r\n"
+                + "        - Baz\r\n"
+                + "  securitySchemes:\r\n"
+                + "    apiKey:\r\n"
+                + "      type: apiKey\r\n"
+                + "      name: API-KEY\r\n"
+                + "      in: header\r\n"
+                + "";
+        Map<String, String> schemas = new HashMap<>();
+        schemas.put("https://example.org/openapi.yaml", schemaData);
+        Dialect dialect = Dialect.builder(Dialects.getOpenApi30()).unknownKeywordFactory((keyword, schemaContext) -> {
+            throw new IllegalArgumentException("Unknown keyword " + keyword);
+        }).build();
+        SchemaRegistry schemaRegistry = SchemaRegistry.withDialect(dialect, builder -> builder.schemas(schemas));
+        assertDoesNotThrow(() -> {
+            schemaRegistry.getSchema(SchemaLocation.of("https://example.org/openapi.yaml#/components/schemas/Item"));
+        });
     }
 }
